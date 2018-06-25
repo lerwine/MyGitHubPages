@@ -1,0 +1,32 @@
+{
+  "name": "mygithubpages",
+  "version": "1.0.0",
+  "description": "Source code for generating content for https://lerwine.github.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lerwine/MyGitHubPages.git"
+  },
+  "author": "Leonard T. Erwine",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/lerwine/MyGitHubPages/issues"
+  },
+  "homepage": "https://github.com/lerwine/MyGitHubPages#readme",
+  "dependencies": {
+    "angular": "^1.7.2",
+    "bootstrap": "^4.1.1",
+    "bootstrap-table": "^1.12.1",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.3"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "gulp": "^3.9.1",
+    "gulp-webserver": "^0.9.1",
+    "mocha": "^5.2.0"
+  }
+}
