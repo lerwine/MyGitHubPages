@@ -9,55 +9,6 @@ $Path = Read-Host -Prompt 'Enter path to JavaScript file';
 $Script:Code = (Get-Content -Path $Path | Out-String).Trim();
 if ($Script:Code -eq $null -or $Script:Code.Length -eq 0) { throw 'Nothing to parse'; }
 
-Function New-CodeToken {
-    Param(
-        [Parameter(Mandatory = $true)]
-        [System.Management.Automation.PSTokenType]$Type,
-        
-        [Parameter(Mandatory = $true, ParameterSetName = 'SourceText')]
-        [int]$Start,
-        
-        [Parameter(Mandatory = $true, ParameterSetName = 'SourceText')]
-        [int]$Length,
-        
-        [Parameter(Mandatory = $true, ParameterSetName = 'SourceText')]
-        [string]$SourceText,
-        
-        [Parameter(Mandatory = $true, ParameterSetName = 'Match')]
-        [System.Text.RegularExpressions.Match]$M
-    )
-
-    if ($PSBoundParameters.ContainsKey('SourceText')) {
-        $Text = $SourceText.Substring($Start, $Length);
-        New-Object -TypeName 'System.Management.Automation.PSObject' -Property @{
-            Type = [Enum]::GetName([System.Management.Automation.PSTokenType], $Type);
-            Start = $Start;
-            Length = $Text.Length;
-            Text = $Text;
-            NextIndex = $Start + $Text.Length;
-        };
-    } else {
-        New-Object -TypeName 'System.Management.Automation.PSObject' -Property @{
-            Type = [Enum]::GetName([System.Management.Automation.PSTokenType], $Type);
-            Start = $M.Index;
-            Length = $M.Length;
-            Text = $M.Value;
-            NextIndex = $M.Index + $M.Length;
-        };
-    }
-}
-
-Function Get-NextNonWhiteSpacePosition {
-    Param(
-        [Parameter(Mandatory = $true)]
-        [string]$SourceText,
-        
-        [Parameter(Mandatory = $true)]
-        [int]$Position
-    )
-    while ($Position -lt $SourceText.Length -and [char]::IsWhiteSpace($SourceText[$Position])) { $Position++; }
-    $Position | Write-Output;
-}
 $Script:SeparatorRegex = New-Object -TypeName 'System.Text.RegularExpressions.Regex' -ArgumentList '\G[^\r\n\S]*(\r\n?|\n|(;)|(\.))', ([System.Text.RegularExpressions.RegexOptions]::Compiled);
 $Script:NumberRegex = New-Object -TypeName 'System.Text.RegularExpressions.Regex' -ArgumentList '\G[^\r\n\S]*(-?\d+(\.\d+)(e\d+)?|0x[a-fA-F\d]+)', ([System.Text.RegularExpressions.RegexOptions]::Compiled);
 $Script:OperatorRegex = New-Object -TypeName 'System.Text.RegularExpressions.Regex' -ArgumentList '\G[^\r\n\S]*(([=!]=?|[+\-*/%<>])=?|\+\+|--|\?|,|&&?|\|\|?|~|\^|<<|>>>?|=>)', ([System.Text.RegularExpressions.RegexOptions]::Compiled);
