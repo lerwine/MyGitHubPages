@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "target":"es5",
+        "module":"commonjs",
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "strict": true,
+        "declarationMap": true,
+        "importHelpers": true,
+        "lib": [
+            "es5"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "jquery": ["node_modules/jquery/dist/jquery.js"],
+            "bootstrap": ["node_modules/bootstrap/dist"],
+            "bootstrap-table": ["node_modules/bootstrap-table/dist"],
+            "angular": ["node_modules/angular"]
+        }
+    },
+    "include": [
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "./src/**/test-*.ts"
+    ]
+}
