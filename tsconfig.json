@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target":"es5",
+        "target":"es6",
         "module":"commonjs",
         "strictNullChecks": true,
         "noImplicitAny": true,
@@ -8,20 +8,12 @@
         "preserveConstEnums": true,
         "sourceMap": true,
         "declaration": true,
-        "outDir": "./dist",
+        "outDir": "./dist/script",
         "strict": true,
         "declarationMap": true,
         "importHelpers": true,
-        "lib": [
-            "es5"
-        ],
-        "baseUrl": ".",
-        "paths": {
-            "jquery": ["node_modules/jquery/dist/jquery.js"],
-            "bootstrap": ["node_modules/bootstrap/dist"],
-            "bootstrap-table": ["node_modules/bootstrap-table/dist"],
-            "angular": ["node_modules/angular"]
-        }
+        "isolatedModules": false,
+        "lib": [ "es6", "dom" ]
     },
     "include": [
         "./src/**/*.ts"
