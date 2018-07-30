@@ -10,4 +10,3 @@ var bp;
         activate();
         function activate() { }
     }
-})(bp || (bp = {}));

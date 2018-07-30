@@ -1,5 +1,0 @@
-{
-    "html.suggest.html5": true,
-    "html.suggest.angular1": true,
-    "jshint.options": { "esversion": 6 }
-}
