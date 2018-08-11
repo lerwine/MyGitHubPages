@@ -14,10 +14,14 @@ gulp.task("clean-dist-script", function() {
     return Del([Path.join(scriptDistTsConfig.options.outDir, "**/*"), "!" + scriptDistTsConfig.options.outDir]);
 });
 
-gulp.task("clean-dist-lib", ["clean-dist-lib-angular", "clean-dist-lib-bootstrap", "clean-dist-lib-bootstrap-table", "clean-dist-lib-popper-js", "clean-dist-lib-jquery"]);
+gulp.task("clean-dist-lib", ["clean-dist-lib-angular", "clean-dist-lib-ngRoute", "clean-dist-lib-bootstrap", "clean-dist-lib-bootstrap-table", "clean-dist-lib-popper-js", "clean-dist-lib-jquery"]);
 
 gulp.task("clean-dist-lib-angular", function() {
     return Del(["./dist/lib/angular/**/*", "!./dist/lib/angular"]);
+});
+
+gulp.task("clean-dist-lib-ngRoute", function() {
+    return Del(["./dist/lib/angular-route/**/*", "!./dist/lib/angular-route"]);
 });
 
 gulp.task("clean-dist-lib-bootstrap", function() {
@@ -44,10 +48,14 @@ gulp.task('build-dist-script', function() {
 
 gulp.task('rebuild-dist-script', ['clean-dist-script', 'build-dist-script']);
 
-gulp.task('refresh-dist-lib', ['refresh-dist-lib-angular', 'refresh-dist-lib-bootstrap', 'refresh-dist-lib-bootstrap-table', 'refresh-dist-lib-popper-js', 'refresh-dist-lib-jquery']);
+gulp.task('refresh-dist-lib', ['refresh-dist-lib-angular', 'refresh-dist-lib-ngRoute', 'refresh-dist-lib-bootstrap', 'refresh-dist-lib-bootstrap-table', 'refresh-dist-lib-popper-js', 'refresh-dist-lib-jquery']);
 
 gulp.task('refresh-dist-lib-angular', ["clean-dist-lib-angular"], function() {
     return gulp.src(["./node_modules/angular/**/*.js", "./node_modules/angular/**/*.css"]).pipe(gulp.dest("./dist/lib/angular"));
+});
+
+gulp.task('refresh-dist-lib-ngRoute', ["clean-dist-lib-ngRoute"], function() {
+    return gulp.src(["./node_modules/angular-route/**/*.js", "!./node_modules/angular/**/index.js"]).pipe(gulp.dest("./dist/lib/angular-route"));
 });
 
 gulp.task('refresh-dist-lib-bootstrap', ["clean-dist-lib-bootstrap"], function() {

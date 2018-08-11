@@ -1,217 +1,251 @@
-'use strict';
-let mainModule: angular.IModule = angular.module("main", []);
-
-interface IMenuSchemaNavItem {
-    title: string;
-    heading?: string;
-    pageUrl: string;
-}
-interface IMenuSchemaLeaf extends IMenuSchemaNavItem {
-    disabled?: boolean;
-}
-type MenuSchemaNavItem = IMenuSchemaLeaf|IMenuSchemaContainer;
-interface IMenuSchemaContainer extends IMenuSchemaNavItem {
-    items: MenuSchemaNavItem[];
-}
-interface IMenuSchema {
-    rootItems: MenuSchemaNavItem[];
-}
-function isMenuSchemaContainer(item: MenuSchemaNavItem): item is IMenuSchemaContainer {
-    return typeof((<{[key: string]: any}>item).items) != "undefined";
-}
-interface IPagePropertiesScope extends angular.IScope {
-    headingText: string;
-    activeNavItem?: INavigationScope;
-    selectedChildItem?: NavigationItem;
-    navItems: NavigationItem[],
-    pageTemplateUrl: string
-};
-
-interface INavigationScope extends angular.IScope {
-    navNode: NavigationItem;
-    isActive: boolean;
-    title: string;
-    heading: string;
-    listItemClass: string;
-    anchorClass: string;
-    disabled: boolean;
-    containsActive: boolean;
-}
-interface INavigationContainerScope extends INavigationScope {
-    selectedChildItem?: NavigationItem;
-}
-type NavigationParent = IPagePropertiesScope|NavigationContainer;
-
-abstract class NavigationItem {
-    private _id : Symbol;
-    private _parentNode : NavigationParent;
-    private _precedingSibling : NavigationItem|undefined;
-    private _followingSibling : NavigationItem|undefined;
-    private _pageUrl: string;
-    public get parentNode() : NavigationParent { return this._parentNode; }
-    public get precedingSibling() : NavigationItem|undefined { return this._precedingSibling; }
-    public get followingSibling() : NavigationItem|undefined { return this._followingSibling; }
-    public get activeNavItem(): INavigationScope|undefined { return this.parentNode.activeNavItem; }
-    public abstract get scope() : INavigationScope;
-    public get title() : string { return this.scope.title; }
-    public get heading() : string { return this.scope.heading; }
-    public get pageUrl() : string { return this._pageUrl; }
-    public get isActive() : boolean { return this.scope.isActive; }
-    public set isActive(value : boolean) {
-        if (this.scope.isActive == value)
-            return;
-        
-        let pageScope: IPagePropertiesScope = this.getPagePropertiesScope();
-        let previousActive: INavigationScope|undefined = pageScope.activeNavItem;
-        this.scope.isActive = value;
-        NavigationItem.setCssClass(this.scope);
-        if (value) {
-            if (typeof(pageScope.activeNavItem) == "undefined" || !pageScope.activeNavItem.navNode.equals(this._id)) {
-                pageScope.activeNavItem = this.scope;
-                if (this.parentNode instanceof NavigationContainer)
-                    this.parentNode.select(this);
-                else
-                    this.parentNode.selectedChildItem = this;
+module navMenuState {
+    export type controllerType = "homeController"|"cookbookController";
+    type MenuConfigNodeType = "page"|"link"|"separator"|"route";
+    interface IMenuConfigNode {
+        type: MenuConfigNodeType;
+    }
+    interface INamedMenuConfigNode extends IMenuConfigNode {
+        type: "page"|"link";
+        id?: string;
+        name: string;
+        toolTip?: string;
+    }
+    function isNamedMenuConfigNode(node: IMenuConfigNode|MenuConfigNode): node is INamedMenuConfigNode { return node.type === "page" || node.type === "link"; }
+    interface IRoutedConfigNode extends IMenuConfigNode {
+        type: "page"|"route";
+        path: string;
+        templateUrl: string;
+        controller: controllerType;
+    }
+    function isRoutedConfigNode(node: IMenuConfigNode|MenuConfigNode): node is IRoutedConfigNode { return node.type === "page" || node.type === "route"; }
+    interface IRouteOnlyConfigNode extends IRoutedConfigNode {
+        type: "route";
+        navItems?: IRouteOnlyConfigNode[];
+    }
+    function isRouteOnlyConfigNode(node: IMenuConfigNode|MenuConfigNode): node is IRouteOnlyConfigNode { return node.type === "route"; }
+    interface IPageMenuConfigNode extends INamedMenuConfigNode, IRoutedConfigNode {
+        type: "page";
+        pageHeading?: string;
+        subHeading?: string;
+        topNavBar?: MenuConfigNode[];
+        sideNavItems?: MenuConfigNode[];
+        hiddenNavIds?: string[];
+    }
+    function isPageMenuConfigNode(node: IMenuConfigNode|MenuConfigNode): node is IPageMenuConfigNode { return node.type === "page"; }
+    interface ILinkMenuConfigNode extends INamedMenuConfigNode {
+        type: "link";
+        url: string;
+    }
+    function isLinkMenuConfigNode(node: IMenuConfigNode|MenuConfigNode): node is ILinkMenuConfigNode { return node.type === "link"; }
+    interface ISeparatorMenuConfigNode extends IMenuConfigNode {
+        type: "separator";
+    }
+    function isSeparatorMenuConfigNode(node: IMenuConfigNode|MenuConfigNode): node is ISeparatorMenuConfigNode { return node.type === "separator"; }
+    type MenuConfigNode = IPageMenuConfigNode|IRouteOnlyConfigNode|ILinkMenuConfigNode|ISeparatorMenuConfigNode;
+    interface IMenuConfigSettings {
+        topNavBar?: MenuConfigNode[],
+        sideNavItems?: MenuConfigNode[]
+    }
+    let settings: IMenuConfigSettings = {
+        topNavBar: [
+            <IPageMenuConfigNode>{ type: "page", path: "/", templateUrl: "pages/home.html", controller: "homeController" },
+            <IPageMenuConfigNode>{ type: "page", path: "/codecookbook", templateUrl: "pages/codecookbook/index.html", controller: "cookbookController", sideNavItems: [
+                <IPageMenuConfigNode>{ type: "page", path: "/codecookbook/angularjs", templateUrl: "pages/codecookbook/angularweb.html", controller: "cookbookController" },
+                <IPageMenuConfigNode>{ type: "page", path: "/codecookbook/git", templateUrl: "pages/codecookbook/git.html", controller: "cookbookController" },
+                <IPageMenuConfigNode>{ type: "page", path: "/codecookbook/npm", templateUrl: "pages/codecookbook/npm.html", controller: "cookbookController" },
+                <IPageMenuConfigNode>{ type: "page", path: "/codecookbook/vscode", templateUrl: "pages/codecookbook/vscode.html", controller: "cookbookController" }
+            ] }
+        ]
+    }
+    export abstract class NavigationNode {
+        private _parent: PageNavigationNode|RouteOnlyNavigationNode|navigationSettings;
+        private _preceding: NavigationItem|undefined;
+        private _following: NavigationItem|undefined;
+        get parent(): PageNavigationNode|RouteOnlyNavigationNode|navigationSettings { return this._parent; }
+        get preceding(): NavigationItem|undefined { return this._preceding; }
+        get following(): NavigationItem|undefined { return this._following; }
+        constructor(source: MenuConfigNode|IMenuConfigNode, parent: PageNavigationNode|RouteOnlyNavigationNode|navigationSettings, preceding?: NavigationItem) {
+            this._preceding = preceding;
+            this._parent = (typeof(preceding) == "undefined") ? parent : preceding.parent;
+            if (typeof(preceding) != "undefined") {
+                this._following = (<NavigationNode>preceding)._following;
+                (<NavigationNode>preceding)._following = this;
+                if (typeof(this._following) != "undefined")
+                    (<NavigationNode>(this._following))._preceding = this;
             }
+        }
+    }
+    export abstract class NamedNavigationNode extends NavigationNode {
+        private _name : string;
+        private _id : string;
+        private _toolTip: string;
+        get id(): string { return this._id; }
+        get name(): string { return this._name; }
+        get toolTip(): string { return this._toolTip; }
+        constructor(source: INamedMenuConfigNode, parent: PageNavigationNode|navigationSettings, preceding?: NavigationItem) {
+            super(source, parent, preceding);
+            this._name = source.name;
+            this._id = (typeof(source.id) == "string") ? source.id.trim() : "";;
+            this._toolTip = (typeof(source.toolTip) == "string") ? source.toolTip.trim() : "";
+        }
+    }
+    export class PageNavigationNode extends NamedNavigationNode {
+        private _pageHeading : string;
+        private _subHeading : string;
+        private _controller : controllerType;
+        private _path : string;
+        private _templateUrl: string;
+        private _topNavBar : NavigationItem[] = [];
+        private _sideNav : NavigationItem[] = [];
+        private _hiddenNavIds: string[] = [];
+        get pageHeading(): string { return this._pageHeading; }
+        get subHeading(): string { return this._subHeading; }
+        get controller(): controllerType { return this._controller; }
+        get path(): string { return this._path; }
+        get templateUrl(): string { return this.templateUrl; }
+        get topNavBar(): NavigationItem[] { return this._topNavBar; }
+        get sideNav(): NavigationItem[] { return this._sideNav; }
+        get hiddenNavIds(): string[] { return this._hiddenNavIds; }
+        constructor(source: IPageMenuConfigNode, parent: PageNavigationNode|navigationSettings, preceding?: NavigationItem) {
+            super(source, parent, preceding);
+            this._controller = source.controller;
+            this._path = source.path;
+            this._templateUrl = source.templateUrl;
+            this._pageHeading = (typeof(source.pageHeading) == "string") ? source.pageHeading.trim() : "";
+            if (this._pageHeading.length == 0)
+                this._pageHeading = this.name;
+            this._subHeading = (typeof(source.subHeading) == "string") ? source.subHeading.trim() : "";
+            this._hiddenNavIds = (typeof(source.hiddenNavIds) == "undefined") ? [] : source.hiddenNavIds.filter(function(s: string) { return s.trim().length == 0; });
+            if (typeof(source.topNavBar) != "undefined") {
+                this._topNavBar = source.topNavBar.map<NavigationItem>(function(this: { pageNode: PageNavigationNode, preceding?: NavigationItem }, value: MenuConfigNode): NavigationItem {
+                    if (isSeparatorMenuConfigNode(value))
+                        this.preceding = new NavigationSeparatorNode(value, this.pageNode, this.preceding);
+                    else if (isLinkMenuConfigNode(value))
+                        this.preceding = new LinkNavigationNode(value, this.pageNode, this.preceding);
+                    else if (isPageMenuConfigNode(value))
+                        this.preceding = new PageNavigationNode(value, this.pageNode, this.preceding);
+                    else
+                        this.preceding = new RouteOnlyNavigationNode(value, this.pageNode, this.preceding);
+                    return this.preceding;
+                }, <{ pageNode: PageNavigationNode, preceding?: NavigationItem }>{ pageNode: this })
+            }
+            if (typeof(source.sideNavItems) != "undefined") {
+                this._topNavBar = source.sideNavItems.map<NavigationItem>(function(this: { pageNode: PageNavigationNode, preceding?: NavigationItem }, value: MenuConfigNode): NavigationItem {
+                    if (isSeparatorMenuConfigNode(value))
+                        this.preceding = new NavigationSeparatorNode(value, this.pageNode, this.preceding);
+                    else if (isLinkMenuConfigNode(value))
+                        this.preceding = new LinkNavigationNode(value, this.pageNode, this.preceding);
+                    else if (isPageMenuConfigNode(value))
+                        this.preceding = new PageNavigationNode(value, this.pageNode, this.preceding);
+                    else
+                        this.preceding = new RouteOnlyNavigationNode(value, this.pageNode, this.preceding);
+                    return this.preceding;
+                }, <{ pageNode: PageNavigationNode, preceding?: NavigationItem }>{ pageNode: this })
+            }
+        }
+    }
+    export class LinkNavigationNode extends NamedNavigationNode {
+        private _url : string;
+        get url(): string { return this._url; }
+        constructor(source: ILinkMenuConfigNode, parent: PageNavigationNode|navigationSettings, preceding?: NavigationItem) {
+            super(source, parent, preceding);
+            this._url = source.url;
+        }
+    }
+    export class RouteOnlyNavigationNode extends NavigationNode {
+        private _controller : controllerType;
+        private _path : string;
+        private _templateUrl: string;
+        get controller(): string { return this._controller; }
+        get path(): string { return this._path; }
+        get templateUrl(): string { return this.templateUrl; }
+        private _navItems: RouteOnlyNavigationNode[] = [];
+        get navItems(): RouteOnlyNavigationNode[] { return this._navItems; }
+        constructor(source: IRouteOnlyConfigNode, parent: PageNavigationNode|RouteOnlyNavigationNode|navigationSettings, preceding?: NavigationItem) {
+            super(source, parent, preceding);
+            this._path = source.path;
+            this._templateUrl = source.templateUrl;
+            this._controller = source.controller;
+            if (typeof(source.navItems) != "undefined") {
+                this._navItems = source.navItems.map<RouteOnlyNavigationNode>(function(this: { navNode: RouteOnlyNavigationNode, preceding?: RouteOnlyNavigationNode }, value: IRouteOnlyConfigNode): RouteOnlyNavigationNode {
+                    this.preceding = new RouteOnlyNavigationNode(value, this.navNode, this.preceding);
+                    return this.preceding;
+                }, <{ navNode: RouteOnlyNavigationNode, preceding?: RouteOnlyNavigationNode }>{ navNode: this })
+            }
+        }
+    }
+    export class NavigationSeparatorNode extends NavigationNode {
+        constructor(source: ISeparatorMenuConfigNode, parent: PageNavigationNode|RouteOnlyNavigationNode|navigationSettings, preceding?: NavigationItem) {
+            super(source, parent, preceding);
+        }
+    }
+    export type NavigationItem = PageNavigationNode|LinkNavigationNode|RouteOnlyNavigationNode|NavigationSeparatorNode;
+    export class navigationSettings {
+        private _topNavBar : NavigationItem[] = [];
+        private _sideNav : NavigationItem[] = [];
+        constructor(settings: IMenuConfigSettings) {
+            if (typeof(settings.topNavBar) != "undefined") {
+                this._topNavBar = settings.topNavBar.map<NavigationItem>(function(this: { settings: navigationSettings, preceding?: NavigationItem }, value: MenuConfigNode): NavigationItem {
+                    if (isSeparatorMenuConfigNode(value))
+                        this.preceding = new NavigationSeparatorNode(value, this.settings, this.preceding);
+                    else if (isLinkMenuConfigNode(value))
+                        this.preceding = new LinkNavigationNode(value, this.settings, this.preceding);
+                    else if (isPageMenuConfigNode(value))
+                        this.preceding = new PageNavigationNode(value, this.settings, this.preceding);
+                    else
+                        this.preceding = new RouteOnlyNavigationNode(value, this.settings, this.preceding);
+                    return this.preceding;
+                }, <{ settings: navigationSettings, preceding?: NavigationItem }>{ settings: this })
+            }
+            if (typeof(settings.sideNavItems) != "undefined") {
+                this._topNavBar = settings.sideNavItems.map<NavigationItem>(function(this: { settings: navigationSettings, preceding?: NavigationItem }, value: MenuConfigNode): NavigationItem {
+                    if (isSeparatorMenuConfigNode(value))
+                        this.preceding = new NavigationSeparatorNode(value, this.settings, this.preceding);
+                    else if (isLinkMenuConfigNode(value))
+                        this.preceding = new LinkNavigationNode(value, this.settings, this.preceding);
+                    else if (isPageMenuConfigNode(value))
+                        this.preceding = new PageNavigationNode(value, this.settings, this.preceding);
+                    else
+                        this.preceding = new RouteOnlyNavigationNode(value, this.settings, this.preceding);
+                    return this.preceding;
+                }, <{ settings: navigationSettings, preceding?: NavigationItem }>{ settings: this })
+            }
+        }
+    }
+    export class navigationSettingsProvider implements angular.IServiceProvider {
+        private _settings: navigationSettings|undefined;
+        constructor(...args: any[]) {
+        }
+        $get(): navigationSettings {
+            if (typeof(this._settings) != "undefined")
+                return this._settings;
+            this._settings = new navigationSettings(settings);
+            return this._settings;
+        }
+        configureRouteProvider($routeProvider: angular.route.IRouteProvider, $locationProvider: angular.ILocationProvider): void {
+            if (typeof(this._settings) == "undefined")
+                this.$get();
+        }
+        getNavigationSettings($location: angular.ILocationService): navigationSettings {
+            throw new Error("Not implemented");
+        }
+    }
+}
 
-            pageScope.headingText = this.scope.heading;
-            pageScope.pageTemplateUrl = this._pageUrl;
-        } else if (typeof(previousActive) != "undefined" && previousActive.navNode.equals(this._id)) {
-            pageScope.activeNavItem = undefined;
-            if (this.parentNode instanceof NavigationContainer)
-                this.parentNode.deselect(this);
-            else
-                this.parentNode.selectedChildItem = undefined;
-        }
-    }
-    static setCssClass(scope: INavigationScope) {
-        if (scope.disabled) {
-            scope.listItemClass = "nav-item border border-secondary bg-dark";
-            scope.anchorClass = "nav-link text-light";
-        } else if (scope.isActive) {
-            scope.listItemClass = "nav-item active border border-secondary bg-light";
-            scope.anchorClass = "nav-link text";
-        } else if (scope.containsActive) {
-            scope.listItemClass = "nav-item active border border-secondary bg-light";
-            scope.anchorClass = "nav-link text";
-        } else {
-            scope.listItemClass = "nav-item border border-secondary bg-dark";
-            scope.anchorClass = "nav-link text-light";
-        }
-    }
-    constructor(parentNode: NavigationParent, scope: INavigationScope, source: MenuSchemaNavItem, precedingSibling?: NavigationItem) {
-        this._id = Symbol();
-        this._parentNode = parentNode;
-        scope.title = source.title;
-        scope.heading = (typeof(source.heading) == "string" && source.heading.trim().length > 0) ? source.heading : source.title;
-        scope.isActive = false;
-        scope.navNode = this;
-        scope.disabled = false;
-        NavigationItem.setCssClass(scope);
-        this._pageUrl = "pages/" + source.pageUrl;
-        this._precedingSibling = precedingSibling;
-        if (typeof(this._precedingSibling) != "undefined") {
-            this._followingSibling = this._precedingSibling._followingSibling;
-            this._precedingSibling._followingSibling = this;
-            if (typeof(this._followingSibling) != "undefined")
-                this._followingSibling._precedingSibling = this;
-        }
-    }
-    activate(): false {
-        if (!(this.isActive || this.scope.disabled))
-            this.isActive = true;
-        return false;
-    }
-    private getPagePropertiesScope(): IPagePropertiesScope {
-        let container: NavigationContainer|IPagePropertiesScope = this.parentNode;
-        while (container instanceof NavigationContainer)
-            container = container.parentNode;
-        return container;
-    }
-    equals(other: NavigationItem|Symbol): boolean {
-        if (typeof(other) == "symbol")
-            return other === this._id;
-        return (<NavigationItem>other).equals(this._id);
-    }
-}
-class NavigationLeaf extends NavigationItem {
-    private _scope : INavigationScope;
-    public get scope() : INavigationScope { return this._scope; }
-    public get disabled() : boolean {
-        return this.scope.disabled;
-    }
-    public set disabled(value : boolean) {
-        this.scope.disabled = value;
-    }
-    constructor(parentItem: NavigationParent, parentScope: angular.IScope, source: IMenuSchemaLeaf, precedingSibling?: NavigationItem) {
-        let scope: INavigationScope = <INavigationScope>(parentScope.$new(true));
-        super(parentItem, scope, source, precedingSibling);
-        this._scope = scope;
-        this.disabled = source.disabled === true;
-    }
-}
-class NavigationContainer extends NavigationItem {
-    private _scope : INavigationContainerScope;
-    public get scope() : INavigationContainerScope { return this._scope; }
-    private _navItems: NavigationItem[];
-    private _selectedChildItem?: NavigationItem;
-    public get navItems(): ReadonlyArray<NavigationItem> { return this._navItems; }
-    public get selectedChildItem(): NavigationItem|undefined { return this._selectedChildItem; }
-    public get activeNavNode() : NavigationItem|undefined {
-        if (typeof(this.parentNode.activeNavItem) != "undefined")
-            return this.parentNode.activeNavItem.navNode;
-    }
+interface IMainModuleScope extends angular.IScope {
 
-    constructor(parentItem: NavigationParent, parentScope: angular.IScope, source: IMenuSchemaContainer, precedingSibling?: NavigationItem) {
-        let scope: INavigationContainerScope = <INavigationContainerScope>(parentScope.$new(true))
-        super(parentItem, scope, source, precedingSibling);
-        this._scope = scope;
-        this._navItems = NavigationContainer.importNavItems(this, this.scope, source.items);
-    }
-    select(item: NavigationItem): void {
-        if (this._navItems.filter(function(value: NavigationItem): boolean { return value.equals(item); }).length == 0)
-            return;
-        if (!(item.isActive || ((item instanceof NavigationContainer) && typeof(item._selectedChildItem) != "undefined")))
-            item.isActive = true;
-        let previousSelected: NavigationItem|undefined = this._selectedChildItem;
-        this._selectedChildItem = item;
-        if (this.parentNode instanceof NavigationContainer)
-            this.parentNode.select(this);
-        else
-            this.parentNode.selectedChildItem = this;
-        if (typeof(previousSelected) != "undefined" && !previousSelected.equals(item))
-            this.deselect(previousSelected);
-    }
-    deselect(item: NavigationItem): void {
-        if (this._navItems.filter(function(value: NavigationItem): boolean { return value.equals(item); }).length == 0)
-            return;
-        if (item.isActive)
-            item.isActive = false;
-        else if (item instanceof NavigationContainer && typeof(item._selectedChildItem) != "undefined")
-            item.deselect(item._selectedChildItem);
-        if (typeof(this._selectedChildItem) == "undefined" || !this._selectedChildItem.equals(item))
-            return;
-        this._selectedChildItem = undefined;
-        if (this.parentNode instanceof NavigationContainer)
-            this.parentNode.deselect(this);
-        else if (typeof(this.parentNode.selectedChildItem) != "undefined" && this.parentNode.selectedChildItem.equals(this))
-            this.parentNode.selectedChildItem = undefined;
-    }
-    static importNavItems(parentItem: NavigationParent, parentScope: angular.IScope, source: MenuSchemaNavItem[]): NavigationItem[] {
-        let precedingSibling: NavigationItem|undefined;
-        return source.map(function(value: MenuSchemaNavItem): NavigationItem {
-            let current: NavigationItem = (isMenuSchemaContainer(value)) ? new NavigationContainer(parentItem, parentScope, value) : new NavigationLeaf(parentItem, parentScope, value);
-            precedingSibling = current;
-            return current;
-        });
-    }
 }
-let pagePropertiesController: angular.IController = mainModule.controller("pageProperties", function(this: angular.IController, $scope: IPagePropertiesScope, $http: angular.IHttpService, $q: angular.IQService) {
-    $scope.headingText = "LErwine Github Repositories";
-    $scope.navItems = [];
-    $http.jsonp<IMenuSchema>("menuSchema.json").then(function(value: angular.IHttpResponse<IMenuSchema>) {
-        $scope.navItems = NavigationContainer.importNavItems($scope, $scope, value.data.rootItems);
-        if ($scope.navItems.length > 0)
-            $scope.navItems[0].isActive = true;
-    });
-});
+angular.module("main", ['ngRoute'])
+.provider('navigationSettingsProvider', navMenuState.navigationSettingsProvider)
+.controller("mainController", ['$scope', '$http', '$route', function(this: angular.IController, $scope: IMainModuleScope, $http: angular.IHttpService, $route: angular.route.IRouteService) {
+    
+}])
+.controller("homeController", ['$scope', '$http', '$route', function(this: angular.IController, $scope: IMainModuleScope, $http: angular.IHttpService, $route: angular.route.IRouteService) {
+    
+}])
+.controller("cookbookController", ['$scope', '$http', '$route', function(this: angular.IController, $scope: IMainModuleScope, $http: angular.IHttpService, $route: angular.route.IRouteService) {
+    
+}])
+.config(['$routeProvider', '$locationProvider', function($routeProvider: angular.route.IRouteProvider, $locationProvider: angular.ILocationProvider): void {
+    
+}]);
