@@ -14,8 +14,7 @@ export const routeMap: Routes = [
     { path: 'git', component: CodeCookbookGitComponent },
     { path: 'npm', component: CodeCookbookNpmComponent },
     { path: '', component: CodeCookbookHomeComponent }
-  ]}]
-  }
+  ]}]}
 ];
 
 @NgModule({
