@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   headerText = 'Lenny\'s GitHub Repositories';
+  subHeadingText = '';
 }

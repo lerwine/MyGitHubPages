@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-code-cookbook',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CodeCookbookComponent implements OnInit {
 
-  constructor() { }
+  constructor(private _app: AppComponent) { }
 
   ngOnInit() {
+    this._app.headerText = 'Code Cookbook';
   }
 
 }

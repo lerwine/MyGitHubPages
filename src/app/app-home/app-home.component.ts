@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-app-home',
@@ -7,9 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppHomeComponent implements OnInit {
 
-  constructor() { }
+  constructor(private _app: AppComponent) { }
 
   ngOnInit() {
+    this._app.headerText = 'Lenny\'s GitHub Repositories';
+    this._app.subHeadingText = '';
   }
 
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-code-cookbook-vs-code',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CodeCookbookVsCodeComponent implements OnInit {
 
-  constructor() { }
+  constructor(private _app: AppComponent) { }
 
   ngOnInit() {
+    this._app.subHeadingText = 'Visual Studio Code Check Sheet';
   }
 
 }
