@@ -390,7 +390,6 @@ export class RepositoryService {
       return of<string>();
     let readme: Observable<string>|undefined = this._readme[id];
     if (typeof(readme) === 'undefined') {
-      console.log('calling getReadMe to ' + this._repoServiceUrl + '/' + id + '/readme');
       readme = this.http.get(this._repoServiceUrl + '/' + id + '/readme', { responseType: 'text', headers: new HttpHeaders({
         'Accept':  'application/vnd.github.v3.html'
       }) })

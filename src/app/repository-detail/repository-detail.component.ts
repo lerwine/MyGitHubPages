@@ -5,6 +5,7 @@ import { RepositoryService } from '../repository.service';
 import { Observable } from '../../../node_modules/rxjs';
 import { RepositoryInfo } from '../repository-info';
 import { RepoReadme } from '../repo-readme';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-repository-detail',
@@ -21,15 +22,18 @@ export class RepositoryDetailComponent implements OnInit {
     return this._selectedName;
   }
 
-  constructor(private _route: ActivatedRoute, private _router: Router, private _service: RepositoryService) { }
+  constructor(private _app: AppComponent, private _route: ActivatedRoute, private _router: Router, private _service: RepositoryService) { }
 
   ngOnInit() {
+    this._app.headerText = '';
+    this._app.subHeadingText = '';
     this.repositories$ = this._service.getRepositories();
     this.repository$ = this._route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this._service.getRepository(params.get('id')))
+      switchMap((params: ParamMap) => {
+        this._app.headerText = params.get('id');
+        return this._service.getRepository(this._app.headerText);
+      })
     );
-    console.log('about to invoke getReadMe');
     this.readme$ = this._route.paramMap.pipe(
       switchMap((params: ParamMap) =>
         this._service.getReadme(params.get('id')))
