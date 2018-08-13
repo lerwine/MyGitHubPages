@@ -1,8 +1,11 @@
-<ul class="items">
-  <li *ngFor="let repo of repositories$ | async"
-    [class.selected]="repo.name === selectedName">
-    <a [routerLink]="['/repository', repo.name]">
-      {{ repo.name }}
-    </a>
-  </li>
-</ul>
+<section class="container-fluid">
+  <ul class="items">
+    <li *ngFor="let repo of repositories$ | async"
+      [class.selected]="repo.name === selectedName">
+      <a [routerLink]="['/repository', repo.name]">
+        {{ repo.name }}
+      </a>
+      <span>{{ repo.description }}</span>
+    </li>
+  </ul>
+</section>

@@ -13,6 +13,7 @@
             "app",
             "kebab-case"
         ],
-        "curly": false
+        "curly": false,
+        "max-line-length": false
     }
 }

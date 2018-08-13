@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoryService, IRepositoryInfo } from '../repository.service';
+import { RepositoryService } from '../repository.service';
 import { ActivatedRoute, ParamMap } from '../../../node_modules/@angular/router';
 import { Observable } from '../../../node_modules/rxjs';
 import { switchMap } from '../../../node_modules/rxjs/operators';
+import { RepositoryInfo } from '../repository-info';
 
 @Component({
   selector: 'app-repository-list',
@@ -10,7 +11,7 @@ import { switchMap } from '../../../node_modules/rxjs/operators';
   styleUrls: ['./repository-list.component.css']
 })
 export class RepositoryListComponent implements OnInit {
-  repositories$: Observable<IRepositoryInfo[]>;
+  repositories$: Observable<RepositoryInfo[]>;
 
   private _selectedName: string;
   public get selectedName(): string {
@@ -20,12 +21,6 @@ export class RepositoryListComponent implements OnInit {
   constructor(private _service: RepositoryService, private _route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.repositories$ = this._route.paramMap.pipe(
-      switchMap((params: ParamMap) => {
-        // (+) before `params.get()` turns the string into a number
-        this._selectedName = params.get('id');
-        return this._service.getRepositories();
-      })
-    );
+    this.repositories$ = this._service.getRepositories();
   }
 }

@@ -12,6 +12,7 @@ import { CodeCookbookNpmComponent } from './code-cookbook-npm/code-cookbook-npm.
 import { CodeCookbookHomeComponent } from './code-cookbook-home/code-cookbook-home.component';
 import { RepositoryModule } from './repository/repository.module';
 import { CommonModule } from '../../node_modules/@angular/common';
+import { HttpClientModule, HttpClient, HttpResponse } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { CommonModule } from '../../node_modules/@angular/common';
   imports: [
     BrowserModule,
     CommonModule,
+    HttpClientModule,
     FormsModule,
     RepositoryModule,
     AppRoutingModule

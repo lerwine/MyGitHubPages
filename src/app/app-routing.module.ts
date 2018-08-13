@@ -6,6 +6,7 @@ import { CodeCookbookVsCodeComponent } from './code-cookbook-vs-code/code-cookbo
 import { CodeCookbookGitComponent } from './code-cookbook-git/code-cookbook-git.component';
 import { CodeCookbookNpmComponent } from './code-cookbook-npm/code-cookbook-npm.component';
 import { CodeCookbookHomeComponent } from './code-cookbook-home/code-cookbook-home.component';
+import { CommonModule } from '../../node_modules/@angular/common';
 
 export const routeMap: Routes = [
   { path: '', component: AppHomeComponent },

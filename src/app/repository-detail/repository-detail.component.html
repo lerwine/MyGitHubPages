@@ -1,3 +1,46 @@
-<p>
-  repository-detail works!
-</p>
+<aside class="float-sm-right border border-secondary p-sm-1 ml-md-3">
+  <ul class="nav flex-column">
+    <li class="nav-item" *ngFor="let repo of repositories$ | async"
+      [class.selected]="repo.name === selectedName">
+      <a [routerLink]="['/repository', repo.name]" class="nav-link" routerLinkActive="active">
+        {{ repo.name }}
+      </a>
+    </li>
+  </ul>
+</aside>
+<section *ngIf="repository$ | async as repository" class="container-fluid border border-light">
+  <div class="row">
+    <div class="col-lg-1 border border-light">Name:</div>
+    <div class="col-lg-5 border border-light">{{ repository.name }}</div>
+    <div class="col-lg-1 border border-light">Is Forked:</div>
+    <div class="col-lg-5 border border-light">{{ repository.isForked }}</div>
+  </div>
+  <div class="row">
+    <div class="col-lg-1 border border-light">Description:</div>
+    <div class="col-lg-11 border border-light">{{ repository.description }}</div>
+  </div>
+  <div class="row">
+    <div class="col-lg-1 border border-light">Repository Url:</div>
+    <div class="col-lg-11 border border-light"><a href="{{ repository.repoUrl }}" target="_blank">{{ repository.repoUrl }}</a></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-1 border border-light">License:</div>
+    <div class="col-lg-5 border border-light">{{ repository.license }}</div>
+    <div class="col-lg-1 border border-light">Language:</div>
+    <div class="col-lg-5 border border-light">{{ repository.language }}</div>
+  </div>
+  <div class="row">
+    <div class="col-lg-1 border border-light">Created:</div>
+    <div class="col-lg-5 border border-light">{{ repository.createdAt }}</div>
+    <div class="col-lg-1 border border-light">Pushed:</div>
+    <div class="col-lg-5 border border-light">{{ repository.pushedAt }}</div>
+  </div>
+  <div class="row">
+    <div class="col-lg-1 border border-light">ID:</div>
+    <div class="col-lg-11 border border-light">{{ repository.id }}</div>
+  </div>
+  <div class="row" *ngIf="readme$ | async as readme">
+    <div class="col-lg-1 border border-light">ReadMe:</div>
+    <div class="col-lg-11 border border-light" [innerHTML]="readme"></div>
+  </div>
+</section>
