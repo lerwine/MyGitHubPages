@@ -4,7 +4,6 @@ import { switchMap } from 'rxjs/operators';
 import { RepositoryService } from '../repository.service';
 import { Observable } from '../../../node_modules/rxjs';
 import { RepositoryInfo } from '../repository-info';
-import { RepoReadme } from '../repo-readme';
 import { AppComponent } from '../app.component';
 
 @Component({
