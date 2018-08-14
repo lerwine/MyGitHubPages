@@ -1,7 +1,7 @@
 <aside class="float-sm-right border border-secondary p-sm-1 ml-md-3">
   <ul class="nav flex-column">
-    <li class="nav-item" *ngFor="let repo of repositories$ | async" [class.selected]="repo.name === selectedName">
-      <a [routerLink]="['/repository', repo.name]" class="nav-link" routerLinkActive="active">
+    <li class="nav-item" *ngFor="let repo of repositories$ | async" [class.selected]="repo.id === selectedId">
+      <a [routerLink]="['/repository', repo.id]" class="nav-link" routerLinkActive="active">
         {{ repo.name }}
       </a>
     </li>

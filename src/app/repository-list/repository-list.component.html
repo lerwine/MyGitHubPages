@@ -1,7 +1,7 @@
 <section class="container-fluid">
   <ul class="items">
-    <li *ngFor="let repo of repositories$ | async" [class.selected]="repo.name === selectedName">
-      <a [routerLink]="['/repository', repo.name]">
+    <li *ngFor="let repo of repositories$ | async" [class.selected]="repo.id === selectedId">
+      <a [routerLink]="['/repository', repo.id]">
         {{ repo.name }}
       </a>
       <span>{{ repo.description }}</span>

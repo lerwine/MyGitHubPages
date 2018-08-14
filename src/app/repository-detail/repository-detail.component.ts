@@ -16,9 +16,9 @@ export class RepositoryDetailComponent implements OnInit {
   repository$: Observable<RepositoryInfo>;
   readme$: Observable<string>;
 
-  private _selectedName: string;
-  public get selectedName(): string {
-    return this._selectedName;
+  private _selectedId: number|undefined;
+  public get selectedId(): number|undefined {
+    return this._selectedId;
   }
 
   constructor(private _app: AppComponent, private _route: ActivatedRoute, private _router: Router, private _service: RepositoryService) { }
@@ -29,13 +29,16 @@ export class RepositoryDetailComponent implements OnInit {
     this.repositories$ = this._service.getRepositories();
     this.repository$ = this._route.paramMap.pipe(
       switchMap((params: ParamMap) => {
-        this._app.headerText = params.get('id');
-        return this._service.getRepository(this._app.headerText);
+        this._selectedId = parseInt(params.get('id'));
+        return this._service.getRepository(this._selectedId);
       })
     );
-    this.readme$ = this._route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this._service.getReadme(params.get('id')))
-    );
+    this.repository$.forEach(r => {
+      this._app.headerText = r.name;
+      this.readme$ = this._route.paramMap.pipe(
+        switchMap((params: ParamMap) =>
+          this._service.getReadme(r.name))
+      );
+    });
   }
 }

@@ -14,9 +14,9 @@ import { AppComponent } from '../app.component';
 export class RepositoryListComponent implements OnInit {
   repositories$: Observable<RepositoryInfo[]>;
 
-  private _selectedName: string;
-  public get selectedName(): string {
-    return this._selectedName;
+  private _selectedId: number|undefined;
+  public get selectedId(): number|undefined {
+    return this._selectedId;
   }
 
   constructor(private _app: AppComponent, private _service: RepositoryService, private _route: ActivatedRoute) { }
