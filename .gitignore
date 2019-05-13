@@ -17,6 +17,13 @@
 .settings/
 *.sublime-workspace
 
+# IDE - Visual Studio
+.vs/*
+obj/*
+bin/*
+*.csproj.user
+*.suo
+
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json
