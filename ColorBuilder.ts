@@ -1,4 +1,4 @@
-﻿/// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
+/// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
 /// <reference path="Scripts/typings/angularjs/angular.d.ts"/>
 /// <reference path="app.ts"/>
 
@@ -17,5 +17,5 @@ namespace colorBuilder {
         }
     }
 
-    app.module.controller("ColorBuilderController", ["$scope", ColorBuilderController]);
+    app.mainModule.controller("ColorBuilderController", ["$scope", ColorBuilderController]);
 }

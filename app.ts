@@ -1,10 +1,149 @@
-﻿/// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
+/// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
 /// <reference path="Scripts/typings/angularjs/angular.d.ts"/>
+/// <reference path="Scripts/typings/angularjs/angular-route.d.ts"/>
 
 namespace app {
-    export let module: ng.IModule = angular.module("mainModule", []);
+    export let mainModule: ng.IModule = angular.module("mainModule");
+    interface INavigationLinkConfig {
+        href: string;
+        text: string;
+        pageId?: string;
+        target?: string;
+        disabled?: boolean;
+        links?: INavigationLinkConfig[];
+    }
+    interface IAppConfig {
+        links: INavigationLinkConfig[];
+    }
+    interface IAppConfigRequestInfo {
+        status?: number;
+        headers?: ng.IHttpHeadersGetter;
+        config?: ng.IRequestConfig;
+        statusText: string;
+        error?: any;
+    }
+    interface INavigationLink extends INavigationLinkConfig {
+        disabled: boolean;
+        links: INavigationLink[];
+        cssClass: string[];
+        onClick(): boolean;
+    }
+    interface IAppConfigLoadResult {
+        requestInfo: IAppConfigRequestInfo;
+        links: INavigationLink[];
+    }
+    function sanitizeNavigationLinks(pages?: INavigationLinkConfig[]): INavigationLink[] {
+        if (typeof (pages) === "undefined" || pages === null)
+            return [];
+        if (typeof (pages) !== "object" || !Array.isArray(pages))
+            return [{ href: "#", text: "(invalid configuration data)", disabled: true, links: [], cssClass: ["nav-item", "disabled"], onClick: () => { return false; } }];
+        return pages.filter(notNil).map((item: INavigationLinkConfig) => {
+            if (typeof (item) !== "object")
+                return { href: "#", text: "(invalid configuration data)", disabled: true, links: [], cssClass: ["nav-item", "disabled"], onClick: () => { return false; } };
 
-    export interface IChangeTracking { hasChanges: boolean; }
+            if (isNilOrWhiteSpace(item.href)) {
+                item.href = "#";
+                item.disabled = true;
+            }
+            if (item.disabled)
+                return { href: item.href, text: item.text, disabled: true, links: sanitizeNavigationLinks(item.links), cssClass: ["nav-item", "disabled"], onClick: () => { return false; } };
+            return { href: item.href, text: item.text, disabled: false, links: sanitizeNavigationLinks(item.links), cssClass: ["nav-item"], onClick: () => { return true; } };
+        });
+    }
+    class applicationConfigurationLoader implements ng.IPromise<IAppConfigLoadResult> {
+        private _get: ng.IPromise<IAppConfigLoadResult>;
+        then<TResult>(successCallback: (promiseValue: IAppConfigLoadResult) => TResult | ng.IPromise<TResult>, errorCallback?: (reason: any) => any, notifyCallback?: (state: any) => any): ng.IPromise<TResult> {
+            return this._get.then(successCallback, errorCallback, notifyCallback);
+        }
+        catch<TResult>(onRejected: (reason: any) => TResult | ng.IPromise<TResult>): ng.IPromise<TResult> { return this._get.catch(onRejected); }
+        finally(finallyCallback: () => any): ng.IPromise<IAppConfigLoadResult> { return this._get.finally(finallyCallback); }
+        constructor($http: ng.IHttpService) {
+            
+            this._get = $http.get<IAppConfig>('appConfig.json').then((promiseValue: ng.IHttpPromiseCallbackArg<IAppConfig>) => {
+                let requestInfo: IAppConfigRequestInfo = {
+                    status: promiseValue.status,
+                    headers: promiseValue.headers,
+                    config: promiseValue.config,
+                    statusText: promiseValue.statusText
+                }
+                if (typeof (promiseValue.data) === 'undefined' || promiseValue.data == null)
+                    requestInfo.error = "No data returned.";
+                else if (typeof (promiseValue.data) !== 'object')
+                    requestInfo.error = "Invalid data.";
+                else if (typeof (promiseValue.data.links) != 'object' || promiseValue.data.links === null || !Array.isArray(promiseValue.data.links))
+                    requestInfo.error = "Invalid pages configuration";
+                return <IAppConfigLoadResult>{
+                    requestInfo: requestInfo,
+                    links: sanitizeNavigationLinks(promiseValue.data.links)
+                };
+            }, (reason: any) => { return <IAppConfigLoadResult>{ requestInfo: { statusText: asString(reason, "Unknown error") }, links: [] }; });
+        }
+    }
+    mainModule.service("applicationConfigurationLoader", applicationConfigurationLoader);
+
+    function hasActiveNavItem(links: INavigationLink[], pageId: string) {
+        for (let i: number = 0; i < this.$scope.links.length; i++) {
+            if (links[i].pageId === this.$scope.currentPageId)
+                return true;
+        }
+        for (let i: number = 0; i < this.$scope.links.length; i++) {
+            if (hasActiveNavItem(links[i].links, pageId))
+                return true;
+        }
+        return false;
+    }
+
+    interface ITopNavScope extends ng.IScope {
+        headerText: string;
+        links: INavigationLink[];
+        initializeTopNav(pageId: string, navLoader: applicationConfigurationLoader): void;
+    }
+    class TopNavController implements ng.IController {
+        constructor(protected $scope: ITopNavScope, loader: applicationConfigurationLoader) {
+            let controller: TopNavController = this;
+            $scope.initializeTopNav = (pageId: string, navLoader: applicationConfigurationLoader) => { return controller.initializeTopNav(pageId, navLoader); };
+        }
+        $doCheck() { }
+        initializeTopNav(pageId: string, navLoader: applicationConfigurationLoader): void {
+            navLoader.then((result: IAppConfigLoadResult) => {
+                this.$scope.links = result.links;
+                if (isNilOrWhiteSpace(pageId))
+                    return;
+                for (let i: number = 0; i < this.$scope.links.length; i++) {
+                    if (this.$scope.links[i].pageId === pageId) {
+                        this.$scope.links[i].cssClass.push("active");
+                        this.$scope.links[i].href = "#";
+                        this.$scope.links[i].onClick = () => { return false; }
+                        return;
+                    }
+                }
+                for (let i: number = 0; i < this.$scope.links.length; i++) {
+                    if (hasActiveNavItem(this.$scope.links[i].links, pageId)) {
+                        this.$scope.links[i].cssClass.push("active");
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
+    interface ITopNavAttributes {
+        headerText: string;
+        pageName: string;
+    };
+    mainModule.directive('topNavAndHeader', ['navigationLoader', (navLoader: applicationConfigurationLoader) => {
+        return <ng.IDirective>{
+            restrict: "E",
+            scope: {},
+            controller: ["$scope", "applicationConfigurationLoader"],
+            link: (scope: ITopNavScope, element: JQuery, attributes: ITopNavAttributes) => {
+                scope.headerText = attributes.headerText;
+                navLoader.then((promiseValue: IAppConfigLoadResult) => {
+                    scope.initializeTopNav(attributes.pageName, navLoader);
+                });
+            }
+        };
+    }]);
 
     // #region Utility functions
 
@@ -44,15 +183,217 @@ namespace app {
         return ((typeof (opt) === "boolean") ? opt : trim === true) ? value.trim() : value;
     }
 
-    export function asNotEmptyOrUndefined<T>(value: Array<T> | null | undefined): Array<T> | undefined;
-    export function asNotEmptyOrUndefined(value: Array<any> | null | undefined): Array<any> | undefined;
-    export function asNotEmptyOrUndefined(value: string | null | undefined, trim?: boolean): string | undefined;
-    export function asNotEmptyOrUndefined(value: string | Array<any> | null | undefined, trim?: boolean): string | Array<any> | undefined {
+    export interface IValueTestFunc<T> { (value: any): value is T };
+    export interface IValueConvertFunc<T> { (value: any): T };
+    export type NilConvertSpec<T> = { (value: null | undefined): T } | T;
+    export type GetValueSpec<T> = { (): T } | T;
+    export type ValueConvertFailedSpec<T> = { (value: any, error: any): T } | T;
+    export interface IValueFinalizeFunc<T> { (value: T): T };
+    interface IConvertValueHandlers<T> {
+        test: IValueTestFunc<T>;
+        convert: IValueConvertFunc<T>;
+        convertFailed?: ValueConvertFailedSpec<T>;
+        whenConverted?: IValueFinalizeFunc<T>;
+        whenMatched?: IValueFinalizeFunc<T>;
+        getFinal?: IValueFinalizeFunc<T>;
+    }
+
+    interface IConvertValueOrNilHandlers<T> extends IConvertValueHandlers<T> { whenNil: NilConvertSpec<T>; }
+
+    interface IConvertValueOrNullHandlers<T> extends IConvertValueHandlers<T> { whenNull: GetValueSpec<T>; }
+
+    interface IConvertValueOrUndefinedHandlers<T> extends IConvertValueHandlers<T> { whenUndefined: GetValueSpec<T>; }
+
+    interface IConvertValueNullOrUndefinedHandlers<T> extends IConvertValueOrNullHandlers<T>, IConvertValueOrUndefinedHandlers<T> { }
+
+    export type ConvertValueNullAndOrUndefinedHandlers<T> = IConvertValueNullOrUndefinedHandlers<T> | IConvertValueOrUndefinedHandlers<T> | IConvertValueOrNullHandlers<T>;
+
+    export type ConvertValueHandlers<T> = IConvertValueHandlers<T> | IConvertValueOrNilHandlers<T> | ConvertValueNullAndOrUndefinedHandlers<T>;
+
+    export type ConvertValueAndOrNullHandlers<T> = IConvertValueOrNullHandlers<T> | IConvertValueNullOrUndefinedHandlers<T>;
+
+    export type ConvertValueAndOrUndefinedHandlers<T> = IConvertValueOrUndefinedHandlers<T> | IConvertValueNullOrUndefinedHandlers<T>;
+
+    export function hasConvertWhenNull<T>(h: ConvertValueHandlers<T>): h is ConvertValueAndOrNullHandlers<T> { return (typeof ((<ConvertValueAndOrNullHandlers<T>>h).whenNull) !== "undefined"); }
+
+    export function hasConvertWhenUndefined<T>(h: ConvertValueHandlers<T>): h is ConvertValueAndOrUndefinedHandlers<T> { return (typeof ((<ConvertValueAndOrUndefinedHandlers<T>>h).whenUndefined) !== "undefined"); }
+
+    export function hasConvertWhenNil<T>(h: ConvertValueHandlers<T>): h is IConvertValueOrNilHandlers<T> { return (typeof ((<IConvertValueOrNilHandlers<T>>h).whenNil) !== "undefined"); }
+
+    /*
+     * arg4                                       arg5                                       arg6                                   arg7
+     * whenUndefined: GetValueSpec<T>,            convertFailed?: ValueConvertFailedSpec<T>, whenConverted?: IValueFinalizeFunc<T>, whenMatched?: IValueFinalizeFunc<T>, getFinal?: IValueFinalizeFunc<T>
+     * convertFailed?: ValueConvertFailedSpec<T>, whenConverted?: IValueFinalizeFunc<T>,     whenMatched?: IValueFinalizeFunc<T>,   getFinal?: IValueFinalizeFunc<T>
+     */
+    export function convertValue<T>(value: any | null | undefined, handlers: ConvertValueHandlers<T>): T;
+    export function convertValue<T>(value: any | null | undefined, testFn: IValueTestFunc<T>, convertFn: IValueConvertFunc<T>, whenNil?: NilConvertSpec<T>): T;
+    export function convertValue<T>(value: any | null | undefined, testFn: IValueTestFunc<T>, convertFn: IValueConvertFunc<T>, whenNull: GetValueSpec<T>, whenUndefined: GetValueSpec<T>, convertFailed?: ValueConvertFailedSpec<T>,
+        whenConverted?: IValueFinalizeFunc<T>, whenMatched?: IValueFinalizeFunc<T>, getFinal?: IValueFinalizeFunc<T>): T;
+    export function convertValue<T>(value: any | null | undefined, arg1: ConvertValueHandlers<T> | IValueTestFunc<T>, convertFn?: IValueConvertFunc<T>, whenNil?: GetValueSpec<T> | NilConvertSpec<T>,
+        whenUndefined?: GetValueSpec<T>, convertFailed?: ValueConvertFailedSpec<T>, whenConverted?: IValueFinalizeFunc<T>, whenMatched?: IValueFinalizeFunc<T>, getFinal?: IValueFinalizeFunc<T>): T {
+        let testFn: IValueTestFunc<T>;
+        let whenNull: GetValueSpec<T> | undefined;
+        let nilSpec: NilConvertSpec<T> | undefined;
+        if (typeof (arg1) === "function") {
+            testFn = arg1;
+            if (typeof (whenUndefined) !== null)
+                whenNull = <GetValueSpec<T>>whenNil;
+            else
+                nilSpec = whenNil;
+        } else {
+            testFn = arg1.test;
+            convertFn = arg1.convert;
+            if (hasConvertWhenNil(arg1))
+                nilSpec = arg1.whenNil;
+            else {
+                if (hasConvertWhenUndefined(arg1))
+                    whenUndefined = arg1.whenUndefined;
+                if (hasConvertWhenNull(arg1))
+                    whenNull = arg1.whenNull;
+            }
+            if (typeof (arg1.convertFailed) !== "undefined")
+                convertFailed = arg1.convertFailed;
+            if (typeof (arg1.whenConverted) !== "undefined")
+                whenConverted = arg1.whenConverted;
+            if (typeof (arg1.whenMatched) !== "undefined")
+                whenMatched = arg1.whenMatched;
+            if (typeof (arg1.getFinal) !== "undefined")
+                getFinal = arg1.getFinal;
+        }
+        let result: T = (() => {
+            let convertedValue: T;
+            if (typeof (nilSpec) !== "undefined") {
+                if (typeof (value) === "undefined" || value === null) {
+                    convertFn = undefined;
+                    convertedValue = (typeof (nilSpec) === "function") ? nilSpec(value) : nilSpec;
+                } else if (testFn(value))
+                    return (typeof (whenMatched) === "function") ? whenMatched(value) : value;
+            } else if (typeof (whenUndefined) !== "undefined") {
+                if (typeof (value) === "undefined") {
+                    convertFn = undefined;
+                    convertedValue = (typeof (whenUndefined) === "function") ? whenUndefined() : whenUndefined;
+                } else if (typeof (whenNull) !== "undefined" && value === null) {
+                    convertFn = undefined;
+                    convertedValue = (typeof (whenNull) === "function") ? whenNull() : whenNull;
+                } else if (testFn(value))
+                    return (typeof (whenMatched) === "function") ? whenMatched(value) : value;
+            } else if (typeof (whenNull) !== "undefined" && (typeof (value) !== "undefined") && value === null) {
+                convertFn = undefined;
+                convertedValue = (typeof (whenNull) === "function") ? whenNull() : whenNull;
+            } else if (testFn(value))
+                return (typeof (whenMatched) === "function") ? whenMatched(value) : value;
+            if (typeof (convertFn) !== "undefined") {
+                if (typeof (convertFailed) !== "undefined")
+                    try { convertedValue = convertFn(value); } catch (e) { convertedValue = (typeof (convertFailed) === "function") ? convertFailed(value, e) : convertFailed; }
+                else
+                    convertedValue = convertFn(value);
+            }
+            return (typeof (whenConverted) === "function") ? whenConverted(convertedValue) : convertedValue;
+        })();
+        return (typeof (getFinal) === "function") ? getFinal(result) : result;
+    }
+    
+    export function isNilOrString(value: any | null | undefined): value is string | null | undefined { return (typeof (value) === "string") || (typeof (value) === "undefined") || value === null; }
+
+    export function isUndefinedOrString(value: any | null | undefined): value is string | undefined { return (typeof (value) === "string") || (typeof (value) === "undefined") || value === null; }
+
+    export function isNullOrString(value: any | null | undefined): value is string | null { return (typeof (value) === "string") || (typeof (value) !== "undefined" && value === null); }
+    
+    export function asStringOrNullOrUndefined(value: any | null | undefined): string | null | undefined {
+        return convertValue<string>(value, isNilOrString, (v: any) => {
+            if (typeof (v) === "object") {
+                if (Array.isArray(v))
+                    return v.map((e: any) => {
+                        return convertValue<string>(e, isNilOrString, (u: any) => {
+                            if (typeof (u) === "object") {
+                                if (Array.isArray(u))
+                                    return u.filter(notNil).join("\n");
+                                try {
+                                    let p: any = u.valueOf();
+                                    if (typeof (p) === "string")
+                                        return p;
+                                    p = p.toString();
+                                    if (typeof (p) === "string")
+                                        return p;
+                                } catch { /* okay to ignore */ }
+                            } else if (typeof (u) === "function")
+                                try {
+                                    let z: any = u.ValueOf();
+                                    if (typeof (z) === "string")
+                                        return z;
+                                    z = z.toString();
+                                    if (typeof (z) === "string")
+                                        return z;
+                                } catch { /* okay to ignore */ }
+                            try {
+                                let m: string = u.toString();
+                                if (typeof (m) === "string")
+                                    return m;
+                            } catch { /* okay to ignore */ }
+                        });
+                    }).filter(notNil).join("\n");
+                try {
+                    let o: any = v.valueOf();
+                    if (typeof (o) === "string")
+                        return o;
+                    o = o.toString();
+                    if (typeof (o) === "string")
+                        return o;
+                } catch { /* okay to ignore */ }
+            } else if (typeof (v) === "function")
+                try {
+                    let f: any = v.valueOf();
+                    if (typeof (f) === "string")
+                        return f;
+                    f = f.toString();
+                    if (typeof (f) === "string")
+                        return f;
+                } catch { /* okay to ignore */ }
+            try {
+                let s: string = v.toString();
+                if (typeof (s) === "string")
+                    return s;
+            } catch { /* okay to ignore */ }
+        });
+    }
+
+    export function asStringOrNull(value: any | null | undefined): string | null {
+        value = asStringOrNullOrUndefined(value);
+        return (typeof (value) === "undefined") ? null : value;
+    }
+
+    export function asStringOrUndefined(value: any | null | undefined): string | undefined {
+        value = asStringOrNullOrUndefined(value);
+        if (typeof (value) === "undefined" || typeof (value) === "string")
+            return value;
+    }
+
+    export function asString(value: any | null | undefined, defaultValue: string = ""): string {
+        value = asStringOrNullOrUndefined(value);
+        return (typeof (value) === "string") ? value : defaultValue;
+    }
+
+    export function asStringAndNotEmpty(value: any | null | undefined, defaultValue: string): string {
+        value = asStringOrNullOrUndefined(value);
+        return (typeof (value) != "string" || value.length) ? defaultValue : value;
+    }
+
+    export function asStringAndNotWhiteSpace(value: any | null | undefined, defaultValue: string, trim: boolean = false): string {
+        value = asStringOrNullOrUndefined(value);
+        if (typeof (value) == "string" && (((trim) ? (value = value.trim()) : value.trim()).length > 0))
+            return value;
+        return defaultValue;
+    }
+
+    export function asUndefinedOrNotEmpty<T>(value: Array<T> | null | undefined): Array<T> | undefined;
+    export function asUndefinedOrNotEmpty(value: Array<any> | null | undefined): Array<any> | undefined;
+    export function asUndefinedOrNotEmpty(value: string | null | undefined, trim?: boolean): string | undefined;
+    export function asUndefinedOrNotEmpty(value: string | Array<any> | null | undefined, trim?: boolean): string | Array<any> | undefined {
         if (typeof (value) !== 'undefined' && value !== null && value.length > 0)
             return (trim === true && typeof (value) === 'string') ? value.trim() : value;
     }
 
-    export function asNotWhitespaceOrUndefined(value: string | null | undefined, trim?: boolean): string | undefined {
+    export function asUndefinedOrNotWhiteSpace(value: string | null | undefined, trim?: boolean): string | undefined {
         if (typeof (value) === 'string') {
             if (trim === true) {
                 if ((value = value.trim()).length > 0)
@@ -62,10 +403,10 @@ namespace app {
         }
     }
 
-    export function asNotEmptyOrNull<T>(value: Array<T> | null | undefined): Array<T> | undefined;
-    export function asNotEmptyOrNull(value: Array<any> | null | undefined): Array<any> | undefined;
-    export function asNotEmptyOrNull(value: string | null | undefined, trim?: boolean): string | undefined;
-    export function asNotEmptyOrNull(value: string | Array<any> | null | undefined, trim?: boolean): string | Array<any> | null {
+    export function asNullOrNotEmpty<T>(value: Array<T> | null | undefined): Array<T> | undefined;
+    export function asNullOrNotEmpty(value: Array<any> | null | undefined): Array<any> | undefined;
+    export function asNullOrNotEmpty(value: string | null | undefined, trim?: boolean): string | undefined;
+    export function asNullOrNotEmpty(value: string | Array<any> | null | undefined, trim?: boolean): string | Array<any> | null {
         if (typeof (value) === 'string') {
             if (trim) {
                 if ((value = value.trim()).length > 0)
@@ -76,7 +417,7 @@ namespace app {
         return null;
     }
 
-    export function asNotWhitespaceOrNull(value: string | null | undefined, trim?: boolean): string | null {
+    export function asNullOrNotWhiteSpace(value: string | null | undefined, trim?: boolean): string | null {
         if (typeof (value) === 'string') {
             if (trim === true) {
                 if ((value = value.trim()).length > 0)
@@ -87,10 +428,48 @@ namespace app {
         return null;
     }
 
-    export function isFiniteNumber(value: number): boolean { return typeof (value) === 'number' && !isNaN(value) && Number.isFinite(value); }
+    export function isNumber(value: any | null | undefined): value is number { return typeof (value) === 'number' && !isNaN(value); }
 
-    export function isFiniteWholeNumber(value: number): boolean { return typeof (value) === 'number' && !isNaN(value) && Number.isFinite(value) && Math.round(value) === value; }
+    export function isFiniteNumber(value: any | null | undefined): value is number { return typeof (value) === 'number' && !isNaN(value) && Number.isFinite(value); }
 
+    export function isFiniteWholeNumber(value: any | null | undefined): value is number { return typeof (value) === 'number' && !isNaN(value) && Number.isFinite(value) && Math.round(value) === value; }
+
+    export const floatingPointNumberRe: RegExp = /^[+-]?\d+(\.\d+)?$/;
+
+    export function asNumber(value: any | null | undefined, allowWhiteSpace?: boolean, allowExtraneousTrailingCharacters?: boolean): number | null;
+    export function asNumber(value: any | null | undefined, defaultValue: number, allowWhiteSpace?: boolean, allowExtraneousTrailingCharacters?: boolean): number | null;
+    export function asNumber(value: any | null | undefined, defaultValue?: number | boolean, allowWhiteSpace?: boolean, allowExtraneousTrailingCharacters?: boolean): number | null {
+        let dv: number | null;
+        if (typeof (defaultValue) === "boolean") {
+            allowExtraneousTrailingCharacters = allowWhiteSpace === true;
+            allowWhiteSpace = defaultValue;
+            dv = null;
+        } else
+            dv = (typeof (dv) === 'number') ? dv : null;
+        return convertValue<number>(value, isNumber, (v: any) => {
+            if (typeof (v) === "boolean")
+                return (v) ? 1 : 0;
+            if (typeof (v) === "function" && (typeof (v) === "object" && !Array.isArray(v)))
+                try {
+                    let f: any = v.valueOf();
+                    if (isNumber(f))
+                        return f;
+                    if (typeof (v) === "boolean")
+                        return (v) ? 1 : 0;
+                    if (typeof (f) == "string")
+                        v = f;
+                } catch { /* okay to ignore */ }
+            if (typeof (v) !== "string")
+                v = asString(v, "");
+            if (allowWhiteSpace)
+                v = v.trim();
+            let n: number = parseFloat(v);
+            if (typeof (n) === 'number' && !isNaN(n) && (allowExtraneousTrailingCharacters || floatingPointNumberRe.test(v)))
+                return n;
+            return dv;
+        }, (v: any) => { return dv; })
+    }
+    
     export function map<TSource, TResult>(source: Iterable<TSource>, callbackfn: (value: TSource, index: number, iterable: Iterable<TSource>) => TResult, thisArg?: any): TResult[] {
         let iterator: Iterator<TSource> = source[Symbol.iterator]();
         let r: IteratorResult<TSource> = iterator.next();
@@ -567,107 +946,6 @@ namespace app {
         else
             state.result.push(makeHtmlValue(JSON.stringify(value), state.cssClass.primitiveValue));
     }
-
-    // #endregion
-
-    // #region TopNavController
-
-    interface INavigationDefinition {
-        url: string;
-        linkTitle: string;
-        pageTitle?: string;
-        items?: INavigationDefinition[];
-    }
-    interface INavigationJSON {
-        currentItemClass: string[];
-        selectedItemClass: string[];
-        otherItemClass: string[];
-        items: INavigationDefinition[];
-    }
-
-    interface INavigationItem extends ITopNavScope {
-        linkTitle: string;
-        pageTitle: string;
-        href: string;
-        class: string[];
-        isCurrent: boolean;
-        items: INavigationItem[];
-        onClick(): void;
-    }
-
-    interface ITopNavScope extends ng.IScope {
-        items: INavigationItem[];
-        pageTitle: string;
-    }
-
-    interface INavLoadResult { item: INavigationItem, selectedItem?: INavigationItem }
-
-    class TopNavController implements ng.IController {
-        constructor(protected $scope: ITopNavScope, protected $location: ng.ILocationService, protected $http: ng.IHttpService) {
-            $http.get<INavigationJSON>("./pageNavigation.json").then((nav: ng.IHttpPromiseCallbackArg<INavigationJSON>) => {
-                let pageName: string = $location.path().split("/").reduce((previousValue: string, currentValue: string) => { return (currentValue.length > 0) ? currentValue : previousValue }, "").toLowerCase();
-                if (isNil(nav.data))
-                    alert("Failed to load navigation from ./pageNavigation.json. Reason (" + nav.status + "): " + nav.statusText);
-                else if (typeof (nav.data.items) === 'undefined')
-                    alert("Failed to load navigation from ./pageNavigation.json. Reason: No items returned. Status: (" + nav.status + "): " + nav.statusText);
-                else {
-                    let selectedItem: INavigationItem | undefined;
-                    $scope.items = nav.data.items.map((d: INavigationDefinition) => {
-                        let result: INavLoadResult = this.createNavigationItem(nav.data, $scope, pageName, d);
-                        if (!isNil(result.selectedItem) && isNil(selectedItem))
-                            selectedItem = result.selectedItem;
-                        return result.item;
-                    });
-                    $scope.pageTitle = ((isNil(selectedItem)) ? $scope.items[0] : selectedItem).pageTitle;
-                }
-            }).catch((reason: any) => {
-                if (!isNil(reason)) {
-                    if (typeof (reason) !== 'string') {
-                        try { alert("Failed to load navigation from ./pageNavigation.json. Reason: " + JSON.stringify(reason) + "."); }
-                        catch { alert("Failed to load navigation from ./pageNavigation.json. Reason: " + reason + "."); }
-                    }
-                    else if ((reason = reason.trim()).length > 0)
-                        alert("Failed to load navigation from ./pageNavigation.json. Reason: " + reason);
-                }
-                alert("Failed to load navigation from ./pageNavigation.json. Reason: unknown.");
-            });
-            
-        }
-        createNavigationItem(data: INavigationJSON, $scope: ITopNavScope, pageName: string, definition: INavigationDefinition): INavLoadResult {
-            let item: INavigationItem = <INavigationItem>($scope.$new());
-            item.linkTitle = definition.linkTitle;
-            item.pageTitle = (isNilOrWhiteSpace(definition.pageTitle)) ? item.linkTitle : definition.pageTitle;
-            let selectedItem: INavigationItem | undefined;
-            if (definition.url.toLowerCase() === pageName) {
-                selectedItem = item;
-                item.href = "#";
-                item.class = data.selectedItemClass;
-                item.isCurrent = true;
-                item.onClick = function () { return false; }
-            } else {
-                item.href = definition.url;
-                item.class = data.otherItemClass;
-                item.isCurrent = false;
-                item.onClick = function () { return true; }
-            }
-            if (notNilOrEmpty(definition.items)) {
-                item.items = definition.items.map((d: INavigationDefinition) => {
-                    let result: INavLoadResult = this.createNavigationItem(data, item, pageName, d);
-                    if (!isNil(result.selectedItem) && isNil(result.selectedItem)) {
-                        selectedItem = result.item;
-                        item.class = data.currentItemClass;
-                        item.isCurrent = true;
-                    }
-                    return result.item;
-                });
-            }
-            return { item: item, selectedItem: selectedItem };
-        }
-
-        $doCheck(): void { }
-    }
-
-    module.controller("TopNavController", ["$scope", "$location", "$http", TopNavController]);
 
     // #endregion
 }

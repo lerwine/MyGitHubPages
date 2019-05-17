@@ -1,4 +1,4 @@
-﻿/// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
+/// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
 /// <reference path="Scripts/typings/angularjs/angular.d.ts"/>
 /// <reference path="app.ts"/>
 
@@ -66,7 +66,7 @@ namespace regexTester {
         clear(): void { localStorage.clear(); }
     }
 
-    app.module.factory("LocalRegexStorageService", LocalRegexStorageService);
+    app.mainModule.factory("LocalRegexStorageService", LocalRegexStorageService);
 
     // #endregion
     
@@ -117,7 +117,7 @@ namespace regexTester {
         setInputRowCount(inc: boolean): void;
     }
 
-    class RegexTesterController implements ng.IController {
+    export class RegexTesterController implements ng.IController {
         private _inputText: string[] = [];
         private _regex: RegExp;
         private _inputPattern: string = '';
@@ -367,5 +367,5 @@ namespace regexTester {
         }
     }
 
-    app.module.controller("RegexTesterController", ["$scope", "LocalRegexStorageService", RegexTesterController]);
+    app.mainModule.controller("RegexTesterController", ["$scope", "LocalRegexStorageService", RegexTesterController]);
 }
