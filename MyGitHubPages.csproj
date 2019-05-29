@@ -79,7 +79,6 @@
     <Content Include="gh-pages\App\UriBuilder.js" />
     <Content Include="gh-pages\ColorBuilder.html" />
     <Content Include="gh-pages\favicon.ico" />
-    <Content Include="gh-pages\Home.htm" />
     <Content Include="gh-pages\index.html" />
     <Content Include="gh-pages\lib\angular.js\angular-animate.js" />
     <Content Include="gh-pages\lib\angular.js\angular-animate.min.js" />
@@ -872,8 +871,11 @@
     <Content Include="gh-pages\lib\twitter-bootstrap\js\bootstrap.bundle.min.js" />
     <Content Include="gh-pages\lib\twitter-bootstrap\js\bootstrap.js" />
     <Content Include="gh-pages\lib\twitter-bootstrap\js\bootstrap.min.js" />
-    <Content Include="gh-pages\RegexTester.htm" />
     <Content Include="gh-pages\RegexTester.html" />
+    <Content Include="gh-pages\standaloneTest.html" />
+    <Content Include="gh-pages\standaloneTest\app.js" />
+    <Content Include="gh-pages\standaloneTest\index.html" />
+    <Content Include="gh-pages\standaloneTest\style.css" />
     <Content Include="gh-pages\Template\topNavAndHeader.html" />
     <Content Include="gh-pages\UriBuilder.html" />
     <Content Include="libman.json" />
@@ -1737,6 +1739,7 @@
     <Content Include="gh-pages\App\ColorBuilder.js.map" />
     <Content Include="gh-pages\App\RegexTester.js.map" />
     <Content Include="gh-pages\App\UriBuilder.js.map" />
+    <Content Include="gh-pages\standaloneTest\encodeCharacterRanges.json" />
     <None Include="packages.config" />
     <Content Include="README.md" />
     <Content Include="tslint.json" />
@@ -1777,6 +1780,7 @@
     <TypeScriptCompile Include="Scripts\typings\bootstrap-table\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="standaloneTest\app.ts" />
     <TypeScriptCompile Include="UriBuilder.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -1784,6 +1788,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SyncHelper.cs" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
