@@ -8,6 +8,7 @@ namespace uriBuilder {
         keyOnly: boolean;
         value: string;
     }
+
     /**
      * Defines scope properties for UriBuilderController.
      *
@@ -27,12 +28,12 @@ namespace uriBuilder {
         originEnabled: boolean;
 
         schemeName: string;
+        
+        schemeOptions: ISchemaOption[];
 
-        schemeOptions: string[];
+        separatorOptions: string[];
 
-        setScheme: { (value: string): void };
-
-        setSeparator: { (value: string): void };
+        selectedScheme: string;
 
         selectedSeparator: string;
 
@@ -59,13 +60,32 @@ namespace uriBuilder {
         enableFragment: boolean;
 
         fragment: string;
+
+        hrefChanged(): void;
+        
+        originChanged(): void;
+
+        schemeChanged(): void;
+
+        userInfoChanged(): void;
+
+        hostNameChanged(): void;
+
+        portChanged(): void;
     }
 
-    let schemeRegex: RegExp = /^([^:\\\/@]+)?:(\/\/?)?/;
+    let schemeRegex: RegExp = /^([a-z_][-.\dA-_a-z~\ud800-\udbff]*)(:[\\/]{0,2})/;
     let userInfoRegex: RegExp = /^([^:\\\/@]+)?(:([^:\\\/@]+)?)?@/;
     let hostAndPortRegex: RegExp = /^([^:\\\/@]+)?(:(\d+))?@/;
     let separatorRegex: RegExp = /[\\\/:]/;
+    let nonSeparatorRegex: RegExp = /[\\\/:]/;
+    let pathSegmentRegex: RegExp = /^(?:([^\\\/:]+)|([\\\/:])([^\\\/:]+)?)(.+)?$/;
     let uriParseRegex: RegExp = /^(([^\\\/@:]*)(:[\\\/]{0,2})((?=[^\\\/@:]*(?::[^\\\/@:]*)?@)([^\\\/@:]*)(:[^\\\/@:]*)?@)?([^\\\/@:]*)(?:(?=:\d*(?:[\\\/:]|$)):(\d*))?(?=[\\\/:]|$))?(.+)?$/;
+    let uriDataRegex: RegExp = /^([$-.\d_a-z~\ud800-\udbff]+|%[a-f\d]{2})+/i;
+    let uriPathRegex: RegExp = /^([!$&-.\d;=@-\[\]_a-z~\ud800-\udbff\/\\]+|%[a-f\d]{2})+/i;
+    let uriPathNameRegex: RegExp = /^([!$&-.\d;=@-\[\]_a-z~\ud800-\udbff]+|%[a-f\d]{2})+/i;
+    let uriAuthorityNameRegex: RegExp = /^([!$&-.\d;=A-\[\]_a-z~\ud800-\udbff]+|%[a-f\d]{2})+/;
+    
     enum uriParseGroup {
         all = 0,
         origin = 1,
@@ -80,158 +100,241 @@ namespace uriBuilder {
     }
     class UriBuilderController implements ng.IController {
         private _href: string = '';
+        private _hasOrigin: boolean = false;
         private _schemeName: string = '';
-        private _selectedSeparator: string = '';
+        private _schemeSeparator: string = '';
+        private _hasUserInfo: boolean = false;
         private _userName: string = '';
+        private _hasPassword: boolean = false;
         private _password: string = '';
         private _hostName: string = '';
+        private _hasPort: boolean = false;
         private _port: string = '';
         private _path: UriBuilderPathSegment[] = [];
+        private _hasQuery: boolean = false;
         private _query: UriQueryItem[] = [];
+        private _hasFragment: boolean = false;
         private _fragment: string = '';
 
-        setScheme(value: string) {
-            let i: number = value.indexOf(':');
-            this.$Scope.schemeName = value.substr(0, i);
-            this.$Scope.selectedSeparator = value.substr(i);
-        }
-        setSeparator(value: string) {
-            this.$Scope.selectedSeparator = value;
-        }
         constructor(protected $Scope: UriBuilderControllerScope) {
             $Scope.href = 'http://myuser:mypw@www.erwinefamily.net:8080/test/path/page.html?the=query#fragmented';
-            $Scope.originEnabled = true;
-            $Scope.schemeName = 'http';
-            $Scope.schemeOptions = ['http://', 'https://', 'ftp://'];
-            $Scope.setScheme = this.setScheme;
-            $Scope.setSeparator = this.setSeparator;
-            $Scope.selectedSeparator = '://';
-            $Scope.enableUsername = true;
-            $Scope.username = 'myuser';
-            $Scope.enablePassword = true;
-            $Scope.password = 'mypw';
-            $Scope.host = 'www.erwinefamily.net';
-            $Scope.port = '8080';
-            $Scope.path = [{ separator: '/', name: 'test' }, { separator: '/', name: 'path' }, { separator: '/', name: 'page.html' }];
-            $Scope.enableQuery = true;
-            $Scope.query = [{ key: 'the', value: 'query', keyOnly: false }];
-            $Scope.enableFragment = true;
-            $Scope.fragment = 'fragmented';
-        }
-
-        $onInit(): void {
-            if (this._href !== this.$Scope.href) {
-                let href: string = this.$Scope.href;
-                let i: number = href.indexOf('#');
-                if (i < 0) {
-                    this.$Scope.enableFragment = false;
-                    this.$Scope.fragment = this._fragment = '';
-                } else {
-                    this.$Scope.enableFragment = false;
-                    this.$Scope.fragment = this._fragment = href.substr(i + 1);
-                    this.$Scope.enableFragment = true;
-                    href = href.substr(0, i);
-                }
-                this.$Scope.query = [];
-                this._query = [];
-                i = href.indexOf('?');
-                if (i < 0)
-                    this.$Scope.enableQuery = false;
-                else {
-                    this.$Scope.query = href.substr(i + 1).split('&').map(function (s) {
-                        let x: number = s.indexOf('=');
-                        if (x < 0)
-                            return { key: decodeURIComponent(s), keyOnly: true, value: '' };
-
-                        return { key: decodeURIComponent(s.substr(0, x)), keyOnly: false, value: decodeURIComponent(s.substr(x + 1)) };
-                    });
-                    this.$Scope.enableQuery = true;
-                    href = href.substr(0, i);
-                }
-                let m: RegExpExecArray = schemeRegex.exec(this.$Scope.href);
-                if (app.isNil(m) || m.length == 0) {
-                    this.$Scope.originEnabled = this.$Scope.enableUsername = this.$Scope.enablePassword = this.$Scope.enablePort = false;
-                    this._schemeName = this.$Scope.schemeName = this._userName = this.$Scope.username = this._password = this.$Scope.password = this._hostName = this.$Scope.host =
-                        this._port = this.$Scope.port = '';
-                } else {
-                    this.$Scope.originEnabled = true;
-                    this.$Scope.schemeName = this._schemeName = (app.isNil(m[1])) ? '' : m[1];
-                    this.$Scope.selectedSeparator = this._selectedSeparator = (app.isNil(m[2])) ? ':' : ':' + m[2];
-                    href = href.substr(m[0].length);
-                    m = userInfoRegex.exec(href);
-                    if (app.isNil(m) || m.length == 0) {
-                        this.$Scope.enableUsername = this.$Scope.enablePassword = false;
-                        this.$Scope.username = this.$Scope.password = this._userName = this._password = '';
-                    } else {
-                        this.$Scope.enableUsername = true;
-                        this.$Scope.username = this._userName = (app.isNil(m[1])) ? '' : m[1];
-                        if (app.isNil(m[2])) {
-                            this.$Scope.enablePassword = false;
-                            this.$Scope.password = this._password = '';
-                        } else {
-                            this.$Scope.enablePassword = true;
-                            this.$Scope.password = this._password = (app.isNil(m[3])) ? '' : m[3];
-                        }
-                        href = href.substr(m[0].length);
-                    }
-                    m = hostAndPortRegex.exec(href);
-                    if (app.isNil(m) || m.length == 0) {
-                        this.$Scope.enablePort = false;
-                        this.$Scope.port = this._port = '';
-                    } else {
-                        this.$Scope.host = this._hostName = (app.isNil(m[1])) ? '' : m[1];
-                        if (app.isNil(m[2])) {
-                            this.$Scope.enablePort = false;
-                            this.$Scope.port = this._port = '';
-                        } else {
-                            this.$Scope.enablePort = true;
-                            this.$Scope.port = this._port = (app.isNil(m[3])) ? '' : m[3];
-                        }
-                        href = href.substr(m[0].length);
-                    }
-                }
-
-                this._path = [];
-                m = separatorRegex.exec(href);
-                let s: string = '';
-                if (!(app.isNil(m) || m.length == 0)) {
-                    if (m.index > 0) {
-                        s = href.substr(0, i);
-                        this._path.push({ separator: '', name: s });
-                        this.$Scope.path.push({ separator: '', name: s });
-                        s = href.substr(m.index, 1);
-                        href = href.substr(m.index + 1);
-                    } else {
-                        s = href.substr(0, 1);
-                        href = href.substr(1);
-                    }
-                    m = separatorRegex.exec(href);
-                    while (!(app.isNil(m) || m.length == 0)) {
-                        let n: string = href.substr(0, i);
-                        this._path.push({ separator: s, name: n });
-                        this.$Scope.path.push({ separator: s, name: n });
-                        s = href.substr(m.index, 1);
-                        href = href.substr(m.index + 1);
-                    }
-                }
-                this._path.push({ separator: s, name: href });
-                this.$Scope.path.push({ separator: s, name: href });
-                return;
+            $Scope.separatorOptions = ["://", ":/", ":"];
+            $Scope.schemeOptions = [SchemaProperties.uriScheme_http, SchemaProperties.uriScheme_https, SchemaProperties.uriScheme_file, SchemaProperties.uriScheme_ftp, SchemaProperties.uriScheme_ftps, SchemaProperties.uriScheme_git,
+                SchemaProperties.uriScheme_gopher, SchemaProperties.uriScheme_ldap, SchemaProperties.uriScheme_mailto, SchemaProperties.uriScheme_netPipe, SchemaProperties.uriScheme_netTcp, SchemaProperties.uriScheme_news,
+                SchemaProperties.uriScheme_nntp, SchemaProperties.uriScheme_sftp, SchemaProperties.uriScheme_ssh, SchemaProperties.uriScheme_telnet, SchemaProperties.uriScheme_urn, SchemaProperties.uriScheme_wais,
+                { name: "", displayText: "(custom)" }];
+            $Scope.selectedScheme = $Scope.schemeName = $Scope.schemeOptions[0].name;
+            $Scope.selectedSeparator = $Scope.schemeOptions[0].schemeSeparator;
+            let constructor: UriBuilderController = this;
+            $Scope.hrefChanged = () => {
+                if ($Scope.href !== this._href)
+                    constructor.parseHref();
             }
+            $Scope.originChanged = () => {
+                if (this._hasOrigin === $Scope.originEnabled)
+                    return;
+                this._hasOrigin = $Scope.originEnabled;
+                this.rebuildHref();
+            };
+            $Scope.schemeChanged = () => {
+                if ($Scope.selectedScheme.length == 0) {
+                    if ($Scope.schemeName === this._schemeName && $Scope.selectedSeparator === this._schemeSeparator)
+                        return;
+                    this._schemeName = $Scope.schemeName;
+                    this._schemeSeparator = $Scope.selectedSeparator;
+                } else {
+                    let selectedSeparator: string = this.$Scope.schemeOptions.filter((value: ISchemaOption) => value.name == $Scope.selectedScheme)[0].schemeSeparator;
+                    if (this._schemeSeparator == selectedSeparator && $Scope.selectedScheme === this._schemeName)
+                        return;
+                    this._schemeSeparator = $Scope.selectedSeparator = selectedSeparator;
+                    this._schemeName = $Scope.schemeName = $Scope.selectedScheme;
+                }
+                this.rebuildHref();
+            }
+            $Scope.userInfoChanged = () => {
+                if (this._hasUserInfo) {
+                    if ($Scope.enableUsername) {
+                        if (this._hasPassword === $Scope.enablePassword)
+                            return;
+                        this._hasPassword = $Scope.enablePassword;
+                    } else
+                        this._hasUserInfo = $Scope.enablePassword = false;
+                } else {
+                    if (!$Scope.enableUsername)
+                        return false;
+                    this._hasUserInfo = true;
+                    $Scope.enablePassword = this._hasPassword;
+                }
+                this.rebuildHref();
+            };
+            $Scope.hostNameChanged = () => {
+                if (this._hostName === $Scope.host)
+                    return;
+                this._hostName = $Scope.host;
+                this.rebuildHref();
+            };
+            $Scope.portChanged = () => {
+                if (this._hasPort === $Scope.enablePort && this._port === $Scope.port)
+                    return;
+                this._hasPort = $Scope.enablePort;
+                this._port = $Scope.port;
+                this.rebuildHref();
+            };
         }
+
+        $onInit(): void { this.parseHref(); }
 
         $doCheck(): void {
             console.info("check...");
+            if (this.$Scope.href !== this._href) {
+                this.parseHref();
+            }
+        }
 
+        parseQuery(query: string): void {
+            this.$Scope.enableQuery = this._hasQuery = (typeof (query) === 'string');
+            if (this._hasQuery) {
+                if (query.startsWith('?'))
+                    query = query.substr(1);
+                if (query.length == 0) {
+                    this._query = [];
+                    this.$Scope.query = [];
+                } else {
+                    this.$Scope.query = query.split('&').map((value: string) => {
+                        let i: number = value.indexOf('=');
+                        if (i < 0)
+                            return <UriQueryItem>{ key: decodeURIComponent(value), keyOnly: true, value: '' };
+                        return <UriQueryItem>{ key: decodeURIComponent(value.substr(0, i)), keyOnly: false, value: decodeURIComponent(value.substr(i + 1)) };
+                    });
+                    this._query = this.$Scope.query.map((value: UriQueryItem) => <UriQueryItem>{ key: value.key, keyOnly: value.keyOnly, value: value.value });
+                }
+            } else {
+                this._query = [];
+                this.$Scope.query = [];
+            }
+        }
+
+        parseQueryAndFragment(pathOrHref: string): string {
+            if (typeof (pathOrHref) != "string" || pathOrHref.length == 0) {
+                this._hasQuery = this._hasFragment = this.$Scope.enableFragment = this.$Scope.enableQuery = false;
+                this._query = [];
+                this.$Scope.query = [];
+                this._fragment = this.$Scope.fragment = "";
+                return "";
+            }
+            let i: number = pathOrHref.indexOf("#");
+            this._hasFragment = this.$Scope.enableFragment = (i >= 0);
+            if (this._hasFragment) {
+                this._fragment = this.$Scope.fragment = decodeURIComponent(pathOrHref.substr(i + 1));
+                pathOrHref = pathOrHref.substr(0, i);
+            } else
+                this._fragment = this.$Scope.fragment = "";
+            i = pathOrHref.indexOf("?");
+            if (i < 0) {
+                this._hasQuery = this.$Scope.enableQuery = false;
+                this._query = [];
+                this.$Scope.query = [];
+                return pathOrHref;
+            }
+            this.parseQuery(pathOrHref.substr(i));
+            return pathOrHref.substr(0, i);
+        }
+
+        parseHref(): void {
+            let href: string = this._href = this.$Scope.href;
+            if ((href = this.parseQueryAndFragment(href)).length == 0) {
+                this.$Scope.href = this._href = this.$Scope.schemeName = this._schemeName = this.$Scope.username = this._userName = this.$Scope.password = this._password = this.$Scope.host = this._hostName = this.$Scope.port = this._port = "";
+                this.$Scope.enablePassword = this.$Scope.enablePort = this.$Scope.enableUsername = this.$Scope.originEnabled = this.$Scope.enableQuery = this.$Scope.enableFragment = this._hasOrigin = this._hasPassword = this._hasPort = this._hasUserInfo = this._hasQuery = this._hasFragment = false;
+                this._path = [<UriBuilderPathSegment>{ name: "", separator: "" }];
+                this.$Scope.path = [<UriBuilderPathSegment>{ name: "", separator: "" }];
+                return;
+            }
+            let matches: RegExpExecArray = uriParseRegex.exec(href);
+            if (typeof (matches) !== "object" || matches === null) {
+                this.$Scope.schemeName = this._schemeName = this.$Scope.username = this._userName = this.$Scope.password = this._password = this.$Scope.host = this._hostName = this.$Scope.port = this._port = "";
+                this.$Scope.enablePassword = this.$Scope.enablePort = this.$Scope.enableUsername = this.$Scope.originEnabled = this._hasOrigin = this._hasPassword = this._hasPort = this._hasUserInfo = false;
+            } else {
+                this.$Scope.originEnabled = this._hasOrigin = (typeof matches[uriParseGroup.origin] === "string");
+                if (this.$Scope.originEnabled) {
+                    this.$Scope.selectedSeparator = this._schemeSeparator = matches[uriParseGroup.schemeSeparator].replace("\\", "/");
+                    this.$Scope.schemeName = this._schemeName = matches[uriParseGroup.schemeName];
+                    let matchingOptions: ISchemaOption[] = this.$Scope.schemeOptions.filter((value: ISchemaOption) => value.name == this._schemeName && (typeof value.schemeSeparator === "string") && value.schemeSeparator === this._schemeSeparator);
+                    this.$Scope.selectedScheme = (matchingOptions.length == 0) ? "" : matchingOptions[0].name;
+                    this.$Scope.enableUsername = this._hasUserInfo = (typeof matches[uriParseGroup.userInfo] === "string");
+                    if (this.$Scope.enableUsername) {
+                        this._userName = this.$Scope.username = (typeof matches[uriParseGroup.username] === "string") ? decodeURIComponent(matches[uriParseGroup.username]) : "";
+                        this.$Scope.enablePassword = (typeof matches[uriParseGroup.password] === "string");
+                        this._password = this.$Scope.password = (this.$Scope.enablePassword) ? matches[uriParseGroup.password] : "";
+                    } else {
+                        this._userName = this.$Scope.username = this._password = this.$Scope.password = "";
+                        this.$Scope.enablePassword = this._hasPassword = false;
+                        this._hostName = this.$Scope.host = (typeof matches[uriParseGroup.hostname] === "string") ? decodeURIComponent(matches[uriParseGroup.hostname]) : "";
+                    }
+                    this.$Scope.enablePort = this._hasPort = (typeof matches[uriParseGroup.portnumber] === "string");
+                    this._port = this.$Scope.port = (this.$Scope.enablePort) ? matches[uriParseGroup.portnumber] : "";
+                } else {
+                    this.$Scope.schemeName = this._schemeName = this.$Scope.username = this._userName = this.$Scope.password = this._password = this.$Scope.host = this._hostName = this.$Scope.port = this._port = "";
+                    this.$Scope.enablePassword = this.$Scope.enablePort = this.$Scope.enableUsername = this.$Scope.originEnabled = this._hasOrigin = this._hasPassword = this._hasPort = this._hasUserInfo = false;
+                }
+                href = (typeof matches[uriParseGroup.path] === "string") ? matches[uriParseGroup.path] : "";
+            }
+            if (href.length == 0) {
+                this._path = [<UriBuilderPathSegment>{ name: "", separator: "" }];
+                this.$Scope.path = [<UriBuilderPathSegment>{ name: "", separator: "" }];
+                this.$Scope.enableQuery = this.$Scope.enableFragment = this._hasQuery = this._hasFragment = false;
+            } else {
+                this._path = [];
+                this.$Scope.path = [];
+                let p: string;
+                matches = pathSegmentRegex.exec(href);
+                while ((typeof matches !== "object") || matches === null) {
+                    if (typeof matches[1] === "string") {
+                        p = decodeURIComponent(matches[1]);
+                        this._path.push(<UriBuilderPathSegment>{ separator: "", name: p });
+                        this.$Scope.push(<UriBuilderPathSegment>{ separator: "", name: p });
+                    } else {
+                        p = (typeof matches[3] === "string") ? decodeURIComponent(matches[3]) : "";
+                        this._path.push(<UriBuilderPathSegment>{ separator: matches[2], name: p });
+                        this.$Scope.push(<UriBuilderPathSegment>{ separator: matches[2], name: p });
+                    }
+                    if (typeof matches[4] !== "string")
+                        break;
+                    matches = pathSegmentRegex.exec(matches[4]);
+                }
+            }
+        }
+
+        rebuildHref(): void {
+            let href: string = "";
+            if (this._hasOrigin) {
+                href = encodeURIComponent(this._schemeName) + this._schemeSeparator;
+                if (this._hasUserInfo) {
+                    href += encodeURIComponent(this._userName);
+                    if (this._hasPassword)
+                        href += ":" + encodeURIComponent(this._password);
+                    href += "@";
+                }
+                href += encodeURIComponent(this._hostName);
+                if (this._hasPort)
+                    href += ":" + encodeURIComponent(this._port);
+            }
+            this._path.forEach((value: UriBuilderPathSegment) => href += value.separator + encodeURIComponent(value.name));
+            if (this._hasQuery) {
+                href += "?";
+                if (this._query.length > 0)
+                    this._query.forEach((value: UriQueryItem, idx: number) => {
+                        if (idx > 0)
+                            href += "&";
+                        if (value.keyOnly)
+                            href += encodeURIComponent(value.key);
+                        else
+                            href += encodeURIComponent(value.key) + "=" + encodeURIComponent(value.value);
+                    });
+            }
+            this._href = this.$Scope.href = (this._hasFragment) ? href + "#" + encodeURI(this._fragment) : href;
         }
     }
-
-    //function app.isNil(value: any): value is null | undefined { return typeof (value) === 'undefined' || value === null; }
-    //function app.isNilOrEmpty(value: string | null | undefined): boolean { return typeof (value) === 'undefined' || value === null || (typeof (value) === 'string' && value.length == 0); }
-    //function app.isNilOrWhiteSpace(value: string | null | undefined): boolean { return typeof (value) === 'undefined' || value === null || (typeof (value) === 'string' && value.trim().length == 0); }
-    //function isFiniteNumber(value: number): boolean { return typeof (value) === 'number' && !isNaN(value) && Number.isFinite(value); }
-    //function isFiniteWholeNumber(value: number): boolean { return typeof (value) === 'number' && !isNaN(value) && Number.isFinite(value) && Math.round(value) === value; }
-
+    
     interface IChangeTracking { hasChanges: boolean; }
 
     interface IUriQueryParamItem { name: string, value?: string };
@@ -1100,6 +1203,10 @@ namespace uriBuilder {
         [Symbol.iterator](): Iterator<UriPathSegment> { return new UriPathSegmentIterator(this._firstItem); }
     }
 
+    interface ISchemaOption extends ISchemaProperties {
+        readonly name: string;
+        readonly displayText: string;
+    }
     /*
      * https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top
       └─┬─┘ └───────┬────────────────────┘└─┬─────────────┘└──┬───────────────────────┘└┬─┘
@@ -1138,8 +1245,8 @@ namespace uriBuilder {
         schemeSeparator?: string;
         defaultPort?: number;
     }
-    class SchemaProperties implements ISchemaProperties {
-        readonly name: string;
+    class SchemaProperties implements ISchemaOption {
+        readonly description: string;
         readonly supportsPath: boolean;
         readonly supportsQuery: boolean;
         readonly supportsFragment: boolean;
@@ -1149,8 +1256,9 @@ namespace uriBuilder {
         readonly requiresUsername: boolean;
         readonly defaultPort: number;
         readonly schemeSeparator: string;
-        constructor(name: string, properties?: ISchemaProperties) {
-            this.name = name;
+        get displayText(): string { return (this.description.length == 0) ? this.name : this.name + " (" + this.description + ")"; }
+        constructor(readonly name: string, properties?: ISchemaProperties, description?: string) {
+            this.description = (typeof description === "string") ? description.trim() : "";
             if (typeof (properties) === 'undefined' || properties === null) {
                 this.supportsPath = true;
                 this.supportsQuery = true;
@@ -1219,75 +1327,75 @@ namespace uriBuilder {
         /**
          * File Transfer protocol
          **/
-        static readonly uriScheme_ftp: SchemaProperties = new SchemaProperties("ftp", { supportsQuery: false, supportsFragment: false, defaultPort: 21 });
+        static readonly uriScheme_ftp: SchemaProperties = new SchemaProperties("ftp", { supportsQuery: false, supportsFragment: false, defaultPort: 21 }, "File Transfer protocol");
         /**
          * File Transfer protocol (secure)
          **/
-        static readonly uriScheme_ftps: SchemaProperties = new SchemaProperties("ftps", { supportsQuery: false, supportsFragment: false, defaultPort: 990 });
+        static readonly uriScheme_ftps: SchemaProperties = new SchemaProperties("ftps", { supportsQuery: false, supportsFragment: false, defaultPort: 990 }, "File Transfer protocol (secure)");
         /**
          * Secure File Transfer Protocol
          **/
-        static readonly uriScheme_sftp: SchemaProperties = new SchemaProperties("sftp", { supportsQuery: false, supportsFragment: false, defaultPort: 22 });
+        static readonly uriScheme_sftp: SchemaProperties = new SchemaProperties("sftp", { supportsQuery: false, supportsFragment: false, defaultPort: 22 }, "Secure File Transfer Protocol");
         /**
          * Hypertext Transfer Protocol
          **/
-        static uriScheme_http: SchemaProperties = new SchemaProperties("http", { defaultPort: 80 });
+        static uriScheme_http: SchemaProperties = new SchemaProperties("http", { defaultPort: 80 }, "Hypertext Transfer Protocol");
         /**
          * Hypertext Transfer Protocol (secure)
          **/
-        static uriScheme_https: SchemaProperties = new SchemaProperties("https", { defaultPort: 443 });
+        static uriScheme_https: SchemaProperties = new SchemaProperties("https", { defaultPort: 443 }, "Hypertext Transfer Protocol (secure)");
         /**
-         * The Gopher protocol
+         * Gopher protocol
          **/
-        static uriScheme_gopher: SchemaProperties = new SchemaProperties("gopher", { defaultPort: 70 });
+        static uriScheme_gopher: SchemaProperties = new SchemaProperties("gopher", { defaultPort: 70 }, "Gopher protocol");
         /**
          * Electronic mail address
          **/
-        static uriScheme_mailto: SchemaProperties = new SchemaProperties("mailto", { schemeSeparator: ":" });
+        static uriScheme_mailto: SchemaProperties = new SchemaProperties("mailto", { schemeSeparator: ":" }, "Electronic mail address");
         /**
          * USENET news
          **/
-        static uriScheme_news: SchemaProperties = new SchemaProperties("news", { supportsCredentials: false, requiresHost: false, supportsPort: false, schemeSeparator: ":" })
+        static uriScheme_news: SchemaProperties = new SchemaProperties("news", { supportsCredentials: false, requiresHost: false, supportsPort: false, schemeSeparator: ":" }, "USENET news")
         /**
          * USENET news using NNTP access
          **/
-        static uriScheme_nntp: SchemaProperties = new SchemaProperties("nntp", { defaultPort: 119 });
+        static uriScheme_nntp: SchemaProperties = new SchemaProperties("nntp", { defaultPort: 119 }, "USENET news using NNTP access");
         /**
          * Reference to interactive sessions
          **/
-        static uriScheme_telnet: SchemaProperties = new SchemaProperties("telnet", { supportsPath: false, supportsQuery: false, supportsFragment: false, supportsCredentials: false, defaultPort: 23 });
+        static uriScheme_telnet: SchemaProperties = new SchemaProperties("telnet", { supportsPath: false, supportsQuery: false, supportsFragment: false, supportsCredentials: false, defaultPort: 23 }, "Reference to interactive sessions");
         /**
          * Wide Area Information Servers
          **/
-        static uriScheme_wais: SchemaProperties = new SchemaProperties("wais", { defaultPort: 443 });
+        static uriScheme_wais: SchemaProperties = new SchemaProperties("wais", { defaultPort: 443 }, "Wide Area Information Servers");
         /**
          * Host-specific file names
          **/
-        static uriScheme_file: SchemaProperties = new SchemaProperties("file", { supportsQuery: false, supportsFragment: false, supportsCredentials: false, requiresHost: false, supportsPort: false });
+        static uriScheme_file: SchemaProperties = new SchemaProperties("file", { supportsQuery: false, supportsFragment: false, supportsCredentials: false, requiresHost: false, supportsPort: false }, "Host-specific file names");
         /**
          * Net Pipe
          **/
-        static uriScheme_netPipe: SchemaProperties = new SchemaProperties("net.pipe", { supportsPort: false });
+        static uriScheme_netPipe: SchemaProperties = new SchemaProperties("net.pipe", { supportsPort: false }, "Net Pipe");
         /**
          * Net-TCP
          **/
-        static uriScheme_netTcp: SchemaProperties = new SchemaProperties("net.tcp", { defaultPort: 808 });
+        static uriScheme_netTcp: SchemaProperties = new SchemaProperties("net.tcp", { defaultPort: 808 }, "Net-TCP");
         /**
          * Lightweight Directory Access Protocol
          **/
-        static uriScheme_ldap: SchemaProperties = new SchemaProperties("ldap", { defaultPort: 389 });
+        static uriScheme_ldap: SchemaProperties = new SchemaProperties("ldap", { defaultPort: 389 }, "Lightweight Directory Access Protocol");
         /**
-         * Lightweight Directory Access Protocol
+         * Secure Shell
          **/
-        static uriScheme_ssh: SchemaProperties = new SchemaProperties("ssh", { defaultPort: 22 });
+        static uriScheme_ssh: SchemaProperties = new SchemaProperties("ssh", { defaultPort: 22 }, "Secure Shell");
         /**
          * GIT Respository
          **/
-        static uriScheme_git: SchemaProperties = new SchemaProperties("git", { supportsQuery: false, supportsFragment: false, defaultPort: 9418 });;
+        static uriScheme_git: SchemaProperties = new SchemaProperties("git", { supportsQuery: false, supportsFragment: false, defaultPort: 9418 }, "GIT Respository");
         /**
          * Uniform Resource notation
          **/
-        static uriScheme_urn: SchemaProperties = new SchemaProperties("urn", { supportsCredentials: false, requiresHost: false, supportsPort: false, schemeSeparator: ":" });
+        static uriScheme_urn: SchemaProperties = new SchemaProperties("urn", { supportsCredentials: false, requiresHost: false, supportsPort: false, schemeSeparator: ":" }, "Uniform Resource notation");
     }
 
     /**
@@ -1519,6 +1627,13 @@ namespace uriBuilder {
         toJSON(): string { return JSON.stringify(this.href); }
     }
 
+    /**
+     * Represents a path segment.
+     * @interface
+     *
+     * @property {string} separator leading separator character.
+     * @property {string} name name of the path segment.
+     * */
     interface UriBuilderPathSegment {
         separator: string;
         name: string;
