@@ -1110,6 +1110,7 @@
     <Content Include="gh-pages\standaloneTest\index.html" />
     <Content Include="gh-pages\standaloneTest\style.css" />
     <Content Include="gh-pages\Template\topNavAndHeader.html" />
+    <Content Include="gh-pages\Test.html" />
     <Content Include="gh-pages\UriBuilder.html" />
     <Content Include="libman.json" />
     <Content Include="lib\angular.js\angular-animate.js" />
@@ -2001,6 +2002,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="accordionGroup.ts" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="ColorBuilder.ts" />
     <TypeScriptCompile Include="RegexTester.ts" />

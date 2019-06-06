@@ -9,6 +9,54 @@ namespace app {
     * @type {ng.IModule}
     */
     export let mainModule: ng.IModule = angular.module("mainModule", []);
+    
+    export interface IParsedUriQueryComponent {
+        originalString: string;
+        name: string;
+        value?: string;
+    }
+
+    export interface IParsedUriPathSegment {
+        originalString: string;
+        name: string;
+    }
+    export interface IParsedUriPathComponent {
+        originalString: string;
+        path: string;
+        segments: IParsedUriPathSegment[];
+    }
+
+    export interface IParsedUriHostComponent {
+        originalString: string;
+        name: string;
+        port?: number;
+    }
+
+    export interface IParsedUriUserInfoComponent {
+        originalString: string;
+        userName: string;
+        password?: string;
+    }
+
+    export interface IParsedUriOriginComponent {
+        originalString: string;
+        scheme: string;
+        separator: string;
+        userInfo?: IParsedUriUserInfoComponent;
+        host?: IParsedUriHostComponent;
+    }
+
+    export interface IParsedUriComponents {
+        originalString: string;
+        href: string;
+        origin?: IParsedUriOriginComponent;
+        path: IParsedUriPathComponent;
+        query?: IParsedUriQueryComponent;
+        fragment?: string;
+    }
+
+    const schemeParseRe: RegExp = /^(?:([^:@\\\/]+)(:(?:\/\/?)?)|(:\/\/?))/;
+
 
     /**
      *
