@@ -77,6 +77,7 @@
     <Content Include="gh-pages\App\app.js" />
     <Content Include="gh-pages\App\ColorBuilder.js" />
     <Content Include="gh-pages\App\RegexTester.js" />
+    <Content Include="gh-pages\App\sys.js" />
     <Content Include="gh-pages\App\UriBuilder.js" />
     <Content Include="gh-pages\ColorBuilder.html" />
     <Content Include="gh-pages\favicon.ico" />
@@ -1978,11 +1979,13 @@
     <Content Include="gh-pages\images\open-iconic\ICON-LICENSE" />
     <Content Include="gh-pages\images\open-iconic\README.md" />
     <Content Include="gh-pages\App\accordionGroup.js.map" />
+    <Content Include="gh-pages\App\sys.js.map" />
     <None Include="packages.config" />
     <Content Include="README.md" />
     <Content Include="tslint.json" />
     <Content Include="tsconfig-old.json" />
     <Content Include="util\SyncBrowserBookmarks.ps1" />
+    <Content Include="util\RefreshImageIndexes.ps1" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2019,7 +2022,6 @@
     <TypeScriptCompile Include="Scripts\typings\bootstrap-table\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="standaloneTest\app.ts" />
     <TypeScriptCompile Include="sys.ts" />
     <TypeScriptCompile Include="UriBuilder.ts" />
   </ItemGroup>
