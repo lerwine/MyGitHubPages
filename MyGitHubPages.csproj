@@ -73,6 +73,7 @@
     <Content Include=".gitignore" />
     <Content Include=".gitmodules" />
     <Content Include="gh-pages\app.css" />
+    <Content Include="gh-pages\App\accordionGroup.js" />
     <Content Include="gh-pages\App\app.js" />
     <Content Include="gh-pages\App\ColorBuilder.js" />
     <Content Include="gh-pages\App\RegexTester.js" />
@@ -1976,6 +1977,7 @@
     <Content Include="gh-pages\standaloneTest\encodeCharacterRanges.json" />
     <Content Include="gh-pages\images\open-iconic\ICON-LICENSE" />
     <Content Include="gh-pages\images\open-iconic\README.md" />
+    <Content Include="gh-pages\App\accordionGroup.js.map" />
     <None Include="packages.config" />
     <Content Include="README.md" />
     <Content Include="tslint.json" />
@@ -2018,6 +2020,7 @@
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="standaloneTest\app.ts" />
+    <TypeScriptCompile Include="sys.ts" />
     <TypeScriptCompile Include="UriBuilder.ts" />
   </ItemGroup>
   <ItemGroup>

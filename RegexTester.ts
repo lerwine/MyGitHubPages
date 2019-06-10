@@ -1,5 +1,6 @@
 /// <reference path="Scripts/typings/jquery/jquery.d.ts"/>
 /// <reference path="Scripts/typings/angularjs/angular.d.ts"/>
+/// <reference path="sys.ts"/>
 /// <reference path="app.ts"/>
 
 namespace regexTester {
@@ -16,7 +17,7 @@ namespace regexTester {
             $scope.evaluationIsDisabled = true;
             $scope.evaluateExpression = () => { controller.evaluateExpression(); }
             regexParser.whenPatternParseSucceeded((re: RegExp) => { $scope.evaluationIsDisabled = false; });
-            regexParser.whenPatternParseFailed((value: string, reason: app.ErrorResult) => { $scope.isDisabled = true; });
+            regexParser.whenPatternParseFailed((value: string, reason: sys.ErrorResult) => { $scope.isDisabled = true; });
             regexParser.then((re: RegExp) => { $scope.evaluationIsDisabled = false; });
         }
 
@@ -64,10 +65,10 @@ namespace regexTester {
         private _parsePending: boolean = false;
         private _parsedPattern: RegExp | undefined;
         private _pauseLevel: number = 0;
-        private _whenInputPatternChanged: app.IValueCallback<string> | undefined;
-        private _whenParsedPatternChanged: app.IValueCallback<RegExp | undefined> | undefined;
-        private _whenPatternParseSucceeded: app.IValueCallback<RegExp> | undefined;
-        private _whenPatternParseFailed: app.IValueErrorCallback<string> | undefined;
+        private _whenInputPatternChanged: sys.IValueCallback<string> | undefined;
+        private _whenParsedPatternChanged: sys.IValueCallback<RegExp | undefined> | undefined;
+        private _whenPatternParseSucceeded: sys.IValueCallback<RegExp> | undefined;
+        private _whenPatternParseFailed: sys.IValueErrorCallback<string> | undefined;
 
         get isPaused(): boolean { return this._pauseLevel > 0; }
 
@@ -77,7 +78,7 @@ namespace regexTester {
             if (this._inputRegexPattern === pattern)
                 return;
             this._inputRegexPattern = pattern;
-            app.execIfFunction<string>(this._whenInputPatternChanged, this._inputRegexPattern);
+            sys.execIfFunction<string>(this._whenInputPatternChanged, this._inputRegexPattern);
             if (this._pauseLevel > 0)
                 this._parsePending = true;
             else
@@ -113,13 +114,13 @@ namespace regexTester {
             }
         }
 
-        whenInputPatternChanged(callback: app.IValueCallback<string>) { this._whenInputPatternChanged = app.chainCallback<string>(this._whenInputPatternChanged, callback); }
+        whenInputPatternChanged(callback: sys.IValueCallback<string>) { this._whenInputPatternChanged = sys.chainCallback<string>(this._whenInputPatternChanged, callback); }
     
-        whenParsedPatternChanged(callback: app.IValueCallback<RegExp | undefined>) { this._whenParsedPatternChanged = app.chainCallback<RegExp | undefined>(this._whenParsedPatternChanged, callback); }
+        whenParsedPatternChanged(callback: sys.IValueCallback<RegExp | undefined>) { this._whenParsedPatternChanged = sys.chainCallback<RegExp | undefined>(this._whenParsedPatternChanged, callback); }
     
-        whenPatternParseSucceeded(callback: app.IValueCallback<RegExp>) { this._whenPatternParseSucceeded = app.chainCallback<RegExp>(this._whenPatternParseSucceeded, callback); }
+        whenPatternParseSucceeded(callback: sys.IValueCallback<RegExp>) { this._whenPatternParseSucceeded = sys.chainCallback<RegExp>(this._whenPatternParseSucceeded, callback); }
         
-        whenPatternParseFailed(callback: app.IValueErrorCallback<string>) { this._whenPatternParseFailed = app.chainCallback<string, app.ErrorResult>(this._whenPatternParseFailed, callback); }
+        whenPatternParseFailed(callback: sys.IValueErrorCallback<string>) { this._whenPatternParseFailed = sys.chainCallback<string, sys.ErrorResult>(this._whenPatternParseFailed, callback); }
         
         startParseCurrentPattern(): ng.IPromise<RegExp> {
             let result: ng.IPromise<RegExp>;
@@ -131,31 +132,31 @@ namespace regexTester {
                     reject(e);
                     return;
                 }
-                if (app.isNil(result))
+                if (sys.isNil(result))
                     reject("Failed ot parse regular expression.");
                 else
                     resolve(result);
             }).then((result: RegExp) => {
                 this._parsedPattern = result;
-                try { app.execIfFunction<RegExp>(this._whenPatternParseSucceeded, result); }
-                finally { app.execIfFunction<RegExp | undefined>(this._whenParsedPatternChanged, result); }
+                try { sys.execIfFunction<RegExp>(this._whenPatternParseSucceeded, result); }
+                finally { sys.execIfFunction<RegExp | undefined>(this._whenParsedPatternChanged, result); }
                 return result;
             }, (reason: any) => {
-                let errorReason: app.ErrorResult = app.asErrorResult(reason);
+                let errorReason: sys.ErrorResult = sys.asErrorResult(reason);
                 this._parsedPattern = undefined;
-                try { app.execIfFunction<string, app.ErrorResult>(this._whenPatternParseFailed, pattern, reason); }
-                finally { app.execIfFunction<RegExp | undefined>(this._whenParsedPatternChanged, undefined); }
+                try { sys.execIfFunction<string, sys.ErrorResult>(this._whenPatternParseFailed, pattern, reason); }
+                finally { sys.execIfFunction<RegExp | undefined>(this._whenParsedPatternChanged, undefined); }
                 return errorReason;
             });
 
             return result;
         }
 
-        then<T>(successCallback: { (result: RegExp): T}, errorCallback?: { (reason: app.ErrorResult): any}): ng.IPromise<T>;
-        then(successCallback: { (result: RegExp): any}, errorCallback?: { (reason: app.ErrorResult): any}): ng.IPromise<any>;
-        then(successCallback: { (result: RegExp): any}, errorCallback?: { (reason: app.ErrorResult): any}): ng.IPromise<any> {
+        then<T>(successCallback: { (result: RegExp): T}, errorCallback?: { (reason: sys.ErrorResult): any}): ng.IPromise<T>;
+        then(successCallback: { (result: RegExp): any}, errorCallback?: { (reason: sys.ErrorResult): any}): ng.IPromise<any>;
+        then(successCallback: { (result: RegExp): any}, errorCallback?: { (reason: sys.ErrorResult): any}): ng.IPromise<any> {
             let result: ng.IPromise<RegExp> = this._result;
-            if (app.isNil(result))
+            if (sys.isNil(result))
                 return this.startParseCurrentPattern();
             return result.then(successCallback, errorCallback);
         }
@@ -224,7 +225,7 @@ namespace regexTester {
         }
 
         static initialize(items: EvaluationSourceItem[], scope: IInputSourceItemParent) {
-            if (app.isNil(scope.sourceItems) || !Array.isArray(scope.sourceItems))
+            if (sys.isNil(scope.sourceItems) || !Array.isArray(scope.sourceItems))
                 scope.sourceItems = [];
             let e: number = (items.length < scope.sourceItems.length) ? items.length : scope.sourceItems.length;
             let i: number;
@@ -293,11 +294,11 @@ namespace regexTester {
                         throw new Error("Resolver not implemented.");
                     });
                 }).then((result: IExpressionEvaluationResult) => { return result; }, (reason: any) => {
-                    let errorReason: app.ErrorResult = app.asErrorResult(reason);
+                    let errorReason: sys.ErrorResult = sys.asErrorResult(reason);
                     throw new Error("Reject not implemented.");
                     // this._parsedPattern = undefined;
-                    // try { app.execIfFunction<string, app.ErrorResult>(this._whenPatternParseFailed, pattern, reason); }
-                    // finally { app.execIfFunction<RegExp | undefined>(this._whenParsedPatternChanged, undefined); }
+                    // try { sys.execIfFunction<string, sys.ErrorResult>(this._whenPatternParseFailed, pattern, reason); }
+                    // finally { sys.execIfFunction<RegExp | undefined>(this._whenParsedPatternChanged, undefined); }
                     // return errorReason;
                 });
             });
@@ -305,9 +306,9 @@ namespace regexTester {
             return result;
         }
 
-        then<T>(successCallback: { (result: IExpressionEvaluationResult): T}, errorCallback?: { (reason: app.ErrorResult): any}): ng.IPromise<T>;
-        then(successCallback: { (result: IExpressionEvaluationResult): any}, errorCallback?: { (reason: app.ErrorResult): any}): ng.IPromise<any>;
-        then(successCallback: { (resresultponse: IExpressionEvaluationResult): any}, errorCallback?: { (reason: app.ErrorResult): any}): ng.IPromise<any> {
+        then<T>(successCallback: { (result: IExpressionEvaluationResult): T}, errorCallback?: { (reason: sys.ErrorResult): any}): ng.IPromise<T>;
+        then(successCallback: { (result: IExpressionEvaluationResult): any}, errorCallback?: { (reason: sys.ErrorResult): any}): ng.IPromise<any>;
+        then(successCallback: { (resresultponse: IExpressionEvaluationResult): any}, errorCallback?: { (reason: sys.ErrorResult): any}): ng.IPromise<any> {
             return this._result.then(successCallback, errorCallback);
         }
     }
@@ -330,7 +331,7 @@ namespace regexTester {
     // #region RegexOptions Service
     
     class RegexOptionsService implements IRegexOptions {
-        private _whenFlagsChanged: app.IValueCallback<string>;
+        private _whenFlagsChanged: sys.IValueCallback<string>;
 
         // #region flags Property
         
@@ -457,7 +458,7 @@ namespace regexTester {
         private updateFlags(): void {
             let flags: string;
             this._flags = flags = RegexOptionsService.toFlags(this);
-            app.execIfFunction<string>(this._whenFlagsChanged, flags);
+            sys.execIfFunction<string>(this._whenFlagsChanged, flags);
         }
 
         updateTo(target: IRegexOptions) {
@@ -469,8 +470,8 @@ namespace regexTester {
             target.unicode = this._unicode;
         }
         
-        whenFlagsChanged(callback: app.IValueCallback<string>) {
-            this._whenFlagsChanged = app.chainCallback<string>(this._whenFlagsChanged, callback);
+        whenFlagsChanged(callback: sys.IValueCallback<string>) {
+            this._whenFlagsChanged = sys.chainCallback<string>(this._whenFlagsChanged, callback);
         }
     }
     
@@ -556,7 +557,7 @@ namespace regexTester {
                 this.$scope.textBoxClass = ["is-valid "];
                 this.$scope.isValid = true;
             });
-            regexParser.whenPatternParseFailed((text: string, reason: app.ErrorResult) => {
+            regexParser.whenPatternParseFailed((text: string, reason: sys.ErrorResult) => {
                 this.$scope.textBoxClass = ["is-invalid"];
                 this.$scope.isValid = false;
                 $scope.patternValidationMessage = (typeof reason === "string") ? reason : (typeof reason.message === "string" && reason.message.trim().length > 0) ? reason.message : "" + reason;
