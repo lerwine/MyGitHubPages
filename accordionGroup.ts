@@ -13,9 +13,11 @@ namespace accordionGroup {
      */
     export interface IShowHideCallback { (show: boolean, state?: any): void; };
 
-    // #region <accordion-group></accordion-group>
+    // #region <accordion-group:container></accordion-group:container>
 
-    export const DIRECTIVENAME_accordionGroup: string = "accordionGroup";
+    export const PREFIX_accordionGroup: string = "accordionGroup";
+
+    export const DIRECTIVENAME_accordionGroupContainer: string = PREFIX_accordionGroup + "Container";
 
     /**
      * Internal interface for tracking show/hide listeners registered with an accordionGroup directive.
@@ -176,7 +178,7 @@ namespace accordionGroup {
         }
     }
     
-    app.mainModule.directive(DIRECTIVENAME_accordionGroup, () => <ng.IDirective>{
+    app.mainModule.directive(DIRECTIVENAME_accordionGroupContainer, () => <ng.IDirective>{
         restrict: "E",
         controller: ["$scope", AccordionGroupController],
         transclude: true,
@@ -185,9 +187,9 @@ namespace accordionGroup {
 
     // #endregion
 
-    // #region accordion-group-content-item
+    // #region accordion-group:content
 
-    export const DIRECTIVENAME_accordionGroupContentItem: string = "accordionGroupContentItem";
+    export const DIRECTIVENAME_accordionGroupContent: string = PREFIX_accordionGroup + "Content";
 
     /**
      * Defines expected attribute values for the target element that has the accordionGroupContentItem directive.
@@ -207,8 +209,8 @@ namespace accordionGroup {
         accordionGroupContentItem: string;
     }
 
-    app.mainModule.directive(DIRECTIVENAME_accordionGroupContentItem, () => <ng.IDirective>{
-        require: "^^" + DIRECTIVENAME_accordionGroup,
+    app.mainModule.directive(DIRECTIVENAME_accordionGroupContent, () => <ng.IDirective>{
+        require: "^^" + DIRECTIVENAME_accordionGroupContainer,
         restrict: "A",
         transclude: true,
         template: '<ng-transclude></ng-transclude>',
@@ -226,9 +228,9 @@ namespace accordionGroup {
 
     // #endregion
 
-    // #region accordion-group-toggle-on-click
+    // #region accordion-group:toggle-on-click
 
-    export const DIRECTIVENAME_accordionGroupToggleOnClick: string = "accordionGroupToggleOnClick";
+    export const DIRECTIVENAME_accordionGroupToggleOnClick: string = PREFIX_accordionGroup + "ToggleOnClick";
 
     /**
      *
@@ -248,7 +250,7 @@ namespace accordionGroup {
     }
 
     app.mainModule.directive(DIRECTIVENAME_accordionGroupToggleOnClick, () => <ng.IDirective>{
-        require: "^^" + DIRECTIVENAME_accordionGroup,
+        require: "^^" + DIRECTIVENAME_accordionGroupContainer,
         restrict: "A",
         transclude: true,
         template: '<ng-transclude></ng-transclude>',
@@ -261,7 +263,7 @@ namespace accordionGroup {
 
     // #region <accordion-group-toggle-button item-id="" expanded-class="" collapsed-class=""></accordion-group-toggle-button>
 
-    export const DIRECTIVENAME_accordionGroupToggleButton: string = "accordionGroupToggleButton";
+    export const DIRECTIVENAME_accordionGroupToggleButton: string = PREFIX_accordionGroup + "ToggleButton";
 
     /**
      *
@@ -492,7 +494,7 @@ namespace accordionGroup {
                 transclude: true,
                 controllerAs: "accordionGroupToggleButtonController",
                 controller: ["$scope", AccordionGroupToggleButtonController],
-                require: "^^" + DIRECTIVENAME_accordionGroup,
+                require: "^^" + DIRECTIVENAME_accordionGroupContainer,
                 scope: { itemId: "@", onAccordionItemExpanded: "&?", onAccordionItemCollapsed: "&?" },
                 link: <ng.IDirectiveLinkFn>AccordionGroupToggleButtonController.directiveLink,
                 template: '<button onclick="return false;" ng-transclude></button>'
@@ -508,7 +510,7 @@ namespace accordionGroup {
 
     // #region <accordion-group-button-text expanded-text="" collapsed-text="" expanded-class="" collapsed-class="" />
 
-    export const DIRECTIVENAME_accordionGroupButtonText: string = "accordionGroupButtonText";
+    export const DIRECTIVENAME_accordionGroupButtonText: string = PREFIX_accordionGroup + "ButtonText";
 
     /**
      *
@@ -607,11 +609,11 @@ namespace accordionGroup {
 
     // #endregion
 
-    // #region <accordion-group-button-expanded></accordion-group-button-expanded>
+    // #region <accordion-group:when-button-expanded></accordion-group:when-button-expanded>
 
-    export const DIRECTIVENAME_accordionGroupButtonExpanded: string = "accordionGroupButtonExpanded";
+    export const DIRECTIVENAME_accordionGroupWhenButtonExpanded: string = PREFIX_accordionGroup + "WhenButtonExpanded";
 
-    app.mainModule.directive(DIRECTIVENAME_accordionGroupButtonExpanded, () => <ng.IDirective>{
+    app.mainModule.directive(DIRECTIVENAME_accordionGroupWhenButtonExpanded, () => <ng.IDirective>{
         require: "^^" + DIRECTIVENAME_accordionGroupToggleButton,
         restrict: "E",
         transclude: true,
@@ -629,11 +631,11 @@ namespace accordionGroup {
 
     // #endregion
 
-    // #region <accordion-group-button-collapsed></accordion-group-button-collapsed>
+    // #region <accordion-group:when-button-collapsed></accordion-group:when-button-collapsed>
 
-    export const DIRECTIVENAME_accordionGroupButtonCollapsed: string = "accordionGroupButtonCollapsed";
+    export const DIRECTIVENAME_accordionGroupWhenButtonCollapsed: string = PREFIX_accordionGroup + "WhenButtonCollapsed";
 
-    app.mainModule.directive(DIRECTIVENAME_accordionGroupButtonCollapsed, () => <ng.IDirective>{
+    app.mainModule.directive(DIRECTIVENAME_accordionGroupWhenButtonCollapsed, () => <ng.IDirective>{
         require: "^^" + DIRECTIVENAME_accordionGroupToggleButton,
         restrict: "E",
         transclude: true,
@@ -651,9 +653,9 @@ namespace accordionGroup {
 
     // #endregion
 
-    // #region <accordion-group-button-image expanded-src="" collapsed-src="" expanded-alt="" collapsed-alt="" expanded-class="" collapsed-class=""></accordion-group-button-image>
+    // #region <accordion-group:button-image expanded-src="" collapsed-src="" expanded-alt="" collapsed-alt="" expanded-class="" collapsed-class=""></accordion-group:button-image>
 
-    export const DIRECTIVENAME_accordionGroupButtonImage: string = "accordionGroupButtonImage";
+    export const DIRECTIVENAME_accordionGroupButtonImage: string = PREFIX_accordionGroup + "ButtonImage";
 
     /**
      *

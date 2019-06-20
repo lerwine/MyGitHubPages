@@ -32,7 +32,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TypeScriptTarget>ES2015</TypeScriptTarget>
+    <TypeScriptTarget>ES2016</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
     <TypeScriptModuleKind>None</TypeScriptModuleKind>
     <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
@@ -1107,10 +1107,6 @@
     <Content Include="gh-pages\lib\twitter-bootstrap\js\bootstrap.js" />
     <Content Include="gh-pages\lib\twitter-bootstrap\js\bootstrap.min.js" />
     <Content Include="gh-pages\RegexTester.html" />
-    <Content Include="gh-pages\standaloneTest.html" />
-    <Content Include="gh-pages\standaloneTest\app.js" />
-    <Content Include="gh-pages\standaloneTest\index.html" />
-    <Content Include="gh-pages\standaloneTest\style.css" />
     <Content Include="gh-pages\Template\topNavAndHeader.html" />
     <Content Include="gh-pages\Test.html" />
     <Content Include="gh-pages\UriBuilder.html" />
@@ -1975,17 +1971,23 @@
     <Content Include="gh-pages\App\ColorBuilder.js.map" />
     <Content Include="gh-pages\App\RegexTester.js.map" />
     <Content Include="gh-pages\App\UriBuilder.js.map" />
-    <Content Include="gh-pages\standaloneTest\encodeCharacterRanges.json" />
     <Content Include="gh-pages\images\open-iconic\ICON-LICENSE" />
     <Content Include="gh-pages\images\open-iconic\README.md" />
     <Content Include="gh-pages\App\accordionGroup.js.map" />
     <Content Include="gh-pages\App\sys.js.map" />
+    <None Include="gh-pages\Schema\AccordionGroup.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="gh-pages\Schema\App.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="gh-pages\Schema\UriBuilder.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <Content Include="README.md" />
     <Content Include="tslint.json" />
     <Content Include="tsconfig-old.json" />
-    <Content Include="util\SyncBrowserBookmarks.ps1" />
-    <Content Include="util\RefreshImageIndexes.ps1" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2032,20 +2034,10 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContentIndex.cs" />
-    <Compile Include="GroupingLinkedList.cs" />
     <Compile Include="LinkedValueListDictionary.cs" />
-    <Compile Include="SyncHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Management.Automation\v4.0_3.0.0.0__31bf3856ad364e35\System.Management.Automation.dll</HintPath>
-    </Reference>
-    <Reference Include="System.XML" />
-    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

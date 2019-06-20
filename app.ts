@@ -511,7 +511,7 @@ namespace app {
         pageName: string;
     };
 
-    mainModule.directive('topNavAndHeader', ['applicationConfigurationLoader', (navLoader: applicationConfigurationLoaderService) => {
+    mainModule.directive('appTopNavAndHeader', ['applicationConfigurationLoader', (navLoader: applicationConfigurationLoaderService) => {
         return <ng.IDirective>{
             restrict: "E",
             scope: {},

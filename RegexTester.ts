@@ -4,7 +4,306 @@
 /// <reference path="app.ts"/>
 
 namespace regexTester {
+    abstract class RegexExpressionBase {
+        private _id: symbol;
+        private _parent: RegexExpression | undefined;
+        private _previous: RegexExpressionBase | undefined;
+        private _next: RegexExpressionBase | undefined;
+        private _first: RegexExpressionBase | undefined;
+        private _last: RegexExpressionBase | undefined;
+        private _size: number = 0;
+
+        protected get baseParent(): RegexExpressionBase { return this._parent; }
+
+        protected get basePrevious(): RegexExpressionBase { return this._previous; }
+
+        protected get baseNext(): RegexExpressionBase { return this._next; }
+
+        protected get baseFirst(): RegexExpressionBase { return this._first; }
+
+        protected get baseLast(): RegexExpressionBase { return this._last; }
+
+        protected get baseSize(): number { return this._size; }
+
+        constructor() { this._id = Symbol(); }
+        
+        protected baseAdd(item: RegexExpressionBase): number {
+            if (sys.isNil(item))
+                throw new Error("Cannot add nil items.");
+            if (!sys.isNil(item._parent)) {
+                if (item._parent._id === this._id)
+                    throw new Error("Item alrady belongs to this expression.");
+                throw new Error("Item belongs to another expression.");
+            }
+            if (sys.isNil(item._previous = this._last))
+                this._first = item;
+            else
+                item._previous._next = item;
+            (this._last = item)._parent = this;
+            return this._size++;
+        }
+
+        protected baseReplace(item: RegexExpressionBase, ref: RegexExpressionBase): void {
+            if (sys.isNil(item))
+                throw new Error("Cannot add nil items.");
+            if (sys.isNil(ref))
+                throw new Error("Reference item cannot be null.");
+            if (sys.isNil(ref._parent) || ref._parent._id !== this._id)
+                throw new Error("Reference item does not belong to this expression");
+            if (!sys.isNil(item._parent)) {
+                if (item._parent._id === this._id) {
+                    if (this._id == ref._id)
+                        return;
+                    throw new Error("Item alrady belongs to this expression.");
+                }
+                throw new Error("Item belongs to another expression.");
+            }
+            item._parent = this;
+            if (sys.isNil(item._previous = ref._previous))
+                this._first = item;
+            else
+                item._previous._next = item;
+            if (sys.isNil(item._next = ref._next))
+                this._last = item;
+            else
+                item._next._previous = item;
+            ref._previous = ref._next = ref._parent = undefined;
+        }
+
+        protected baseInsertBefore(item: RegexExpressionBase, ref: RegexExpressionBase): number {
+            if (sys.isNil(item))
+                throw new Error("Cannot add nil items.");
+            if (!sys.isNil(item._parent)) {
+                if (item._parent._id === this._id)
+                    throw new Error("Item alrady belongs to this expression.");
+                throw new Error("Item belongs to another expression.");
+            }
+            if (sys.isNil(ref))
+                throw new Error("Reference item cannot be null.");
+            if (sys.isNil(ref._parent) || ref._parent._id !== this._id)
+                throw new Error("Reference item does not belong to this expression");
+            let index: number;
+            if (sys.isNil(item._previous = (item._next = ref)._previous)) {
+                index = 0;
+                this._first = item;
+            } else {
+                item._previous._next = item;
+                index = 1;
+                for (let i: RegexExpressionBase = ref._previous._previous; !sys.isNil(i); i = i._previous)
+                    index++;
+            }
+            (ref._previous = item)._parent = this;
+            this._size++;
+            return index;
+        }
+
+        protected baseInsertAfter(item: RegexExpressionBase, ref: RegexExpressionBase): number {
+            if (sys.isNil(item))
+                throw new Error("Cannot add nil items.");
+            if (!sys.isNil(item._parent)) {
+                if (item._parent._id === this._id)
+                    throw new Error("Item alrady belongs to this expression.");
+                throw new Error("Item belongs to another expression.");
+            }
+            if (sys.isNil(ref))
+                throw new Error("Reference item cannot be null.");
+            if (sys.isNil(ref._parent) || ref._parent._id !== this._id)
+                throw new Error("Reference item does not belong to this expression");
+            let index: number;
+            if (sys.isNil(item._next = (item._previous = ref)._next)) {
+                index = this._size;
+                this._last = item;
+            } else {
+                item._next._previous = item;
+                index = 1;
+                for (let i: RegexExpressionBase = ref._previous; !sys.isNil(i); i = i._previous)
+                    index++;
+            }
+            (ref._next = item)._parent = this;
+            this._size++;
+            return index;
+        }
+
+        protected baseRemove(item: RegexExpressionBase): boolean {
+            if (sys.isNil(item) || sys.isNil(item._parent) || item._parent._id !== this._id)
+                return false;
+            if (sys.isNil(item._previous)) {
+                if (sys.isNil(this._first = item._next)) {
+                    this._last = undefined;
+                    this._size = 0;
+                } else {
+                    this._first._previous = undefined;
+                    item._next = undefined;
+                    this._size--;
+                }
+            } else {
+                if (sys.isNil(item._previous._next = item._next))
+                    this._last = item._previous;
+                else {
+                    item._next._previous = item._previous;
+                    item._next = undefined;
+                }
+                item._previous = undefined;
+            }
+            item._parent = undefined;
+            return true;
+        }
+
+        protected baseGet(index: number): RegexExpressionBase | undefined {
+            if (!isNaN(index) && index >= 0 && index < this._size) {
+                if (index > (this._size >> 1)) {
+                    let n: number = this._size - 1;
+                    for (let i: RegexExpressionBase = this._last; !sys.isNil(i); i = i._previous) {
+                        if (index == n)
+                            return i;
+                        n--;
+                    }
+                } else {
+                    let n: number = 0;
+                    for (let i: RegexExpressionBase = this._first; !sys.isNil(i); i = i._next) {
+                        if (index == n)
+                            return i;
+                        n++;
+                    }
+                }
+            }
+        }
+
+        protected baseClear(): void {
+            for (let item: RegexExpressionBase = this._first; !sys.isNil(item); item = item._next)
+                item._previous = item._next = item._parent = undefined;
+            this._first = this._last = undefined;
+            this._size = 0;
+        }
+    }
+
+    class AlternationSet<TParent extends RegexExpressionBase> extends RegexExpressionBase implements Set<RegexExpression> {
+        [Symbol.toStringTag]: "Set";
+
+        get size(): number { return this.baseSize; }
+        get parent(): TParent { return <TParent>this.baseParent; }
+        get previous(): AlternationSet<TParent> { return <AlternationSet<TParent>>this.basePrevious; }
+        get next(): AlternationSet<TParent> { return <AlternationSet<TParent>>this.baseNext; }
+
+        constructor(item: RegexExpression) {
+            super();
+            this.baseAdd(item);
+        }
+
+        add(value: RegexExpression): this {
+            this.baseAdd(value);
+            return this;
+        }
+        clear(): void {
+            this.baseClear();
+            this.baseAdd(new RegexExpression());
+        }
+        delete(value: RegexExpression): boolean { return this.baseSize > 1 && this.baseRemove(value); }
+        forEach(callbackfn: (value: RegexExpression, value2: RegexExpression, set: Set<RegexExpression>) => void, thisArg?: any): void {
+            throw new Error("Method not implemented.");
+        }
+        has(value: RegexExpression): boolean {
+            throw new Error("Method not implemented.");
+        }
+        [Symbol.iterator](): IterableIterator<RegexExpression> {
+            throw new Error("Method not implemented.");
+        }
+        entries(): IterableIterator<[RegexExpression, RegexExpression]> {
+            throw new Error("Method not implemented.");
+        }
+        keys(): IterableIterator<RegexExpression> {
+            throw new Error("Method not implemented.");
+        }
+        values(): IterableIterator<RegexExpression> {
+            throw new Error("Method not implemented.");
+        }
+        replace(item: RegexExpression, ref: RegexExpression): void { this.baseReplace(item, ref); }
+        insertBefore(item: RegexExpression, ref: RegexExpression): number { return this.baseInsertBefore(item, ref); }
+        insertAfter(item: RegexExpression, ref: RegexExpression): number { return this.baseInsertAfter(item, ref); }
+        get(index: number): RegexExpression { return <RegexExpression>this.baseGet(index); }
+    }
+
+    class RegexExpression extends RegexExpressionBase {
+
+    }
+
+    class Group extends RegexExpression implements Set<AlternationSet<Group>> {
+        add(value: AlternationSet<Group>): this {
+            throw new Error("Method not implemented.");
+        }
+        delete(value: AlternationSet<Group>): boolean {
+            throw new Error("Method not implemented.");
+        }
+        forEach(callbackfn: (value: AlternationSet<Group>, value2: AlternationSet<Group>, set: Set<AlternationSet<Group>>) => void, thisArg?: any): void {
+            throw new Error("Method not implemented.");
+        }
+        has(value: AlternationSet<Group>): boolean {
+            throw new Error("Method not implemented.");
+        }
+        size: number;
+        [Symbol.iterator](): IterableIterator<AlternationSet<Group>> {
+            throw new Error("Method not implemented.");
+        }
+        entries(): IterableIterator<[AlternationSet<Group>, AlternationSet<Group>]> {
+            throw new Error("Method not implemented.");
+        }
+        keys(): IterableIterator<AlternationSet<Group>> {
+            throw new Error("Method not implemented.");
+        }
+        values(): IterableIterator<AlternationSet<Group>> {
+            throw new Error("Method not implemented.");
+        }
+        [Symbol.toStringTag]: "Set";
+        addx(item: RegexExpression): number { return this.baseAdd(new AlternationSet<Group>(item)); }
+        insertBefore(item: RegexExpression, ref: RegexExpression): number { return this.baseInsertBefore(new AlternationSet<Group>(item), ref); }
+        insertAfter(item: RegexExpression, ref: RegexExpression): number { return this.baseInsertAfter(new AlternationSet<Group>(item), ref); }
+        remove(item: AlternationSet<Group>): boolean { return this.baseRemove(item); }
+        get(index: number): AlternationSet<Group> { return <AlternationSet<Group>>this.baseGet(index); }
+        clear(): void { this.baseClear(); }
+    }
+
+    /*
+
+        
+
+        ?
+        ??
+        *
+        *?
+        +
+        +?
+        {n}
+        {n,m}
+        {n,}
+        {n,m}?
+        {n,}?
+
+    */
     // #region RegexTester Controller
+    enum RegexMatchGroup {
+        all = 0,
+        openCaptureGroup = 1,
+        groupType = 2,
+        closeGroup = 3,
+        openCharGroup = 4,
+        subPattern = 5
+    }
+
+    let rePattern: RegExp = /^(?:(\((\?[:=!]?|#)?)|(\))|(\[)|((?:\\(?:u[\da-f]{4}|x[\da-f]{2}|c[a-z]|(?:0(?:[1-7][0-7]?)?|[123](?:[0-7][0-7]?)?|[4-7][0-7]?)|.)|.)+))/;
+    // TODO: This next regex may not be valid.
+    let intraBracketRegex = /^(?:(\\(?:u[\da-f]{4}|x[\da-f]{2}|c[a-z]|(?:0(?:[1-7][0-7]?)?|[123](?:[0-7][0-7]?)?|[4-7][0-7]?)|.)|([^\]])))/;
+
+    interface IRegexToken {
+
+    }
+
+    function ParseRegexPattern(pattern: string): IRegexToken[] {
+        let result: IRegexToken[] = [];
+        while (pattern.length > 0) {
+
+        }
+        return result;
+    }
     
     interface IRegexTesterScope extends ng.IScope {
         evaluateExpression(): void;
