@@ -8,6 +8,9 @@
  * @namespace
  */
 namespace sys {
+
+    export const whitespaceRe: RegExp = /[\s\r\n]+/g;
+
     /**
      *
      *
@@ -422,7 +425,7 @@ namespace sys {
         let t: string = typeof value;
         return t === "boolean" || t === "undefined" || (t === "object" && value === null);
     }
-
+    
     /**
      *
      *
@@ -478,16 +481,111 @@ namespace sys {
     }
 
     /**
-     *
+     * Converts a value to a boolean value.
      *
      * @export
      * @param {(any | null | undefined)} value
-     * @param {boolean} [defaultValue=""]
+     * @param {boolean} [defaultValue=false]
      * @returns {boolean}
      */
     export function asBoolean(value: any | null | undefined, defaultValue: boolean = false): boolean {
         value = asBooleanOrNullOrUndefined(value);
         return (typeof (value) === "boolean") ? value : defaultValue;
+    }
+
+    /**
+     *
+     *
+     * @export
+     * @interface IValueCallback
+     * @template T
+     */
+    export interface IValueCallback<T> { (value: T): void; }
+
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and executes a callback if the converted values are not equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {IValueCallback<boolean>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testBooleanChange(currentValue: any | null | undefined, newValue: any | null | undefined, whenChangedFn: IValueCallback<boolean>, thisObj?: any): boolean;
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and executes a callback if converted values are not equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {boolean} defaultValue - The default value to use when the current or new value are undefined, null or could not be converted to a boolean value.
+     * @param {IValueCallback<boolean>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testBooleanChange(currentValue: any | null | undefined, newValue: any | null | undefined, defaultValue: boolean, whenChangedFn: IValueCallback<boolean>, thisObj?: any): boolean;
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and alternatively executes a callback depending upon whether the converted values are equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {IValueCallback<boolean>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {IValueCallback<boolean>} whenNotChangedFn - Callback to invoke when the current and new values (converted to boolean) are equal. The single parameter will be the current value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testBooleanChange(currentValue: any | null | undefined, newValue: any | null | undefined, whenChangedFn: IValueCallback<boolean>, whenNotChangedFn: IValueCallback<boolean>, thisObj?: any): boolean;
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and alternatively executes a callback depending upon whether the converted values are equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {boolean} defaultValue - The default value to use when the current or new value are undefined, null or could not be converted to a boolean value.
+     * @param {IValueCallback<boolean>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {IValueCallback<boolean>} whenNotChangedFn - Callback to invoke when the current and new values (converted to boolean) are equal. The single parameter will be the current value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testBooleanChange(currentValue: any | null | undefined, newValue: any | null | undefined, defaultValue: boolean, whenChangedFn: IValueCallback<boolean>, whenNotChangedFn: IValueCallback<boolean>, thisObj?: any): boolean;
+    export function testBooleanChange(currentValue: any | null | undefined, newValue: any | null | undefined, arg2: IValueCallback<boolean> | boolean, arg3?: any, arg4?: any, arg5?: any): boolean {
+        let n: boolean;
+        if (typeof arg2 === "boolean") {
+            if (asBoolean(currentValue, arg2) === (n = asBoolean(newValue, arg2))) {
+                if (typeof arg4 === "function") {
+                    if (arguments.length > 5)
+                        arg4.call(arg5, n);
+                    else
+                        arg4(n);
+                }
+                return false;
+            }
+            if (arguments.length > 5)
+                arg3.call(arg5, n);
+            else if (arguments.length > 4 && typeof arg4 !== "function")
+                arg3.call(arg4, n);
+            else
+                arg3(n);
+        } else {
+            if (asBoolean(currentValue, false) === (n = asBoolean(newValue, false))) {
+                if (typeof arg3 === "function") {
+                    if (arguments.length > 4)
+                        arg3.call(arg4, n);
+                    else
+                        arg3(n);
+                }
+                return false;
+            }
+            if (arguments.length > 4)
+                arg2.call(arg4, n);
+            else if (arguments.length == 4 && typeof arg3 !== "function")
+                arg2.call(arg3, n);
+            else
+                arg2(n);
+        }
+        return true;
     }
 
     /**
@@ -647,6 +745,94 @@ namespace sys {
         if (typeof (value) == "string" && (((trim) ? (value = value.trim()) : value.trim()).length > 0))
             return value;
         return defaultValue;
+    }
+
+    interface IValueChangeCallback<T> { (newValue: T, oldValue: T): void; }
+
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and executes a callback if the converted values are not equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {IValueChangeCallback<string>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testStringChange(currentValue: any | null | undefined, newValue: any | null | undefined, whenChangedFn: IValueChangeCallback<string>, thisObj?: any): boolean;
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and executes a callback if converted values are not equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {string} defaultValue - The default value to use when the current or new value are undefined, null or could not be converted to a boolean value.
+     * @param {IValueChangeCallback<string>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testStringChange(currentValue: any | null | undefined, newValue: any | null | undefined, defaultValue: string,                        whenChangedFn: IValueChangeCallback<string>, thisObj?: any): boolean;
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and alternatively executes a callback depending upon whether the converted values are equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being false.
+     * @param {IValueChangeCallback<string>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {IValueChangeCallback<string>} whenNotChangedFn - Callback to invoke when the current and new values (converted to boolean) are equal. The single parameter will be the current value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testStringChange(currentValue: any | null | undefined, newValue: any | null | undefined, whenChangedFn: IValueChangeCallback<string>, whenNotChangedFn: IValueCallback<string>, thisObj?: any): boolean;
+    /**
+     * Compares current and new values, converting them to boolean, if necessary, and alternatively executes a callback depending upon whether the converted values are equal.
+     *
+     * @export
+     * @param {(any | null | undefined)} currentValue - Represents the existing boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {(any | null | undefined)} newValue - Represents the new boolean value. If this is null, undefined or could not be converted to boolean, then it will be counted as being equal to the defaultValue parameter.
+     * @param {boolean} defaultValue - The default value to use when the current or new value are undefined, null or could not be converted to a boolean value.
+     * @param {IValueChangeCallback<string>} whenChangedFn - Callback to invoke when the current and new values (converted to boolean) are not equal. The single parameter will be the new value converted to boolean.
+     * @param {IValueChangeCallback<string>} whenNotChangedFn - Callback to invoke when the current and new values (converted to boolean) are equal. The single parameter will be the current value converted to boolean.
+     * @param {any} [thisObj] - An object to which the this keyword can refer in the whenChangedFn function.
+     * @returns {boolean} - true if the current and new values (converted to boolean) were not equal.
+     */
+    export function testStringChange(currentValue: any | null | undefined, newValue: any | null | undefined, defaultValue: string,                        whenChangedFn: IValueChangeCallback<string>, whenNotChangedFn: IValueCallback<string>, thisObj?: any): boolean;
+    export function testStringChange(currentValue: any | null | undefined, newValue: any | null | undefined, arg2: IValueChangeCallback<string> | string, arg3?: any, arg4?: any, arg5?: any): boolean {
+        let n: string, o: string;
+        if (typeof arg2 === "string") {
+            if ((o = asString(currentValue, arg2)) === (n = asString(newValue, arg2))) {
+                if (typeof arg4 === "function") {
+                    if (arguments.length > 5)
+                        arg4.call(arg5, n);
+                    else
+                        arg4(n);
+                }
+                return false;
+            }
+            if (arguments.length > 5)
+                arg3.call(arg5, n, o)
+            else if (arguments.length > 4 && typeof arg4 !== "function")
+                arg3.call(arg4, n, o);
+            else
+                arg3(n, o);
+        } else {
+            if ((o = asString(currentValue, "")) === (n = asString(newValue, ""))) {
+                if (typeof arg3 === "function") {
+                    if (arguments.length > 4)
+                        arg3.call(arg4, n);
+                    else
+                        arg3(n);
+                }
+                return false;
+            }
+            if (arguments.length > 4)
+                arg2.call(arg4, n, o);
+            else if (arguments.length == 4 && typeof arg3 !== "function")
+                arg2.call(arg3, n, o);
+            else
+                arg2(n, o);
+        }
+        return true;
     }
 
     /**
@@ -836,6 +1022,14 @@ namespace sys {
         }, (v: any) => { return dv; })
     }
 
+    interface IIterableItemTranslateFn<TElement, TResult> { (value: TElement, index: number, iterable: Iterable<TElement>): TResult; }
+
+    interface IIterableItemMergeFn<TElement, TResult> { (previousValue: TResult, currentValue: TElement, index: number, iterable: Iterable<TElement>): TResult; }
+
+    interface IValueTranslateFn<TSource, TResult> { (value: TSource): TResult; }
+
+    interface IValueMergeFn<T1, T2, TResult> { (x: T1, y: T2): TResult; }
+
     /**
      *
      *
@@ -843,23 +1037,23 @@ namespace sys {
      * @template TSource
      * @template TResult
      * @param {Iterable<TSource>} source
-     * @param {(value: TSource, index: number, iterable: Iterable<TSource>) => TResult} callbackfn
+     * @param {IIterableItemTranslateFn<TSource, TResult>} callbackfn
      * @param {*} [thisArg]
      * @returns {TResult[]}
      */
-    export function map<TSource, TResult>(source: Iterable<TSource>, callbackfn: (value: TSource, index: number, iterable: Iterable<TSource>) => TResult, thisArg?: any): TResult[] {
+    export function map<TSource, TResult>(source: Iterable<TSource>, callbackfn: IIterableItemTranslateFn<TSource, TResult>, thisArg?: any): TResult[] {
         let iterator: Iterator<TSource> = source[Symbol.iterator]();
         let r: IteratorResult<TSource> = iterator.next();
         let result: TResult[] = [];
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                result.push(callbackfn.call(thisArg, r.value, index++, source));
+                result.push(callbackfn.call(thisArg, r.value, ++index, source));
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                result.push(callbackfn(r.value, index++, source));
+                result.push(callbackfn(r.value, ++index, source));
                 r = iterator.next();
             }
         return result;
@@ -871,23 +1065,23 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {boolean}
      */
-    export function every<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): boolean {
+    export function every<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): boolean {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (!callbackfn.call(thisArg, r.value, index++, source))
+                if (!callbackfn.call(thisArg, r.value, ++index, source))
                     return false;
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (!callbackfn(r.value, index++, source))
+                if (!callbackfn(r.value, ++index, source))
                     return false;
                 r = iterator.next();
             }
@@ -900,23 +1094,23 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {boolean}
      */
-    export function some<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): boolean {
+    export function some<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): boolean {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (callbackfn.call(thisArg, r.value, index++, source))
+                if (callbackfn.call(thisArg, r.value, ++index, source))
                     return true;
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (callbackfn(r.value, index++, source))
+                if (callbackfn(r.value, ++index, source))
                     return true;
                 r = iterator.next();
             }
@@ -935,15 +1129,15 @@ namespace sys {
     export function forEach<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => void, thisArg?: any) {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                callbackfn.call(thisArg, r.value, index++, source);
+                callbackfn.call(thisArg, r.value, ++index, source);
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                callbackfn(r.value, index++, source);
+                callbackfn(r.value, ++index, source);
                 r = iterator.next();
             }
     }
@@ -954,24 +1148,24 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {T[]}
      */
-    export function filter<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): T[] {
+    export function filter<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): T[] {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
         let result: T[] = [];
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (callbackfn.call(thisArg, r.value, index++, source))
+                if (callbackfn.call(thisArg, r.value, ++index, source))
                     result.push(r.value);
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (callbackfn(r.value, index++, source))
+                if (callbackfn(r.value, ++index, source))
                     result.push(r.value);
                 r = iterator.next();
             }
@@ -985,48 +1179,125 @@ namespace sys {
      * @template TSource
      * @template TResult
      * @param {Iterable<TSource>} source
-     * @param {(previousValue: TResult, currentValue: TSource, currentIndex: number, iterable: Iterable<TSource>) => TResult} callbackfn
+     * @param {IIterableItemMergeFn<TSource, TResult>} callbackfn
      * @param {TResult} initialValue
      * @returns {TResult}
      */
-    export function reduce<TSource, TResult>(source: Iterable<TSource>, callbackfn: (previousValue: TResult, currentValue: TSource, currentIndex: number, iterable: Iterable<TSource>) => TResult, initialValue: TResult): TResult {
+    export function reduce<TSource, TResult>(source: Iterable<TSource>, callbackfn: IIterableItemMergeFn<TSource, TResult>, initialValue: TResult): TResult {
         let iterator: Iterator<TSource> = source[Symbol.iterator]();
         let r: IteratorResult<TSource> = iterator.next();
         let result: TResult = initialValue;
-        let index: number = 0;
+        let index: number = -1;
         while (!r.done) {
-            result = callbackfn(result, r.value, index++, source);
+            result = callbackfn(result, r.value, ++index, source);
             r = iterator.next();
         }
         return result;
     }
 
+    export function findFirstOrDefault<TElement, TResult>(source: Iterable<TElement>, testCallbackFn: IIterableItemTranslateFn<TElement, boolean>, onMatchCallback: IIterableItemTranslateFn<TElement, TResult>,
+        noMatchCallback: IValueTranslateFn<Iterable<TElement>, TResult>, thisArg?: any): TResult {
+        if (isNil(source))
+            return (arguments.length > 4) ? noMatchCallback.call(thisArg, source) : noMatchCallback(source);
+        let iterator: Iterator<TElement> = source[Symbol.iterator]();
+        let r: IteratorResult<TElement> = iterator.next();
+        let index: number = -1;
+        if (arguments.length > 4) {
+            while (!r.done) {
+                if (testCallbackFn.call(thisArg, r.value, ++index, source))
+                    return onMatchCallback(r.value, index, source);
+                r = iterator.next();
+            }
+            return noMatchCallback.call(thisArg, source);
+        }
+        while (!r.done) {
+            if (testCallbackFn(r.value, ++index, source))
+                return onMatchCallback(r.value, index, source);
+            r = iterator.next();
+        }
+        return noMatchCallback(source);
+    }
+
+    export function findFirst<TElement, TResult>(source: Iterable<TElement>, testCallbackFn: IIterableItemTranslateFn<TElement, boolean>, onMatchCallback: IIterableItemTranslateFn<TElement, TResult>, thisArg?: any): TResult {
+        if (!isNil(source)) {
+            let iterator: Iterator<TElement> = source[Symbol.iterator]();
+            let r: IteratorResult<TElement> = iterator.next();
+            let index: number = -1;
+            if (arguments.length > 2)
+                while (!r.done) {
+                    if (testCallbackFn.call(thisArg, r.value, ++index, source))
+                        return onMatchCallback(r.value, index, source);
+                    r = iterator.next();
+                }
+            else
+                while (!r.done) {
+                    if (testCallbackFn(r.value, ++index, source))
+                        return onMatchCallback(r.value, index, source);
+                    r = iterator.next();
+                }
+        }
+    }
+
     /**
-     *
+     * Iterates through the list to get the first matching item or returns a default value.
      *
      * @export
-     * @template T
-     * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
-     * @param {*} [thisArg]
-     * @returns {(T | undefined)}
+     * @template T - Type of element.
+     * @param {Iterable<T>} source - The iterable object to search.
+     * @param {IIterableItemTranslateFn<T, boolean>} testCallbackFn - The predicate function which determines whether the item is a match.
+     * @param {T} defaultValue - The default value to return if no match is found.
+     * @param {*} [thisArg] - The object to be used as the current "this" object.
+     * @returns {T} - The matching object or the default value if no match was found.
      */
-    export function first<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): T | undefined {
+    export function firstOrDefault<T>(source: Iterable<T>, testCallbackFn: IIterableItemTranslateFn<T, boolean>, defaultValue: T, thisArg?: any): T {
+        if (isNil(source))
+            return defaultValue;
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
-        let index: number = 0;
-        if (typeof (thisArg) !== 'undefined')
+        let index: number = -1;
+        if (arguments.length > 3)
             while (!r.done) {
-                if (callbackfn.call(thisArg, r.value, index++, source))
+                if (testCallbackFn.call(thisArg, r.value, ++index, source))
                     return r.value;
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (callbackfn(r.value, index, source))
+                if (testCallbackFn(r.value, ++index, source))
                     return r.value;
                 r = iterator.next();
             }
+        return defaultValue;
+    }
+
+    /**
+     * Iterates through the list to get the first matching item.
+     *
+     * @export
+     * @template T - Type of element.
+     * @param {Iterable<T>} source - The iterable object to search.
+     * @param {IIterableItemTranslateFn<T, boolean>} testCallbackFn - The predicate function which determines whether the item is a match.
+     * @param {*} [thisArg] - The object to be used as the current "this" object.
+     * @returns {(T | undefined)} - The matching object or undefined if no match was found.
+     */
+    export function first<T>(source: Iterable<T>, testCallbackFn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): T | undefined {
+        if (!isNil(source)) {
+            let iterator: Iterator<T> = source[Symbol.iterator]();
+            let r: IteratorResult<T> = iterator.next();
+            let index: number = -1;
+            if (arguments.length > 2)
+                while (!r.done) {
+                    if (testCallbackFn.call(thisArg, r.value, ++index, source))
+                        return r.value;
+                    r = iterator.next();
+                }
+            else
+                while (!r.done) {
+                    if (testCallbackFn(r.value, ++index, source))
+                        return r.value;
+                    r = iterator.next();
+                }
+        }
     }
 
     /**
@@ -1035,26 +1306,27 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {number}
      */
-    export function indexOf<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): number {
+    export function indexOf<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): number {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (callbackfn.call(thisArg, r.value, index++, source))
+                if (callbackfn.call(thisArg, r.value, ++index, source))
                     return index;
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (callbackfn(r.value, index, source))
+                if (callbackfn(r.value, ++index, source))
                     return index;
                 r = iterator.next();
             }
+        return -1;
     }
 
     /**
@@ -1063,24 +1335,24 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {(T | undefined)}
      */
-    export function last<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): T | undefined {
+    export function last<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): T | undefined {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
         let result: T;
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (callbackfn.call(thisArg, r.value, index++, source))
+                if (callbackfn.call(thisArg, r.value, ++index, source))
                     result = r.value;
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (callbackfn(r.value, index++, source))
+                if (callbackfn(r.value, ++index, source))
                     result = r.value;
                 r = iterator.next();
             }
@@ -1117,25 +1389,25 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {T[]}
      */
-    export function takeWhile<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): T[] {
+    export function takeWhile<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): T[] {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
         let result: T[] = [];
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (!callbackfn.call(thisArg, r.value, index++, source))
+                if (!callbackfn.call(thisArg, r.value, ++index, source))
                     break;
                 result.push(r.value);
                 r = iterator.next();
             }
         else
             while (!r.done) {
-                if (!callbackfn(r.value, index++, source))
+                if (!callbackfn(r.value, ++index, source))
                     break;
                 result.push(r.value);
                 r = iterator.next();
@@ -1156,9 +1428,9 @@ namespace sys {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
         let result: T[] = [];
-        let index: number = 0;
+        let index: number = -1;
         while (!r.done) {
-            if (index == count) {
+            if (++index == count) {
                 do {
                     result.push(r.value);
                     r = iterator.next();
@@ -1166,7 +1438,6 @@ namespace sys {
                 return result;
             }
             r = iterator.next();
-            index++;
         }
         return result;
     }
@@ -1177,18 +1448,18 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(value: T, index: number, iterable: Iterable<T>) => boolean} callbackfn
+     * @param {IIterableItemTranslateFn<T, boolean>} callbackfn
      * @param {*} [thisArg]
      * @returns {T[]}
      */
-    export function skipWhile<T>(source: Iterable<T>, callbackfn: (value: T, index: number, iterable: Iterable<T>) => boolean, thisArg?: any): T[] {
+    export function skipWhile<T>(source: Iterable<T>, callbackfn: IIterableItemTranslateFn<T, boolean>, thisArg?: any): T[] {
         let iterator: Iterator<T> = source[Symbol.iterator]();
         let r: IteratorResult<T> = iterator.next();
         let result: T[] = [];
-        let index: number = 0;
+        let index: number = -1;
         if (typeof (thisArg) !== 'undefined')
             while (!r.done) {
-                if (!callbackfn.call(thisArg, r.value, index++, source)) {
+                if (!callbackfn.call(thisArg, r.value, ++index, source)) {
                     do {
                         result.push(r.value);
                         r = iterator.next();
@@ -1199,7 +1470,7 @@ namespace sys {
             }
         else
             while (!r.done) {
-                if (!callbackfn(r.value, index++, source)) {
+                if (!callbackfn(r.value, ++index, source)) {
                     do {
                         result.push(r.value);
                         r = iterator.next();
@@ -1217,11 +1488,11 @@ namespace sys {
      * @export
      * @template T
      * @param {Iterable<T>} source
-     * @param {(x: T, y: T) => boolean} [callbackfn]
+     * @param {IValueMergeFn<T, T, boolean>} [callbackfn]
      * @param {*} [thisArg]
      * @returns {T[]}
      */
-    export function unique<T>(source: Iterable<T>, callbackfn?: (x: T, y: T) => boolean, thisArg?: any): T[] {
+    export function unique<T>(source: Iterable<T>, callbackfn?: IValueMergeFn<T, T, boolean>, thisArg?: any): T[] {
         if (typeof (callbackfn) !== 'function')
             callbackfn = function (x: T, y: T) { return x === y; }
         let iterator: Iterator<T> = source[Symbol.iterator]();
@@ -1919,15 +2190,6 @@ namespace sys {
             return callbackfn.apply(this, args);
         return <TResult>args[0];
     }
-
-    /**
-     *
-     *
-     * @export
-     * @interface IValueCallback
-     * @template T
-     */
-    export interface IValueCallback<T> { (value: T): void; }
 
     /**
      *

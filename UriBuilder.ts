@@ -1868,10 +1868,10 @@ namespace uriBuilder {
         private _schemeSpecs: UriSchemeSpecification = UriSchemeSpecification.uriScheme_http;
         private _onIsEditingEncodedUriStringChanged?: { (isEditingEncodedUriString: boolean, encodedUriString: string): void };
         private _onIsAbsoluteUriChanged?: { (isAbsoluteUri: boolean, isEditingEncodedUriString: boolean): void };
+        private _action: string;
 
         // #region Properties
-
-        private _action: string;
+        
         get action(): string { return this._action; }
 
         get encodedUriString(): string { return this._encodedUriString; }
@@ -2062,7 +2062,7 @@ namespace uriBuilder {
                 controller: ["$scope", "$log", UriBuilderController],
                 transclude: true,
                 replace: true,
-                template: '<form action="uriBuilder.action" method="get"><ng-transclude></ng-transclude></form>',
+                template: '<form action="{{uriBuilder.action}}" method="get"><ng-transclude></ng-transclude></form>',
                 link: UriBuilderController.link
             };
         }

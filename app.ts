@@ -209,11 +209,11 @@ namespace app {
 
         /**
          *
-         *
+         * @param {JQueryEventObject} [event] - Event object.
          * @returns {boolean}
          * @memberof INavigationLink
          */
-        onClick(): boolean;
+        onClick(event?: JQueryEventObject): void;
     }
 
     /**
@@ -474,7 +474,12 @@ namespace app {
                     if (this.$scope.links[i].pageId === pageId) {
                         this.$scope.links[i].cssClass.push("active");
                         this.$scope.links[i].href = "#";
-                        this.$scope.links[i].onClick = () => { return false; }
+                        this.$scope.links[i].onClick = (event?: JQueryEventObject) => {
+                            if (!sys.isNil(event)) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                        };
                         return;
                     }
                 }
@@ -521,7 +526,8 @@ namespace app {
                 navLoader.then((promiseValue: IAppConfigLoadResult) => {
                     scope.initializeTopNav(attributes.pageName, navLoader);
                 });
-            }
+            },
+            templateUrl: "Template/topNavAndHeader.htm"
         };
     }]);
 }
