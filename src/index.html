@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:ng="http://angularjs.org">
+<head>
+    <meta name="viewport" content="width=1024, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta charset="utf-8" />
+    <meta name="myGitHubPages:pageId" content="Home" />
+    <title>Lenny's Git Repositories</title>
+    <link rel="stylesheet" href="lib/twitter-bootstrap/css/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="lib/angular.js/angular-csp.css" type="text/css" />
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="lib/jquery/jquery.js"></script>
+    <script src="lib/twitter-bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="lib/angular.js/angular.js"></script>
+    <script src="lib/angular.js/angular-route.js"></script>
+    <script src="App/sys.js"></script>
+    <script src="App/main.js"></script>
+</head>
+<body ng-app="myGitHubPages" ng-controller="mainController">
+    <header class="container-fluid p-1">
+        <h1>{{ pageTitle }}</h1>
+        <h2 ng-show="showSubtitle">{{ subTitle }}</h2>
+        <nav class="container-fluid navbar navbar-expand-sm p-1 mr-auto">
+            <ul class="navbar-nav">
+                <li class="nav-item" ng-repeat="i in topNavItems"><a ng-href="{{i.href}}" ng-class="i.cssClass" ng-click="i.onClick($event)">{{ i.navTitle }}</a></li>
+            </ul>
+        </nav>
+    </header>
+    <ng-view></ng-view>
+    <footer class="container-fluid">&copy; Leonard T. Erwine 2019.</footer>
+</body>
+</html>

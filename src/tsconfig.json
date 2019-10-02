@@ -1,0 +1,27 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es6",
+    "module": "none",
+    "lib": [
+      "es2017",
+      "dom"
+    ]
+  },
+  "include": [ "App/**/*" ],
+  "exclude": [
+    "node_modules",
+    "packages",
+    "wwwroot",
+    "lib",
+    "obj",
+    "bin",
+    "gh-pages",
+    "content",
+    "**/*.spec.ts"
+  ]
+}

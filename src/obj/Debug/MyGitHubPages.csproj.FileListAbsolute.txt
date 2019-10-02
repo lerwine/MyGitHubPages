@@ -1,0 +1,7 @@
+C:\Users\lerwi\GitHub\MyGitHubPages\bin\MyGitHubPages.dll.config
+C:\Users\lerwi\GitHub\MyGitHubPages\bin\MyGitHubPages.dll
+C:\Users\lerwi\GitHub\MyGitHubPages\bin\MyGitHubPages.pdb
+C:\Users\lerwi\GitHub\MyGitHubPages\obj\Debug\MyGitHubPages.csproj.CoreCompileInputs.cache
+C:\Users\lerwi\GitHub\MyGitHubPages\obj\Debug\MyGitHubPages.dll
+C:\Users\lerwi\GitHub\MyGitHubPages\obj\Debug\MyGitHubPages.pdb
+C:\Users\lerwi\GitHub\MyGitHubPages\obj\Debug\MyGitHubPages.csprojAssemblyReference.cache

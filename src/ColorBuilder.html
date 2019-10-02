@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mainModule" xmlns:ng="http://angularjs.org" xmlns:app="https://lerwine.github.io/Schema/App.xsd">
+<head>
+    <meta name="viewport" content="width=1024, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta charset="utf-8" />
+    <title>Color Builder</title>
+    <link rel="stylesheet" href="lib/twitter-bootstrap/css/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="lib/angular.js/angular-csp.css" type="text/css" />
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="lib/jquery/jquery.js"></script>
+    <script src="lib/twitter-bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="lib/angular.js/angular.js"></script>
+    <script src="App/sys.js"></script>
+    <script src="App/app.js"></script>
+    <script src="App/ColorBuilder.js"></script>
+    <style>
+        small { font-size: xx-small }
+    </style>
+</head>
+<body>
+    <app:top-nav-and-header headerText="Color Builder" pageId="colorBuilder"></app:top-nav-and-header>
+    <section class="container-fluid" ng-controller="ColorBuilderController">
+        <form action="ColorBuilder.html" method="get"></form>
+    </section>
+    <footer class="container-fluid ">&copy; Leonard T. Erwine 2019.</footer>
+</body>
+</html>

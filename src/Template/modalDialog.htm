@@ -1,0 +1,47 @@
+<div class="modal fade" id="{{modalId}}" tabindex="-1" role="dialog" aria-labelledby="{{dialogLabelId}}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{dialogLabelId}}">Pattern Options</h5>
+                <button type="button" class="close" aria-label="Close" ng-click="regexOptions.setDialogVisibility(false, $event)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid flex-nowrap">
+                    <div class="form-row">
+                        <div class="form-check col-3">
+                            <input class="form-check-input" type="checkbox" ng-model="global" id="globalCheckBox" />
+                            <label class="form-check-label" for="globalCheckBox">Global</label>
+                        </div>
+                        <div class="form-check col-3">
+                            <input class="form-check-input" type="checkbox" ng-model="ignoreCase" id="ignoreCaseCheckBox" />
+                            <label class="form-check-label" for="ignoreCaseCheckBox">Ignore Case</label>
+                        </div>
+                        <div class="form-check col-3">
+                            <input class="form-check-input" type="checkbox" ng-model="multiline" id="multilineCheckBox" />
+                            <label class="form-check-label" for="multilineCheckBox">Multi-Line</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-check col-3">
+                            <input class="form-check-input" type="checkbox" ng-model="sticky" id="stickyCheckBox" />
+                            <label class="form-check-label" for="stickyCheckBox">Sticky</label>
+                        </div>
+                        <div class="form-check col-3">
+                            <input class="form-check-input" type="checkbox" ng-model="unicode" id="unicodeCheckBox" />
+                            <label class="form-check-label" for="unicodeCheckBox">Unicode</label>
+                        </div>
+                        <div class="form-check col-3">
+                            <input class="form-check-input" type="checkbox" ng-model="ignoreWhitespace" id="ignoreWhitespaceCheckBox" />
+                            <label class="form-check-label" for="ignoreWhitespaceCheckBox">Ignore Whitespace</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" ng-click="regexOptions.setDialogVisibility(false, $event)">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

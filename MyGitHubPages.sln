@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGitHubPages", "MyGitHubPages.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJsPageOrganizer", "..\AngularJsPageOrganizer\AngularJsPageOrganizer.csproj", "{A9C36B72-569E-4962-8677-57D50C11D433}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGitHubPages", "src\MyGitHubPages.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9C36B72-569E-4962-8677-57D50C11D433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9C36B72-569E-4962-8677-57D50C11D433}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9C36B72-569E-4962-8677-57D50C11D433}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9C36B72-569E-4962-8677-57D50C11D433}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
