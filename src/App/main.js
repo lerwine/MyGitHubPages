@@ -132,13 +132,16 @@ var myGitHubPages;
     const CONTROLLER_NAME = "mainController";
     const SERVICE_NAME = "mainNavigation";
     const PROVIDER_NAME = SERVICE_NAME + "Provider";
+    let SideNavOption;
+    (function (SideNavOption) {
+        SideNavOption[SideNavOption["childItemsOnly"] = 0] = "childItemsOnly";
+        SideNavOption[SideNavOption["currentAndChildItems"] = 1] = "currentAndChildItems";
+        SideNavOption[SideNavOption["parentAndSiblings"] = 2] = "parentAndSiblings";
+    })(SideNavOption = myGitHubPages.SideNavOption || (myGitHubPages.SideNavOption = {}));
     class NavigationItem {
         constructor(source) {
             this._isCurrentPage = false;
             this._hasCurrentPage = false;
-            this._includeCurrentInSideNav = false;
-            this._includeParentInSideNav = false;
-            this._includeSiblingsInSideNav = false;
             this.__id = Symbol();
             this._path = source[0];
             this._navTitle = source[2].navTitle;
@@ -148,9 +151,7 @@ var myGitHubPages;
             this._childItems = (typeof source[2].childItems !== "object" || source[2].childItems === null || source[2].childItems.length == 0) ? [] : source[2].childItems.map((value) => new NavigationItem(value));
             this._id = (typeof source[2].id === "symbol") ? source[2].id : this.__id;
             this._route.__metaData = this;
-            this._includeCurrentInSideNav = source[2].includeCurrentInSideNav === true;
-            this._includeParentInSideNav = source[2].includeParentInSideNav === true;
-            this._includeSiblingsInSideNav = source[2].includeSiblingsInSideNav === true;
+            this._sideNavOption = (typeof source[2].sideNavOption === "number") ? source[2].sideNavOption : SideNavOption.childItemsOnly;
             if (this._childItems.length > 0)
                 this._childItems.forEach((c) => { c._parent = this; });
         }
@@ -166,9 +167,7 @@ var myGitHubPages;
         get isCurrentPage() { return this._isCurrentPage; }
         get hasCurrentPage() { return this._hasCurrentPage; }
         get isActive() { return this._isCurrentPage || this._hasCurrentPage; }
-        get includeCurrentInSideNav() { return this._includeCurrentInSideNav; }
-        get includeParentInSideNav() { return this._includeParentInSideNav; }
-        get includeSiblingsInSideNav() { return this._includeSiblingsInSideNav; }
+        get sideNavOption() { return this._sideNavOption; }
         get cssClass() { return (this._isCurrentPage) ? this._mainNavigation.currentItemClass() : (this._hasCurrentPage) ? this._mainNavigation.currentParentClass() : this._mainNavigation.otherItemClass(); }
         static getMetaData(route) {
             return route.__metaData;
@@ -186,7 +185,46 @@ var myGitHubPages;
             }
             return result;
         }
-        getSideNavItems() { return (this._includeCurrentInSideNav) ? [this].concat(this._childItems) : this._childItems; }
+        getSideNavLeadItems() {
+            if (this._childItems.length == 0) {
+                if (this._sideNavOption === SideNavOption.currentAndChildItems)
+                    return [this];
+                if (this._sideNavOption !== SideNavOption.parentAndSiblings || typeof this._parent === "undefined")
+                    return [];
+                return [this._parent].concat(this._parent._childItems);
+            }
+            if (this._sideNavOption === SideNavOption.currentAndChildItems)
+                return [this].concat(this._childItems);
+            if (this._sideNavOption !== SideNavOption.parentAndSiblings || typeof this._parent === "undefined")
+                return this._childItems;
+            let result = [this._parent];
+            for (let i = 0; i < this._parent._childItems.length; i++) {
+                result.push(this._parent._childItems[i]);
+                if (this._parent._childItems[i].__id === this.__id)
+                    break;
+            }
+            return result;
+        }
+        getSideNavChildItems() {
+            if (this._sideNavOption !== SideNavOption.parentAndSiblings || typeof this._parent === "undefined")
+                return [];
+            //if (this._sideNavOption === SideNavOption.currentAndChildItems || (this._sideNavOption === SideNavOption.parentAndSiblings && typeof this._parent !== "undefined"))
+            //    return this._childItems;
+            return [];
+        }
+        getSideNavTrailingItems() {
+            if (this._sideNavOption === SideNavOption.currentAndChildItems)
+                return [this];
+            if (this._sideNavOption !== SideNavOption.parentAndSiblings || typeof this._parent === "undefined")
+                return this._childItems;
+            let result = [this._parent];
+            for (let i = 0; i < this._parent._childItems.length; i++) {
+                result.push(this._parent._childItems[i]);
+                if (this._parent._childItems[i].__id === this.__id)
+                    break;
+            }
+            return result;
+        }
         static getCurrentPage(items) {
             for (let i = 0; i < items.length; i++) {
                 if (items[i]._isCurrentPage)
@@ -459,16 +497,16 @@ var myGitHubPages;
         .provider(SERVICE_NAME, mainNavigationServiceProvider)
         .controller(CONTROLLER_NAME, ['$scope', SERVICE_NAME, mainController])
         .config(['$routeProvider', PROVIDER_NAME, function ($routeProvider, mainNavigationProvider) {
-            mainNavigationProvider.when('/home', { templateUrl: 'Template/Home.htm' }, { navTitle: 'Home', pageTitle: '' })
-                .when('/regex', { templateUrl: 'Template/RegexBuilder/Match.htm' }, {
-                navTitle: 'Regex', pageTitle: 'Regex Evaluator (match)', includeCurrentInSideNav: true, childItems: [
-                    ['/regex/replace', { templateUrl: 'Template/RegexBuilder/Replace.htm' }, { navTitle: 'Replace', pageTitle: 'Regex Evaluator (replace)', includeParentInSideNav: true }],
-                    ['/regex/search', { templateUrl: 'Template/RegexBuilder/Search.htm' }, { navTitle: 'Search', pageTitle: 'Regex Evaluator (search)', includeParentInSideNav: true }],
-                    ['/regex/split', { templateUrl: 'Template/RegexBuilder/Split.htm' }, { navTitle: 'Split', pageTitle: 'Regex Evaluator (split)', includeParentInSideNav: true }]
-                ]
-            })
-                .when('/', { redirectTo: '/home' })
-                .config($routeProvider);
+            //mainNavigationProvider.when('/home', { templateUrl: 'Template/Home.htm' }, { navTitle: 'Home', pageTitle: '' })
+            //    .when('/regex', { templateUrl: 'Template/RegexBuilder/Match.htm' }, {
+            //        navTitle: 'Regex', pageTitle: 'Regex Evaluator (match)', includeCurrentInSideNav: true, childItems: [
+            //            ['/regex/replace', { templateUrl: 'Template/RegexBuilder/Replace.htm' }, { navTitle: 'Replace', pageTitle: 'Regex Evaluator (replace)', includeParentInSideNav: true }],
+            //            ['/regex/search', { templateUrl: 'Template/RegexBuilder/Search.htm' }, { navTitle: 'Search', pageTitle: 'Regex Evaluator (search)', includeParentInSideNav: true }],
+            //            ['/regex/split', { templateUrl: 'Template/RegexBuilder/Split.htm' }, { navTitle: 'Split', pageTitle: 'Regex Evaluator (split)', includeParentInSideNav: true }]
+            //        ]
+            //    })
+            //    .when('/', { redirectTo: '/home' })
+            //    .config($routeProvider);
             // configure html5 to get links working on jsfiddle
             //$locationProvider.html5Mode(true);
         }]);

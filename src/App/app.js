@@ -104,6 +104,31 @@ var app;
      */
     class applicationConfigurationLoaderOld {
         /**
+         *Creates an instance of applicationConfigurationLoader.
+         * @param {ng.IHttpService} $http
+         * @memberof applicationConfigurationLoader
+         */
+        constructor($http) {
+            this._get = $http.get('appConfig.json').then((promiseValue) => {
+                let requestInfo = {
+                    status: promiseValue.status,
+                    headers: promiseValue.headers,
+                    config: promiseValue.config,
+                    statusText: promiseValue.statusText
+                };
+                if (typeof (promiseValue.data) === 'undefined' || promiseValue.data == null)
+                    requestInfo.error = "No data returned.";
+                else if (typeof (promiseValue.data) !== 'object')
+                    requestInfo.error = "Invalid data.";
+                else if (typeof (promiseValue.data.links) != 'object' || promiseValue.data.links === null || !Array.isArray(promiseValue.data.links))
+                    requestInfo.error = "Invalid pages configuration";
+                return {
+                    requestInfo: requestInfo,
+                    links: sanitizeNavigationLinks(promiseValue.data.links)
+                };
+            }, (reason) => { return { requestInfo: { statusText: sys.asString(reason, "Unknown error") }, links: [] }; });
+        }
+        /**
          *
          *
          * @template TResult
@@ -133,31 +158,6 @@ var app;
          * @memberof applicationConfigurationLoader
          */
         finally(finallyCallback) { return this._get.finally(finallyCallback); }
-        /**
-         *Creates an instance of applicationConfigurationLoader.
-         * @param {ng.IHttpService} $http
-         * @memberof applicationConfigurationLoader
-         */
-        constructor($http) {
-            this._get = $http.get('appConfig.json').then((promiseValue) => {
-                let requestInfo = {
-                    status: promiseValue.status,
-                    headers: promiseValue.headers,
-                    config: promiseValue.config,
-                    statusText: promiseValue.statusText
-                };
-                if (typeof (promiseValue.data) === 'undefined' || promiseValue.data == null)
-                    requestInfo.error = "No data returned.";
-                else if (typeof (promiseValue.data) !== 'object')
-                    requestInfo.error = "Invalid data.";
-                else if (typeof (promiseValue.data.links) != 'object' || promiseValue.data.links === null || !Array.isArray(promiseValue.data.links))
-                    requestInfo.error = "Invalid pages configuration";
-                return {
-                    requestInfo: requestInfo,
-                    links: sanitizeNavigationLinks(promiseValue.data.links)
-                };
-            }, (reason) => { return { requestInfo: { statusText: sys.asString(reason, "Unknown error") }, links: [] }; });
-        }
     }
     /**
      *

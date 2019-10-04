@@ -14,13 +14,11 @@
   },
   "include": [ "App/**/*" ],
   "exclude": [
-    "node_modules",
     "packages",
     "wwwroot",
     "lib",
     "obj",
     "bin",
-    "gh-pages",
     "content",
     "**/*.spec.ts"
   ]

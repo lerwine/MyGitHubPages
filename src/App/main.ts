@@ -258,8 +258,8 @@ namespace myGitHubPages {
             if (this._sideNavOption !== SideNavOption.parentAndSiblings || typeof this._parent === "undefined")
                 return [];
 
-            if (this._sideNavOption === SideNavOption.currentAndChildItems || (this._sideNavOption === SideNavOption.parentAndSiblings && typeof this._parent !== "undefined"))
-                return this._childItems;
+            //if (this._sideNavOption === SideNavOption.currentAndChildItems || (this._sideNavOption === SideNavOption.parentAndSiblings && typeof this._parent !== "undefined"))
+            //    return this._childItems;
             return [];
         }
 
@@ -275,15 +275,6 @@ namespace myGitHubPages {
                     break;
             }
             return result;
-            let result: NavigationItem[] = [];
-            for (let i: number = 0; i < this._parent._childItems.length; i++) {
-                if (this._parent._childItems[i].__id === this.__id) {
-                    for (let n: number = i + 1; n < this._parent.childItems.length; n++)
-                        result.push(this._parent._childItems[n]);
-                }
-                break;
-            }
-
         }
 
         static getCurrentPage(items: NavigationItem[]): NavigationItem | undefined {
@@ -583,16 +574,16 @@ namespace myGitHubPages {
         .provider(SERVICE_NAME, mainNavigationServiceProvider)
         .controller(CONTROLLER_NAME, ['$scope', SERVICE_NAME, mainController])
         .config(['$routeProvider', PROVIDER_NAME, function ($routeProvider: ng.route.IRouteProvider, mainNavigationProvider: mainNavigationServiceProvider): void {
-            mainNavigationProvider.when('/home', { templateUrl: 'Template/Home.htm' }, { navTitle: 'Home', pageTitle: '' })
-                .when('/regex', { templateUrl: 'Template/RegexBuilder/Match.htm' }, {
-                    navTitle: 'Regex', pageTitle: 'Regex Evaluator (match)', includeCurrentInSideNav: true, childItems: [
-                        ['/regex/replace', { templateUrl: 'Template/RegexBuilder/Replace.htm' }, { navTitle: 'Replace', pageTitle: 'Regex Evaluator (replace)', includeParentInSideNav: true }],
-                        ['/regex/search', { templateUrl: 'Template/RegexBuilder/Search.htm' }, { navTitle: 'Search', pageTitle: 'Regex Evaluator (search)', includeParentInSideNav: true }],
-                        ['/regex/split', { templateUrl: 'Template/RegexBuilder/Split.htm' }, { navTitle: 'Split', pageTitle: 'Regex Evaluator (split)', includeParentInSideNav: true }]
-                    ]
-                })
-                .when('/', { redirectTo: '/home' })
-                .config($routeProvider);
+            //mainNavigationProvider.when('/home', { templateUrl: 'Template/Home.htm' }, { navTitle: 'Home', pageTitle: '' })
+            //    .when('/regex', { templateUrl: 'Template/RegexBuilder/Match.htm' }, {
+            //        navTitle: 'Regex', pageTitle: 'Regex Evaluator (match)', includeCurrentInSideNav: true, childItems: [
+            //            ['/regex/replace', { templateUrl: 'Template/RegexBuilder/Replace.htm' }, { navTitle: 'Replace', pageTitle: 'Regex Evaluator (replace)', includeParentInSideNav: true }],
+            //            ['/regex/search', { templateUrl: 'Template/RegexBuilder/Search.htm' }, { navTitle: 'Search', pageTitle: 'Regex Evaluator (search)', includeParentInSideNav: true }],
+            //            ['/regex/split', { templateUrl: 'Template/RegexBuilder/Split.htm' }, { navTitle: 'Split', pageTitle: 'Regex Evaluator (split)', includeParentInSideNav: true }]
+            //        ]
+            //    })
+            //    .when('/', { redirectTo: '/home' })
+            //    .config($routeProvider);
             // configure html5 to get links working on jsfiddle
             //$locationProvider.html5Mode(true);
         }]);
