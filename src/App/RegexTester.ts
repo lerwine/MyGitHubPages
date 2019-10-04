@@ -5,7 +5,7 @@
 /// <reference path="sys.ts"/>
 /// <reference path="app.ts"/>
 
-namespace regexTester {
+module regexTester {
     // #region Constants
 
     const DIRECTIVENAME_REGEXTESTER: string = "regexTester";

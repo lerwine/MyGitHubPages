@@ -10,7 +10,7 @@ import forEach = sys.forEach;
 import isNil = sys.isNil;
 import isNilOrEmpty = sys.isNilOrEmpty;
 
-namespace debugHtml {
+module debugHtml {
     /**
      *
      *

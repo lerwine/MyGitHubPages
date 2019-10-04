@@ -4,7 +4,7 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="sys.ts"/>
 
-namespace rootBroadcaster {
+module rootBroadcaster {
     export const SERVICE_NAME: string = "rootBroadcaster";
     const EVENTNAME_ROUTECHANGESUCCESS = "$routeChangeSuccess";
 

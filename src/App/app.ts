@@ -4,7 +4,7 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="sys.ts"/>
 
-namespace app {
+module app {
     const DIRECTIVE_TEMPLATE_PATH = "Template/";
 
     export function getDirectiveTemplatePath(directiveName: string, nameSpace?: string) {

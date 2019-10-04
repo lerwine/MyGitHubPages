@@ -4,7 +4,7 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="app.ts"/>
 
-namespace colorBuilder {
+module colorBuilder {
     interface IColorBuilderScope extends ng.IScope {
 
     }

@@ -8,7 +8,7 @@
  * 
  * @namespace
  */
-namespace sys {
+module sys {
     // #region Constants
 
     /**

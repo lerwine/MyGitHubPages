@@ -5,7 +5,7 @@
 /// <reference path="sys.ts"/>
 /// <reference path="app.ts"/>
 
-namespace textEditControl {
+module textEditControl {
     const WHITESPACE_REGEX: RegExp = /[\s\r\n\p{C}]+/g;
     const NEWLINE_REGEX: RegExp = /\r\n?|\n/g;
     const TABBABLE_REGEX: RegExp = /^(?=\s*\S)/g;

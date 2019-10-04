@@ -6,7 +6,7 @@
 /// <reference path="sys.ts"/>
 /// <reference path="app.ts"/>
 
-namespace uriBuilder {
+module uriBuilder {
     // #region Uri Scheme Specification
 
     const schemeRegex: RegExp = /^([a-z_][-.\dA-_a-z~\ud800-\udbff]*)(:[\\/]{0,2})/;

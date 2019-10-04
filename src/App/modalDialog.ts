@@ -5,7 +5,7 @@
 /// <reference path="sys.ts"/>
 /// <reference path="app.ts"/>
 
-namespace modalDialog {
+module modalDialog {
     const DIRECTIVENAME_modalDialog: string = "modalDialog";
 
     interface IModalDialogScope extends ng.IScope {

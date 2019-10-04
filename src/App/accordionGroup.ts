@@ -4,7 +4,7 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="app.ts"/>
 
-namespace accordionGroup {
+module accordionGroup {
     /**
      * Callback function definition for notifying listeners when the target element's visiblity is changed.
      *

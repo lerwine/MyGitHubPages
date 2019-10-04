@@ -6,7 +6,7 @@
     "removeComments": false,
     "sourceMap": true,
     "target": "es6",
-    "module": "none",
+    "module": "commonjs",
     "lib": [
       "es2017",
       "dom"
@@ -20,6 +20,6 @@
     "obj",
     "bin",
     "content",
-    "**/*.spec.ts"
+    "Scripts"
   ]
 }
