@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGitHubPages", "src\MyGitHubPages.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "script", "script\script.njsproj", "{52E3AEEB-EAE4-47C0-A68D-77B1F3C4B5F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E3AEEB-EAE4-47C0-A68D-77B1F3C4B5F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E3AEEB-EAE4-47C0-A68D-77B1F3C4B5F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E3AEEB-EAE4-47C0-A68D-77B1F3C4B5F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E3AEEB-EAE4-47C0-A68D-77B1F3C4B5F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

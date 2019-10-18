@@ -1,0 +1,15 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "lib": [ "es6", "dom" ],
+    "sourceMap": true,
+    "removeComments": true
+  },
+  "exclude": [
+    "node_modules",
+    "bin",
+    "obj"
+  ]
+}

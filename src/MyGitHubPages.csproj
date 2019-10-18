@@ -73,7 +73,9 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="ColorBuilder.html" />
+    <Content Include="colorBuilder\colorBuilder.htm" />
     <Content Include="favicon.ico" />
+    <Content Include="home\home.htm" />
     <Content Include="images\dave-gandy\chevron-up.svg" />
     <Content Include="images\dave-gandy\copy-document.svg" />
     <Content Include="images\dave-gandy\cut.svg" />
@@ -319,6 +321,14 @@
     <Content Include="images\open-iconic\svg\zoom-out.svg" />
     <Content Include="index.html" />
     <Content Include="index-old.html" />
+    <Content Include="jasmine-standalone\index.html" />
+    <Content Include="jasmine-standalone\lib\jasmine-3.5.0\boot.js" />
+    <Content Include="jasmine-standalone\lib\jasmine-3.5.0\jasmine-html.js" />
+    <Content Include="jasmine-standalone\lib\jasmine-3.5.0\jasmine.css" />
+    <Content Include="jasmine-standalone\lib\jasmine-3.5.0\jasmine.js" />
+    <Content Include="jasmine-standalone\lib\jasmine-3.5.0\jasmine_favicon.png" />
+    <Content Include="jasmine-standalone\appSpecRunner.html" />
+    <Content Include="jasmine-standalone\regexTesterSpecRunner.html" />
     <Content Include="libman.json" />
     <Content Include="lib\angular.js\angular-animate.js" />
     <Content Include="lib\angular.js\angular-animate.min.js" />
@@ -1142,6 +1152,9 @@
     <Content Include="images\open-iconic\ICON-LICENSE" />
     <Content Include="images\open-iconic\README.md" />
     <Content Include="RegexTester.html" />
+    <Content Include="regexTester\match.htm" />
+    <Content Include="regexTester\replace.htm" />
+    <Content Include="regexTester\split.htm" />
     <Content Include="Template\ColorBuilder\HSB.htm" />
     <Content Include="Template\ColorBuilder\RGB.htm" />
     <Content Include="Template\Home.htm" />
@@ -1160,6 +1173,7 @@
     <Content Include="Test.html" />
     <Content Include="tslint.json" />
     <Content Include="tsconfig.json" />
+    <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1179,9 +1193,11 @@
     <Content Include="lib\twitter-bootstrap\js\bootstrap.js" />
     <Content Include="lib\twitter-bootstrap\js\bootstrap.min.js" />
     <Content Include="UriBuilder.html" />
+    <Content Include="uriBuilder\uriBuilder.htm" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="App\accordionGroup.ts" />
     <TypeScriptCompile Include="App\app.ts" />
     <TypeScriptCompile Include="App\ColorBuilder.ts" />
@@ -1192,6 +1208,11 @@
     <TypeScriptCompile Include="App\sys.ts" />
     <TypeScriptCompile Include="App\TextEditControl.ts" />
     <TypeScriptCompile Include="App\UriBuilder.ts" />
+    <TypeScriptCompile Include="colorBuilder\colorBuilder.ts" />
+    <TypeScriptCompile Include="home\home.ts" />
+    <TypeScriptCompile Include="jasmine-standalone\spec\appSpec.ts" />
+    <TypeScriptCompile Include="jasmine-standalone\spec\regexTesterSpec.ts" />
+    <TypeScriptCompile Include="regexTester\regexTester.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-component-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -1202,7 +1223,9 @@
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap-table\index.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\index.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="uriBuilder\uriBuilder.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

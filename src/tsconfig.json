@@ -3,23 +3,28 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "noEmitOnError": true,
-    "removeComments": false,
+    "removeComments": true,
     "sourceMap": true,
     "target": "es6",
     "module": "commonjs",
     "lib": [
-      "es2017",
+      "es6",
       "dom"
     ]
   },
-  "include": [ "App/**/*" ],
+  "include": [
+    "./app.ts",
+    "./home/**/*",
+    "./regexTester/**/*",
+    "./uriBuilder/**/*",
+    "./colorBuilder/**/*",
+    "./jasmine-standalone/spec/**/*"
+  ],
   "exclude": [
-    "packages",
-    "wwwroot",
-    "lib",
-    "obj",
-    "bin",
-    "content",
-    "Scripts"
+    "./packages",
+    "./lib",
+    "./obj",
+    "./bin",
+    "./Scripts"
   ]
 }

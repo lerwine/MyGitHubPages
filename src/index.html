@@ -14,16 +14,20 @@
     <script src="lib/twitter-bootstrap/js/bootstrap.bundle.js"></script>
     <script src="lib/angular.js/angular.js"></script>
     <script src="lib/angular.js/angular-route.js"></script>
-    <script src="App/sys.js"></script>
-    <script src="App/main.js"></script>
+    <script src="app.js"></script>
+    <script src="home/home.js"></script>
+    <script src="regexTester/regexTester.js"></script>
 </head>
-<body ng-app="myGitHubPages" ng-controller="mainController">
+<body ng-app="MyGitHubPages" ng-controller="mainContentController">
     <header class="container-fluid p-1">
         <h1>{{ pageTitle }}</h1>
         <h2 ng-show="showSubtitle">{{ subTitle }}</h2>
         <nav class="container-fluid navbar navbar-expand-sm p-1 mr-auto">
             <ul class="navbar-nav">
-                <li class="nav-item" ng-repeat="i in topNavItems"><a ng-href="{{i.href}}" ng-class="i.cssClass" ng-click="i.onClick($event)">{{ i.navTitle }}</a></li>
+                <li class="nav-item"><a href="#!/home" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="{{regexHref}}" class="nav-link">Regex</a></li>
+                <li class="nav-item"><a href="#!/uri" class="nav-link">URI</a></li>
+                <li class="nav-item"><a href="#!/color" class="nav-link">Colors</a></li>
             </ul>
         </nav>
     </header>
