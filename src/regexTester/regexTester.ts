@@ -427,15 +427,16 @@ module regexTester {
         private _regex: RegExp;
         private _hasFault: boolean = false;
         private _faultReason: any;
+        private readonly _taskId: symbol = Symbol();
         readonly [Symbol.toStringTag]: string = app.ServiceNames.regexParser;
 
         /**
          * Creates an instance of RegexParserService.
          * @param {ng.IRootScopeService} $rootScope
-         * @param {ng.IQService} $q
+         * @param {app.SupplantableTaskService} supplantingTask
          * @memberof RegexParserService
          */
-        constructor(private readonly $rootScope: ng.IRootScopeService, private readonly $q: ng.IQService) {
+        constructor(private readonly $rootScope: ng.IRootScopeService, private readonly supplantingTask: app.SupplantableTaskService) {
             let initialResults: IRegexParseSuccessResult = { pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags) };
             this._regex = initialResults.regex;
         }
@@ -620,6 +621,8 @@ module regexTester {
             }
 
             let svc: RegexParserService = this;
+            this.supplantingTask.start(this._taskId, function (resolve: ng.IQResolveReject<IRegexParseSuccessResult>, reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
+            }, );
             this.$q(function (resolve: ng.IQResolveReject<IRegexParseSuccessResult>, reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
                 try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId); } catch { }
                 if (parseId !== svc._parseId)

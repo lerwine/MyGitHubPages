@@ -1,47 +1,248 @@
 var app;
 (function (app) {
-    app.ModuleNames = {
-        app: "MyGitHubPages",
-        home: "MyGitHubPages.home",
-        regexTester: "MyGitHubPages.regexTester",
-        uriBuilder: "MyGitHubPages.uriBuilder",
-        colorBuilder: "MyGitHubPages.colorBuilder"
-    };
-    app.ModulePaths = {
-        home: "/home",
-        regexMatch: "/regex/match",
-        regexReplace: "/regex/replace",
-        regexSplit: "/regex/split",
-        uriBuilder: "/uri",
-        colorBuilder: "/color"
-    };
+    app.ModuleNames = { app: "MyGitHubPages", home: "MyGitHubPages.home", regexTester: "MyGitHubPages.regexTester", uriBuilder: "MyGitHubPages.uriBuilder", colorBuilder: "MyGitHubPages.colorBuilder" };
+    app.ModulePaths = { home: "/home", regexMatch: "/regex/match", regexReplace: "/regex/replace", regexSplit: "/regex/split", uriBuilder: "/uri", colorBuilder: "/color" };
     app.ControllerNames = {
-        mainContent: "mainContentController",
-        homePage: "homePageController",
-        regexMatch: "regexMatchController",
-        regexReplace: "regexReplaceController",
-        regexSplit: "regexSplitController",
-        uriBuilder: "uriBuilderPageController",
+        mainContent: "mainContentController", homePage: "homePageController", regexMatch: "regexMatchController", regexReplace: "regexReplaceController", regexSplit: "regexSplitController", uriBuilder: "uriBuilderPageController",
         colorBuilder: "colorBuilderPageController"
     };
-    app.ServiceNames = {
-        pageTitle: "pageTitleService",
-        mainNavigationProvider: "mainNavigationProvider",
-        regexParser: "regexParser"
-    };
+    app.ServiceNames = { supplantablePromiseChain: "supplantablePromiseChainService", pageTitle: "pageTitleService", mainNavigationProvider: "mainNavigationProvider", regexParser: "regexParser" };
     app.EventNames = {
-        setPageTitle: "MyGitHubPages.setPageTitle",
-        topNavChanged: "MyGitHubPages.topNavChanged",
-        regexPatternChanged2: "MyGitHubPages.regexPatternChanged",
-        regexFlagsChanged2: "MyGitHubPages.regexFlagsChanged",
-        startRegexPatternParse2: "MyGitHubPages.startRegexPatternParse",
-        endRegexPatternParse2: "MyGitHubPages.endRegexPatternParse",
-        regexPatternParseError2: "MyGitHubPages.regexPatternParseError",
-        regexPatternParseSuccess: "MyGitHubPages.regexPatternParseSuccess",
+        setPageTitle: "MyGitHubPages.setPageTitle", topNavChanged: "MyGitHubPages.topNavChanged", regexPatternChanged2: "MyGitHubPages.regexPatternChanged", regexFlagsChanged2: "MyGitHubPages.regexFlagsChanged",
+        startRegexPatternParse2: "MyGitHubPages.startRegexPatternParse", endRegexPatternParse2: "MyGitHubPages.endRegexPatternParse", regexPatternParseError2: "MyGitHubPages.regexPatternParseError", regexPatternParseSuccess: "MyGitHubPages.regexPatternParseSuccess",
         regexObjectChanged2: "MyGitHubPages.regexObjectChanged"
     };
     app.HashPrefix = "!";
     app.NavPrefix = "#!";
+    ;
+    class PromiseChainSupersededError extends Error {
+        constructor(message) { super(message); }
+    }
+    app.PromiseChainSupersededError = PromiseChainSupersededError;
+    class SupplantableChainPromise {
+        constructor(_promise, arg1, arg2) {
+            this._promise = _promise;
+            this._instanceId = Symbol();
+            if (typeof arg1 === "symbol") {
+                this._taskId = arg1;
+                this._chainId = Symbol();
+                this._supplantableTaskService = arg2;
+            }
+            else {
+                this._taskId = arg1._taskId;
+                this._supplantableTaskService = arg1._supplantableTaskService;
+                if (typeof arg2 !== "symbol")
+                    this._chainId = Symbol();
+                else {
+                    this._chainId = arg2;
+                    if (arg2 === arg1._chainId)
+                        return;
+                }
+            }
+        }
+        IsSameTask(arg0) { return this._taskId === ((typeof arg0 === "symbol") ? arg0 : arg0._taskId); }
+        isSameChain(task) { return this._chainId === ((typeof task === "symbol") ? task : task._chainId); }
+        then(successCallback, arg1, arg2, thisArg) {
+            let errorCallback;
+            let notifyCallback;
+            let hasThis;
+            if (typeof arg1 === "function") {
+                errorCallback = arg1;
+                if (typeof arg2 === "function") {
+                    hasThis = arguments.length > 3;
+                    notifyCallback = arg2;
+                }
+                else {
+                    hasThis = arguments.length === 3;
+                    if (hasThis)
+                        thisArg = arg2;
+                }
+            }
+            else if (typeof arg2 === "function") {
+                hasThis = arguments.length > 3;
+                notifyCallback = arg2;
+            }
+            else if (arguments.length === 3) {
+                hasThis = true;
+                thisArg = arg2;
+            }
+            else {
+                hasThis = arguments.length === 2;
+                if (hasThis)
+                    thisArg = arg1;
+            }
+            let task = this;
+            if (typeof notifyCallback === "function") {
+                if (typeof errorCallback === "function")
+                    return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
+                        if (task._supplantableTaskService.isSuperceded(task))
+                            throw new PromiseChainSupersededError();
+                        if (hasThis) {
+                            if (arguments.length == 0)
+                                return successCallback.call(thisArg);
+                            return successCallback.call(thisArg, promiseValue);
+                        }
+                        if (arguments.length == 0)
+                            return successCallback();
+                        return successCallback(promiseValue);
+                    }, function (reason) {
+                        if (hasThis) {
+                            if (arguments.length == 0)
+                                return errorCallback.call(thisArg);
+                            return errorCallback.call(thisArg, reason);
+                        }
+                        if (arguments.length == 0)
+                            return errorCallback();
+                        return errorCallback(reason);
+                    }, function (state) {
+                        if (hasThis) {
+                            if (arguments.length == 0)
+                                return notifyCallback.call(thisArg);
+                            return notifyCallback.call(thisArg, state);
+                        }
+                        if (arguments.length == 0)
+                            return notifyCallback();
+                        return notifyCallback(state);
+                    }), this, this._chainId);
+                return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
+                    if (task._supplantableTaskService.isSuperceded(task))
+                        throw new PromiseChainSupersededError();
+                    if (hasThis) {
+                        if (arguments.length == 0)
+                            return successCallback.call(thisArg);
+                        return successCallback.call(thisArg, promiseValue);
+                    }
+                    if (arguments.length == 0)
+                        return successCallback();
+                    return successCallback(promiseValue);
+                }, undefined, function (state) {
+                    if (hasThis) {
+                        if (arguments.length == 0)
+                            return notifyCallback.call(thisArg);
+                        return notifyCallback.call(thisArg, state);
+                    }
+                    if (arguments.length == 0)
+                        return notifyCallback();
+                    return notifyCallback(state);
+                }), this, this._chainId);
+            }
+            if (typeof errorCallback === "function")
+                return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
+                    if (task._supplantableTaskService.isSuperceded(task))
+                        throw new PromiseChainSupersededError();
+                    if (hasThis) {
+                        if (arguments.length == 0)
+                            return successCallback.call(thisArg);
+                        return successCallback.call(thisArg, promiseValue);
+                    }
+                    if (arguments.length == 0)
+                        return successCallback();
+                    return successCallback(promiseValue);
+                }, function (reason) {
+                    if (hasThis) {
+                        if (arguments.length == 0)
+                            return errorCallback.call(thisArg);
+                        return errorCallback.call(thisArg, reason);
+                    }
+                    if (arguments.length == 0)
+                        return errorCallback();
+                    return errorCallback(reason);
+                }), this, this._chainId);
+            return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
+                if (task._supplantableTaskService.isSuperceded(task))
+                    throw new PromiseChainSupersededError();
+                if (hasThis) {
+                    if (arguments.length == 0)
+                        return successCallback.call(thisArg);
+                    return successCallback.call(thisArg, promiseValue);
+                }
+                if (arguments.length == 0)
+                    return successCallback();
+                return successCallback(promiseValue);
+            }), this, this._chainId);
+        }
+        catch(onRejected, thisArg) {
+            let task = this;
+            if (arguments.length > 1)
+                return new SupplantableChainPromise(this._promise.catch(function (reason) { return onRejected.call(thisArg, reason); }), this, this._chainId);
+            return new SupplantableChainPromise(this._promise.catch(function (reason) { return onRejected(reason); }), this, this._chainId);
+        }
+        finally(finallyCallback, thisArg) {
+            let task = this;
+            if (arguments.length > 1)
+                return new SupplantableChainPromise(this._promise.finally(function () { return finallyCallback.call(thisArg, task._supplantableTaskService.isSuperceded(task)); }), this, this._chainId);
+            return new SupplantableChainPromise(this._promise.finally(function () { return finallyCallback(task._supplantableTaskService.isSuperceded(task)); }), this, this._chainId);
+        }
+    }
+    app.SupplantableChainPromise = SupplantableChainPromise;
+    class SupplantablePromiseChainService {
+        constructor($q, $interval) {
+            this.$q = $q;
+            this.$interval = $interval;
+            this._tasks = [];
+            this[Symbol.toStringTag] = app.ServiceNames.supplantablePromiseChain;
+        }
+        isSuperceded(task) {
+            for (let i = 0; i < this._tasks.length; i++) {
+                if (this._tasks[i].IsSameTask(task))
+                    return !this._tasks[i].isSameChain(task);
+            }
+            return false;
+        }
+        start(taskId, resolver, arg2, thisArg) {
+            let deferred = this.$q.defer();
+            let svc = this;
+            let delay;
+            let hasThis;
+            if (typeof arg2 === "number") {
+                hasThis = arguments.length > 3;
+                delay = (isNaN(arg2)) ? 0 : arg2;
+            }
+            else {
+                if (arguments.length == 3) {
+                    thisArg = arg2;
+                    hasThis = true;
+                }
+                else
+                    hasThis = arguments.length > 3;
+            }
+            this.$interval(function () {
+                let resolve = function (value) {
+                    if (arguments.length == 0)
+                        deferred.resolve();
+                    else
+                        deferred.resolve(value);
+                };
+                let reject = function (reason) {
+                    if (arguments.length == 0)
+                        deferred.reject();
+                    else
+                        deferred.reject(reason);
+                };
+                let notify = function (state) {
+                    if (arguments.length == 0)
+                        deferred.notify();
+                    else
+                        deferred.notify(state);
+                };
+                if (hasThis)
+                    return resolver.call(thisArg, resolve, reject, notify);
+                return resolver(resolve, reject, notify);
+            }, delay, 1, true);
+            let result;
+            for (let i = 0; i < this._tasks.length; i++) {
+                if (this._tasks[i].IsSameTask(taskId)) {
+                    result = new SupplantableChainPromise(deferred.promise, this._tasks[i]);
+                    this._tasks[i] = result;
+                    return result;
+                }
+            }
+            result = new SupplantableChainPromise(deferred.promise, taskId, this);
+            this._tasks.push(result);
+            return result;
+        }
+    }
+    app.SupplantablePromiseChainService = SupplantablePromiseChainService;
     class PageTitleService {
         constructor() {
             this._pageTitle = "Lenny's GitHub Repositories";
@@ -118,6 +319,7 @@ var app;
                 controller: app.ControllerNames.colorBuilder
             }).when('/', { redirectTo: app.ModulePaths.home });
         }])
+        .service(app.ServiceNames.supplantablePromiseChain, ['$q', '$interval', SupplantablePromiseChainService])
         .service(app.ServiceNames.pageTitle, PageTitleService)
         .controller(app.ControllerNames.mainContent, ['$scope', app.ServiceNames.pageTitle, MainContentController]);
 })(app || (app = {}));
