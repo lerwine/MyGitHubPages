@@ -1,7 +1,7 @@
 var app;
 (function (app) {
     app.ModuleNames = {
-        app: 'MyGitHubPages', home: 'MyGitHubPages.home', regexTester: 'MyGitHubPages.regexTester', uriBuilder: 'MyGitHubPages.uriBuilder',
+        app: 'MyGitHubPages', regexTester: 'MyGitHubPages.regexTester', uriBuilder: 'MyGitHubPages.uriBuilder',
         colorBuilder: 'MyGitHubPages.colorBuilder'
     };
     app.ModulePaths = {
@@ -9,12 +9,12 @@ var app;
         regexSplit: '/regex/split', uriBuilder: '/uri', colorBuilder: '/color'
     };
     app.ControllerNames = {
-        mainContent: 'mainContentController', homePage: 'homePageController', regexMatch: 'regexMatchController',
+        mainContent: 'mainContentController', staticPage: 'staticPageController', regexMatch: 'regexMatchController',
         regexReplace: 'regexReplaceController', regexSplit: 'regexSplitController', uriBuilder: 'uriBuilderPageController',
         colorBuilder: 'colorBuilderPageController'
     };
     app.ServiceNames = {
-        supplantablePromiseChain: 'supplantablePromiseChainService', pageTitle: 'pageTitleService',
+        supplantablePromiseChain: 'supplantablePromiseChainService', pageLocation: 'pageLocationService',
         mainNavigationProvider: 'mainNavigationProvider', regexParser: 'regexParser'
     };
     app.EventNames = {
@@ -54,39 +54,12 @@ var app;
         IsSameTask(arg0) {
             return this._taskId === ((typeof arg0 === 'symbol') ? arg0 : arg0._taskId);
         }
-        isSameChain(task) {
-            return this._chainId === ((typeof task === 'symbol') ? task : task._chainId);
+        isSameChain(arg0) {
+            return this._chainId === ((typeof arg0 === 'symbol') ? arg0 : arg0._chainId);
         }
-        then(successCallback, arg1, arg2, thisArg) {
-            let errorCallback;
-            let notifyCallback;
-            let hasThis;
-            if (typeof arg1 === 'function') {
-                errorCallback = arg1;
-                if (typeof arg2 === 'function') {
-                    hasThis = arguments.length > 3;
-                    notifyCallback = arg2;
-                }
-                else {
-                    hasThis = arguments.length === 3;
-                    if (hasThis)
-                        thisArg = arg2;
-                }
-            }
-            else if (typeof arg2 === 'function') {
-                hasThis = arguments.length > 3;
-                notifyCallback = arg2;
-            }
-            else if (arguments.length === 3) {
-                hasThis = true;
-                thisArg = arg2;
-            }
-            else {
-                hasThis = arguments.length === 2;
-                if (hasThis)
-                    thisArg = arg1;
-            }
+        then(successCallback, errorCallback, notifyCallback, thisArg) {
             const task = this;
+            const hasThis = arguments.length > 3;
             if (typeof notifyCallback === 'function') {
                 if (typeof errorCallback === 'function')
                     return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
@@ -176,6 +149,13 @@ var app;
                 return successCallback(promiseValue);
             }), this, this._chainId);
         }
+        thenCall(successCallback, arg1, arg2, thisArg) {
+            if (arguments.length > 3)
+                return this.then(successCallback, arg1, arg2, thisArg);
+            if (arguments.length == 3)
+                return this.then(successCallback, arg1, undefined, arg2);
+            return this.then(successCallback, undefined, undefined, arg1);
+        }
         catch(onRejected, thisArg) {
             const task = this;
             if (arguments.length > 1)
@@ -205,30 +185,24 @@ var app;
             this._tasks = [];
             this[Symbol.toStringTag] = app.ServiceNames.supplantablePromiseChain;
         }
-        isSuperceded(task) {
+        isSuperceded(promise) {
             for (let i = 0; i < this._tasks.length; i++) {
-                if (this._tasks[i].IsSameTask(task))
-                    return !this._tasks[i].isSameChain(task);
+                if (this._tasks[i].IsSameTask(promise))
+                    return !this._tasks[i].isSameChain(promise);
             }
             return false;
         }
-        start(taskId, resolver, arg2, thisArg) {
+        start(taskId, resolver, thisArg) {
+            if (arguments.length > 2)
+                return this.startDelayed(taskId, resolver, 0, thisArg);
+            return this.startDelayed(taskId, resolver, 0);
+        }
+        startDelayed(taskId, resolver, delay, thisArg) {
             const deferred = this.$q.defer();
             const svc = this;
-            let delay;
-            let hasThis;
-            if (typeof arg2 === 'number') {
-                hasThis = arguments.length > 3;
-                delay = (isNaN(arg2)) ? 0 : arg2;
-            }
-            else {
-                if (arguments.length == 3) {
-                    thisArg = arg2;
-                    hasThis = true;
-                }
-                else
-                    hasThis = arguments.length > 3;
-            }
+            const hasThis = arguments.length > 3;
+            if (isNaN(delay))
+                delay = 0;
             this.$interval(function () {
                 const resolve = function (value) {
                     if (arguments.length == 0)
@@ -266,71 +240,43 @@ var app;
         }
     }
     app.SupplantablePromiseChainService = SupplantablePromiseChainService;
-    class PageTitleService {
-        constructor() {
+    class PageLocationService {
+        constructor($rootScope) {
             this._pageTitle = 'Lenny\'s GitHub Repositories';
             this._pageSubTitle = '';
             this._regexHref = app.NavPrefix + app.ModulePaths.regexMatch;
-            this[Symbol.toStringTag] = app.ServiceNames.pageTitle;
-        }
-        regexHref(value) {
-            if (typeof value === 'string') {
-                if ((value = value.trim()).length > 0) {
-                    this._regexHref = value;
-                    if (typeof this._scope !== 'undefined')
-                        this._scope.regexHref = this._regexHref;
+            this[Symbol.toStringTag] = app.ServiceNames.pageLocation;
+            const svc = this;
+            $rootScope.$on('$routeChangeSuccess', function (event, current) {
+                switch (current.templateUrl) {
+                    case 'home.htm':
+                        svc.pageTitle('');
+                        break;
+                    case 'git.htm':
+                        svc.pageTitle('GIT Cheat Sheet');
+                        break;
+                    case 'vscode.htm':
+                        svc.pageTitle('VS Code Cheat Sheet');
+                        break;
+                    case 'npm.htm':
+                        svc.pageTitle('NPM Cheat Sheet');
+                        break;
                 }
-            }
-            return this._regexHref;
+            });
         }
-        pageTitle(value) {
-            if (typeof value === 'string') {
-                this._pageTitle = ((value = value.trim()).length == 0) ? 'Lenny\'s GitHub Page' : value;
-                if (typeof this._scope !== 'undefined')
-                    this._scope.pageTitle = this._pageTitle;
-            }
-            return this._pageTitle;
-        }
-        pageSubTitle(value) {
-            if (typeof value === 'string') {
-                this._pageSubTitle = value;
-                if (typeof this._scope !== 'undefined')
-                    this._scope.showSubtitle = (this._scope.subTitle = this._pageSubTitle).trim().length > 0;
-            }
-            return this._pageSubTitle;
-        }
-        setScope(scope) {
-            if (typeof scope === 'object' && scope !== null) {
-                (this._scope = scope).pageTitle = this._pageTitle;
-                scope.showSubtitle = (scope.subTitle = this._pageSubTitle).trim().length > 0;
-                this._scope.regexHref = this._regexHref;
-            }
-        }
-    }
-    app.PageTitleService = PageTitleService;
-    class MainContentController {
-        constructor($scope, pageTitleService) {
-            this.$scope = $scope;
-            this[Symbol.toStringTag] = app.ControllerNames.mainContent;
-            const ctrl = this;
-            $scope.regexHref = app.NavPrefix + app.ModulePaths.regexMatch;
-            pageTitleService.setScope($scope);
-        }
-        $doCheck() { }
-    }
-    app.MainContentController = MainContentController;
-    app.mainModule = angular.module(app.ModuleNames.app, ['ngRoute'])
-        .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
-            $locationProvider.hashPrefix(app.HashPrefix);
+        static ConfigureRoutes($routeProvider) {
             $routeProvider.when(app.ModulePaths.home, {
-                templateUrl: 'home/home.htm',
-                controller: app.ControllerNames.homePage
+                templateUrl: 'home.htm',
+                controller: app.ControllerNames.staticPage
             }).when(app.ModulePaths.git, {
-                templateUrl: 'git.htm'
+                templateUrl: 'git.htm',
+                controller: app.ControllerNames.staticPage
             }).when(app.ModulePaths.vscode, {
-                templateUrl: 'vscode.htm'
+                templateUrl: 'vscode.htm',
+                controller: app.ControllerNames.staticPage
             }).when(app.ModulePaths.npm, {
-                templateUrl: 'npm.htm'
+                templateUrl: 'npm.htm',
+                controller: app.ControllerNames.staticPage
             }).when(app.ModulePaths.regexMatch, {
                 templateUrl: 'regexTester/match.htm',
                 controller: app.ControllerNames.regexMatch
@@ -347,9 +293,72 @@ var app;
                 templateUrl: 'colorBuilder/colorBuilder.htm',
                 controller: app.ControllerNames.colorBuilder
             }).when('/', { redirectTo: app.ModulePaths.home });
+        }
+        regexHref(value) {
+            if (typeof value === 'string') {
+                if ((value = value.trim()).length > 0) {
+                    this._regexHref = value;
+                    if (typeof this._scope !== 'undefined')
+                        this._scope.regexHref = this._regexHref;
+                }
+            }
+            return this._regexHref;
+        }
+        pageTitle(value, subTitle) {
+            if (typeof value === 'string') {
+                this._pageTitle = ((value = value.trim()).length == 0) ? 'Lenny\'s GitHub Page' : value;
+                this._pageSubTitle = (typeof subTitle === 'string') ? subTitle : '';
+                if (typeof this._scope !== 'undefined') {
+                    this._scope.pageTitle = this._pageTitle;
+                    this._scope.showSubtitle = (this._scope.subTitle = this._pageSubTitle).length > 0;
+                }
+            }
+            return this._pageTitle;
+        }
+        pageSubTitle(value) { return this._pageSubTitle; }
+        setScope(scope) {
+            if (typeof scope === 'object' && scope !== null) {
+                (this._scope = scope).pageTitle = this._pageTitle;
+                scope.showSubtitle = (scope.subTitle = this._pageSubTitle).trim().length > 0;
+                this._scope.regexHref = this._regexHref;
+            }
+        }
+    }
+    app.PageLocationService = PageLocationService;
+    class StaticPageController {
+        constructor(pageLocationService, $location) {
+            this[Symbol.toStringTag] = app.ControllerNames.staticPage;
+            const path = $location.path();
+            if (path == app.ModulePaths.git)
+                pageLocationService.pageTitle('GIT Cheat Sheet');
+            else if (path == app.ModulePaths.vscode)
+                pageLocationService.pageTitle('VS Code Cheat Sheet');
+            else if (path == app.ModulePaths.npm)
+                pageLocationService.pageTitle('NPM Cheat Sheet');
+            else
+                pageLocationService.pageTitle('');
+        }
+        $doCheck() { }
+    }
+    app.StaticPageController = StaticPageController;
+    class MainContentController {
+        constructor($scope, pageLocationService) {
+            this.$scope = $scope;
+            this[Symbol.toStringTag] = app.ControllerNames.mainContent;
+            const ctrl = this;
+            $scope.regexHref = app.NavPrefix + app.ModulePaths.regexMatch;
+            pageLocationService.setScope($scope);
+        }
+        $doCheck() { }
+    }
+    app.MainContentController = MainContentController;
+    app.mainModule = angular.module(app.ModuleNames.app, ['ngRoute'])
+        .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
+            $locationProvider.hashPrefix(app.HashPrefix);
+            PageLocationService.ConfigureRoutes($routeProvider);
         }])
         .service(app.ServiceNames.supplantablePromiseChain, ['$q', '$interval', SupplantablePromiseChainService])
-        .service(app.ServiceNames.pageTitle, PageTitleService)
-        .controller(app.ControllerNames.mainContent, ['$scope', app.ServiceNames.pageTitle, MainContentController]);
+        .service(app.ServiceNames.pageLocation, PageLocationService)
+        .controller(app.ControllerNames.mainContent, ['$scope', app.ServiceNames.pageLocation, MainContentController]);
 })(app || (app = {}));
 //# sourceMappingURL=app.js.map

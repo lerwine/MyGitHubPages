@@ -4,7 +4,7 @@
 /// <reference path="../app.ts"/>
 
 /**
- * The JavaScript module corresponding to the MyGitHubPages.uriBuilder angular js module.
+ * The commonjs module corresponding to the MyGitHubPages.uriBuilder angular js module.
  * @module uriBuilder
  */
 module uriBuilder {

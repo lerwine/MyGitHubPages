@@ -3,7 +3,7 @@
 /// <reference path="Scripts/typings/bootstrap/index.d.ts"/>
 
 /**
- * The JavaScript module corresponding to the MyGitHubPages angular js module.
+ * The commonjs module corresponding to the MyGitHubPages angular js module.
  * @module app
  */
 module app {
@@ -19,12 +19,6 @@ module app {
          * @readonly
          */
         readonly app: 'MyGitHubPages';
-        /**
-         * Name of the Home page module.
-         * @type: {"MyGitHubPages.home"}
-         * @readonly
-         */
-        readonly home: 'MyGitHubPages.home';
         /**
          * Name of the Regular Expression Tester pages module.
          * @type: {"MyGitHubPages.regexTester"}
@@ -50,7 +44,7 @@ module app {
      * @constant ModuleNames
      */
     export const ModuleNames: IModuleNames = {
-        app: 'MyGitHubPages', home: 'MyGitHubPages.home', regexTester: 'MyGitHubPages.regexTester', uriBuilder: 'MyGitHubPages.uriBuilder', 
+        app: 'MyGitHubPages', regexTester: 'MyGitHubPages.regexTester', uriBuilder: 'MyGitHubPages.uriBuilder',
         colorBuilder: 'MyGitHubPages.colorBuilder'
     };
 
@@ -139,11 +133,11 @@ module app {
          */
         readonly mainContent: 'mainContentController';
         /**
-         * The name of the Home page controller.
-         * @type: {"homePageController"}
+         * The name of controller for static pages.
+         * @type: {"staticPageController"}
          * @readonly
          */
-        readonly homePage: 'homePageController';
+        readonly staticPage: 'staticPageController';
         /**
          * The name of the Regular Expression Match page controller.
          * @type: {"regexMatchController"}
@@ -182,7 +176,7 @@ module app {
      * @type {IControllerNames}
      */
     export const ControllerNames: IControllerNames = {
-        mainContent: 'mainContentController', homePage: 'homePageController', regexMatch: 'regexMatchController',
+        mainContent: 'mainContentController', staticPage: 'staticPageController', regexMatch: 'regexMatchController',
         regexReplace: 'regexReplaceController', regexSplit: 'regexSplitController', uriBuilder: 'uriBuilderPageController',
         colorBuilder: 'colorBuilderPageController'
     };
@@ -200,11 +194,11 @@ module app {
          */
         readonly supplantablePromiseChain: 'supplantablePromiseChainService';
         /**
-         * The name of the Page Title service.
-         * @type: {"pageTitleService"}
+         * The name of the Page Location service.
+         * @type: {"pageLocationService"}
          * @readonly
          */
-        readonly pageTitle: 'pageTitleService';
+        readonly pageLocation: 'pageLocationService';
         /**
          * The name of the Main Navigation service provider.
          * @type: {"mainNavigationProvider"}
@@ -225,10 +219,10 @@ module app {
      * @type {IServiceNames}
      */
     export const ServiceNames: IServiceNames = {
-        supplantablePromiseChain: 'supplantablePromiseChainService', pageTitle: 'pageTitleService',
+        supplantablePromiseChain: 'supplantablePromiseChainService', pageLocation: 'pageLocationService',
         mainNavigationProvider: 'mainNavigationProvider', regexParser: 'regexParser'
     };
- 
+
     /**
      * Statically defined custom event names.
      * @export
@@ -409,9 +403,9 @@ module app {
      * @export
      * @class SupplantableChainPromise
      * @implements {ng.IPromise<T>}
-     * @template T - The type of value to be resolved.
+     * @template V - The type of value to be resolved.
      */
-    export class SupplantableChainPromise<T> implements ng.IPromise<T> {
+    export class SupplantableChainPromise<V> implements ng.IPromise<V> {
         private readonly _supplantableTaskService: SupplantablePromiseChainService;
         private readonly _taskId: symbol;
         private readonly _chainId: symbol;
@@ -421,34 +415,34 @@ module app {
          * Creates an instance of SupplantableChainPromise to represent a following promise within a supplantable process chain.
          * @constructor
          * @memberof SupplantableTask
-         * @param {ng.IPromise<T>} promise - The promise to be wrapped by this instance.
+         * @param {ng.IPromise<V>} promise - The promise to be wrapped by this instance.
          * @param {SupplantableChainPromise<any>} preceding - The promise in a supplantable promise chain to be to be supplanted by this
          *        promise.
          */
-        constructor(promise: ng.IPromise<T>, preceding: SupplantableChainPromise<any>);
+        constructor(promise: ng.IPromise<V>, preceding: SupplantableChainPromise<any>);
         /**
          * Creates an instance of SupplantableChainPromise.
          * @constructor
          * @memberof SupplantableTask
-         * @param {ng.IPromise<T>} promise - The promise to be wrapped by this instance.
+         * @param {ng.IPromise<V>} promise - The promise to be wrapped by this instance.
          * @param {SupplantableChainPromise<any>} preceding - Either a promise within a supplantable promise chain to be to be supplanted
          *        by this promise or the preceding promise in the current promise chain.
          * @param {symbol} chainId - Unique identifier for the current promise chain.
          * @description If chainId matches the promise chain of the preceding promise, then this will be the followin promise in that
          *              promise chain; otherwise, this will be the first promise in a chain that supercedes the previous chain.
          */
-        constructor(promise: ng.IPromise<T>, preceding: SupplantableChainPromise<any>, chainId: symbol);
+        constructor(promise: ng.IPromise<V>, preceding: SupplantableChainPromise<any>, chainId: symbol);
         /**
          * Creates an instance of SupplantableChainPromise to represent a new promise chain.
          * @constructor
          * @memberof SupplantableTask
-         * @param {ng.IPromise<T>} promise - The promise to be wrapped by this instance.
+         * @param {ng.IPromise<V>} promise - The promise to be wrapped by this instance.
          * @param {symbol} taskId - The unique identifier of the promise chain to be superseded (if it exists).
          * @param {SupplantablePromiseChainService} supplantableTaskService - The Supplantable Promise Chain service which tracks
          *        supplantable promise chains.
          */
-        constructor(promise: ng.IPromise<T>, taskId: symbol, supplantableTaskService: SupplantablePromiseChainService);
-        constructor(private readonly _promise: ng.IPromise<T>, arg1: SupplantableChainPromise<any> | symbol,
+        constructor(promise: ng.IPromise<V>, taskId: symbol, supplantableTaskService: SupplantablePromiseChainService);
+        constructor(private readonly _promise: ng.IPromise<V>, arg1: SupplantableChainPromise<any> | symbol,
                 arg2?: SupplantablePromiseChainService | symbol) {
             if (typeof arg1 === 'symbol') {
                 this._taskId = arg1;
@@ -499,140 +493,59 @@ module app {
          * @returns {boolean} - true if the value is the unique identifier for the current promise chain; otherwise, false.
          */
         isSameChain(chainId: symbol): boolean;
-        isSameChain(task: SupplantableChainPromise<any> | symbol): boolean {
-            return this._chainId === ((typeof task === 'symbol') ? task : task._chainId);
+        isSameChain(arg0: SupplantableChainPromise<any> | symbol): boolean {
+            return this._chainId === ((typeof arg0 === 'symbol') ? arg0 : arg0._chainId);
         }
-        ///*
-        // *
-        // *
-        // * @template TThis - The type of the current object during callback invocation.
-        // * @template TSuccessResult - The type of return value when the current promise is successfully resolved.
-        // * @template TErrorResult - The type of return value when the current promise is rejected.
-        // * @template TState - type of notification state value.
-        // * @param {ISupplantablePromiseSuccessThisCallback<TThis, T, TSuccessResult>} successCallback - This gets invoked when (and if) the current promise is resolved.
-        // * @param {ISupplantablePromiseErrorThisCallback<TThis, TErrorResult>} errorCallback - This gets invoked when (and if) the current promise is rejected.
-        // * @param {ISupplantableTaskNotifyThisCallback<TThis, TState>} notifyCallback - This gets called when the promise notifies a state change.
-        // * @param {TThis} thisArg - The object to use as the current object during callback invocation.
-        // * @returns {SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>} - The resulting promise.
-        // * @memberof SupplantableTask
-        // */
-        //then<TThis, TSuccessResult, TErrorResult, TState>(successCallback: ISupplantablePromiseSuccessThisCallback<TThis, T, TSuccessResult>, errorCallback: ISupplantablePromiseErrorThisCallback<TThis, TErrorResult>, notifyCallback: ISupplantableTaskNotifyThisCallback<TThis, TState>, thisArg: TThis): SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>;
-        /**
-         *
-         *
-         * @template TResult
-         * @param {SupplantableChainPromiseSuccessCallback<T, TResult>} successCallback
-         * @returns {SupplantableChainPromise<TResult>}
-         * @memberof SupplantableChainPromise
-         */
-        then<TResult>(successCallback: SupplantableChainPromiseSuccessCallback<T, TResult>): SupplantableChainPromise<TResult>;
-        /**
-         *
-         *
-         * @template TResult
-         * @template TThis
-         * @param {SupplantableChainPromiseSuccessThisCallback<T, TResult, TThis>} successCallback
-         * @param {(TThis & (TThis extends Function ? never : TThis))} thisArg
-         * @returns {SupplantableChainPromise<TResult>}
-         * @memberof SupplantableChainPromise
-         */
-        then<TResult, TThis>(successCallback: SupplantableChainPromiseSuccessThisCallback<T, TResult, TThis>,
-            thisArg: TThis & (TThis extends Function ? never : TThis)): SupplantableChainPromise<TResult>;
-        /**
-         *
-         *
-         * @template TSuccessResult
-         * @template TErrorResult
-         * @param {SupplantableChainPromiseSuccessCallback<T, TSuccessResult>} successCallback
-         * @param {SupplantableChainPromiseErrorCallback<TErrorResult>} errorCallback
-         * @returns {(SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>)}
-         * @memberof SupplantableChainPromise
-         */
-        then<TSuccessResult, TErrorResult>(successCallback: SupplantableChainPromiseSuccessCallback<T, TSuccessResult>,
-                errorCallback: SupplantableChainPromiseErrorCallback<TErrorResult>):
-                    SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>;
-        /**
-         *
-         *
-         * @template TSuccessResult
-         * @template TErrorResult
-         * @template TThis
-         * @param {SupplantableChainPromiseSuccessThisCallback<T, TSuccessResult, TThis>} successCallback
-         * @param {SupplantableChainPromiseErrorThisCallback<TErrorResult, TThis>} errorCallback
-         * @param {(TThis & (TThis extends Function ? never : TThis))} thisArg
-         * @returns {(SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>)}
-         * @memberof SupplantableChainPromise
-         */
-        then<TSuccessResult, TErrorResult, TThis>(successCallback: SupplantableChainPromiseSuccessThisCallback<T, TSuccessResult, TThis>,
-                errorCallback: SupplantableChainPromiseErrorThisCallback<TErrorResult, TThis>,
-                thisArg: TThis & (TThis extends Function ? never : TThis)):
-                    SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>;
-        /**
-         *
-         *
-         * @template TSuccessResult
-         * @template TErrorResult
-         * @template TState
-         * @param {SupplantableChainPromiseSuccessCallback<T, TSuccessResult>} successCallback
-         * @param {SupplantableChainPromiseErrorCallback<TErrorResult>} errorCallback
-         * @param {SupplantableChainPromiseNotifyCallback<TState>} notifyCallback
-         * @returns {(SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>)}
-         * @memberof SupplantableChainPromise
-         */
-        then<TSuccessResult, TErrorResult, TState>(successCallback: SupplantableChainPromiseSuccessCallback<T, TSuccessResult>,
-                errorCallback: SupplantableChainPromiseErrorCallback<TErrorResult>,
-                notifyCallback: SupplantableChainPromiseNotifyCallback<TState>):
-                    SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>;
-        /**
-         *
-         *
-         * @template TSuccessResult
-         * @template TErrorResult
-         * @template TState
-         * @template TThis
-         * @param {SupplantableChainPromiseSuccessThisCallback<T, TSuccessResult, TThis>} successCallback
-         * @param {SupplantableChainPromiseErrorThisCallback<TErrorResult, TThis>} errorCallback
-         * @param {SupplantableChainPromiseNotifyThisCallback<TState, TThis>} notifyCallback
-         * @param {TThis} thisArg
-         * @returns {(SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>)}
-         * @memberof SupplantableChainPromise
-         */
-        then<TSuccessResult, TErrorResult, TState, TThis>(
-            successCallback: SupplantableChainPromiseSuccessThisCallback<T, TSuccessResult, TThis>,
-            errorCallback: SupplantableChainPromiseErrorThisCallback<TErrorResult, TThis>,
-            notifyCallback: SupplantableChainPromiseNotifyThisCallback<TState, TThis>, thisArg: TThis):
-                SupplantableChainPromise<TSuccessResult> | SupplantableChainPromise<TErrorResult>;
-        then(successCallback: SupplantableChainPromiseSuccessCallback<T, any>, arg1?: any, arg2?: any,
-                thisArg?: any): SupplantableChainPromise<any> {
-            let errorCallback: SupplantableChainPromiseErrorCallback<any>;
-            let notifyCallback: SupplantableChainPromiseNotifyCallback<any>;
-            let hasThis: boolean;
-            if (typeof arg1 === 'function') {
-                errorCallback = <SupplantableChainPromiseErrorCallback<any>>arg1;
-                if (typeof arg2 === 'function') {
-                    hasThis = arguments.length > 3;
-                    notifyCallback = <SupplantableChainPromiseNotifyCallback<any>>arg2;
-                } else {
-                    hasThis = arguments.length === 3;
-                    if (hasThis)
-                        thisArg = arg2;
-                }
-            } else if (typeof arg2 === 'function') {
-                hasThis = arguments.length > 3;
-                notifyCallback = <SupplantableChainPromiseNotifyCallback<any>>arg2;
-            } else if (arguments.length === 3) {
-                hasThis = true;
-                thisArg = arg2;
-            } else {
-                hasThis = arguments.length === 2;
-                if (hasThis)
-                    thisArg = arg1;
-            }
 
-            const task: SupplantableChainPromise<T> = this;
+        /**
+         *
+         *
+         * @template R
+         * @param {SupplantableChainPromiseSuccessCallback<V, R>} successCallback
+         * @returns {SupplantableChainPromise<R>}
+         * @memberof SupplantableChainPromise
+         */
+        then<R>(successCallback: SupplantableChainPromiseSuccessCallback<V, R>): SupplantableChainPromise<R>;
+        /**
+         *
+         *
+         * @template R
+         * @template E
+         * @param {SupplantableChainPromiseSuccessCallback<V, R>} successCallback
+         * @param {SupplantableChainPromiseErrorCallback<E>} errorCallback
+         * @returns {(SupplantableChainPromise<R> | SupplantableChainPromise<E>)}
+         * @memberof SupplantableChainPromise
+         */
+        then<R, E>(successCallback: SupplantableChainPromiseSuccessCallback<V, R>,
+                errorCallback: SupplantableChainPromiseErrorCallback<E>):
+                    SupplantableChainPromise<R> | SupplantableChainPromise<E>;
+        /**
+         *
+         *
+         * @template R
+         * @template E
+         * @template S
+         * @param {SupplantableChainPromiseSuccessCallback<V, R>} successCallback
+         * @param {SupplantableChainPromiseErrorCallback<E>} errorCallback
+         * @param {SupplantableChainPromiseNotifyCallback<S>} notifyCallback
+         * @returns {(SupplantableChainPromise<R> | SupplantableChainPromise<E>)}
+         * @memberof SupplantableChainPromise
+         */
+        then<R, E, S>(successCallback: SupplantableChainPromiseSuccessCallback < V, R > ,
+            errorCallback: SupplantableChainPromiseErrorCallback < E > ,
+            notifyCallback: SupplantableChainPromiseNotifyCallback<S>): SupplantableChainPromise<R> | SupplantableChainPromise<E>;
+        then<R, E, S, T>(successCallback: SupplantableChainPromiseSuccessCallback < V, R > ,
+            errorCallback: SupplantableChainPromiseErrorCallback < E > ,
+            notifyCallback: SupplantableChainPromiseNotifyCallback<S>,
+            thisArg: T): SupplantableChainPromise<R> | SupplantableChainPromise<E>;
+        then(successCallback: SupplantableChainPromiseSuccessCallback<V, any>, errorCallback?: SupplantableChainPromiseErrorCallback<any> ,
+                notifyCallback?: SupplantableChainPromiseNotifyCallback<any>,
+                thisArg?: any): SupplantableChainPromise<any> {
+            const task: SupplantableChainPromise<V> = this;
+            const hasThis = arguments.length > 3;
             if (typeof notifyCallback === 'function') {
                 if (typeof errorCallback === 'function')
-                    return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: T): T | ng.IPromise<T> {
+                    return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: V): V | ng.IPromise<V> {
                         if (task._supplantableTaskService.isSuperceded(task))
                             throw new PromiseChainSupersededError();
                         if (hasThis) {
@@ -662,7 +575,7 @@ module app {
                             return notifyCallback();
                         return notifyCallback(state);
                     }), this, this._chainId);
-                return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: T): T | ng.IPromise<T> {
+                return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: V): V | ng.IPromise<V> {
                     if (task._supplantableTaskService.isSuperceded(task))
                         throw new PromiseChainSupersededError();
                     if (hasThis) {
@@ -685,7 +598,7 @@ module app {
                 }), this, this._chainId);
             }
             if (typeof errorCallback === 'function')
-                return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: T): T | ng.IPromise<T> {
+                return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: V): V | ng.IPromise<V> {
                     if (task._supplantableTaskService.isSuperceded(task))
                         throw new PromiseChainSupersededError();
                     if (hasThis) {
@@ -706,7 +619,7 @@ module app {
                         return errorCallback();
                     return errorCallback(reason);
                 }), this, this._chainId);
-            return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: T): T | ng.IPromise<T> {
+            return new SupplantableChainPromise<any>(this._promise.then(function (promiseValue?: V): V | ng.IPromise<V> {
                 if (task._supplantableTaskService.isSuperceded(task))
                     throw new PromiseChainSupersededError();
                 if (hasThis) {
@@ -718,6 +631,63 @@ module app {
                     return successCallback();
                 return successCallback(promiseValue);
             }), this, this._chainId);
+        }
+
+        /**
+         *
+         *
+         * @template R
+         * @template T
+         * @param {SupplantableChainPromiseSuccessThisCallback<V, R, T>} successCallback
+         * @param {(T & (T extends Function ? never : T))} thisArg
+         * @returns {SupplantableChainPromise<R>}
+         * @memberof SupplantableChainPromise
+         */
+        thenCall<R, T>(successCallback: SupplantableChainPromiseSuccessThisCallback<V, R, T>,
+            thisArg: T): SupplantableChainPromise<R>;
+        /**
+         *
+         *
+         * @template R
+         * @template E
+         * @template T
+         * @param {SupplantableChainPromiseSuccessThisCallback<V, R, T>} successCallback
+         * @param {SupplantableChainPromiseErrorThisCallback<E, T>} errorCallback
+         * @param {(T & (T extends Function ? never : T))} thisArg
+         * @returns {(SupplantableChainPromise<R> | SupplantableChainPromise<E>)}
+         * @memberof SupplantableChainPromise
+         */
+        thenCall<R, E, T>(successCallback: SupplantableChainPromiseSuccessThisCallback<V, R, T>,
+                errorCallback: SupplantableChainPromiseErrorThisCallback<E, T>,
+                thisArg: T):
+                    SupplantableChainPromise<R|E>;
+        /**
+         *
+         *
+         * @template R
+         * @template E
+         * @template S
+         * @template T
+         * @param {SupplantableChainPromiseSuccessThisCallback<V, R, T>} successCallback
+         * @param {SupplantableChainPromiseErrorThisCallback<E, T>} errorCallback
+         * @param {SupplantableChainPromiseNotifyThisCallback<S, T>} notifyCallback
+         * @param {T} thisArg
+         * @returns {(SupplantableChainPromise<R> | SupplantableChainPromise<E>)}
+         * @memberof SupplantableChainPromise
+         */
+        thenCall<R, E, S, T>(
+            successCallback: SupplantableChainPromiseSuccessThisCallback<V, R, T>,
+            errorCallback: SupplantableChainPromiseErrorThisCallback<E, T>,
+            notifyCallback: SupplantableChainPromiseNotifyThisCallback<S, T>, thisArg: T):
+                SupplantableChainPromise<R | E>;
+        thenCall<R, T>(successCallback: SupplantableChainPromiseSuccessThisCallback<V, R, T>, arg1: any, arg2?: any,
+                thisArg?: any): SupplantableChainPromise<any> {
+            if (arguments.length > 3)
+                return this.then(successCallback, <SupplantableChainPromiseErrorCallback<any>>arg1,
+                    <SupplantableChainPromiseNotifyCallback<any>>arg2, thisArg);
+            if (arguments.length == 3)
+                return this.then(successCallback, <SupplantableChainPromiseErrorCallback<any>>arg1, undefined, arg2);
+            return this.then(successCallback, undefined, undefined, arg1);
         }
 
         /**
@@ -742,7 +712,7 @@ module app {
         catch<TThis, TResult>(onRejected: (this: TThis, reason?: any) => TResult | ng.IPromise<TResult>,
             thisArg: TThis): SupplantableChainPromise<TResult>;
         catch<TResult>(onRejected: (reason?: any) => TResult | ng.IPromise<TResult>, thisArg?: any): SupplantableChainPromise<TResult> {
-            const task: SupplantableChainPromise<T> = this;
+            const task: SupplantableChainPromise<V> = this;
             if (arguments.length > 1)
                 return new SupplantableChainPromise<TResult>(this._promise.catch<TResult>(function (reason: any) {
                     return onRejected.call(thisArg, reason);
@@ -756,34 +726,46 @@ module app {
          *
          *
          * @param {{ (isSuperseded: boolean): any; }} finallyCallback
-         * @returns {SupplantableChainPromise<T>}
+         * @returns {SupplantableChainPromise<V>}
          * @memberof SupplantableTask
          */
-        finally(finallyCallback: (isSuperseded: boolean) => any): SupplantableChainPromise<T>;
+        finally(finallyCallback: (isSuperseded: boolean) => any): SupplantableChainPromise<V>;
         /**
          *
          *
          * @template TThis
          * @param {{ (this: TThis, isSuperseded: boolean): any; }} finallyCallback
          * @param {TThis} thisArg
-         * @returns {SupplantableChainPromise<T>}
+         * @returns {SupplantableChainPromise<V>}
          * @memberof SupplantableTask
          */
-        finally<TThis>(finallyCallback: (this: TThis, isSuperseded: boolean) => any, thisArg: TThis): SupplantableChainPromise<T>;
-        finally(finallyCallback: (isSuperseded: boolean) => any, thisArg?: any): SupplantableChainPromise<T> {
-            const task: SupplantableChainPromise<T> = this;
+        finally<TThis>(finallyCallback: (this: TThis, isSuperseded: boolean) => any, thisArg: TThis): SupplantableChainPromise<V>;
+        finally(finallyCallback: (isSuperseded: boolean) => any, thisArg?: any): SupplantableChainPromise<V> {
+            const task: SupplantableChainPromise<V> = this;
             if (arguments.length > 1)
-                return new SupplantableChainPromise<T>(this._promise.finally(function () {
+                return new SupplantableChainPromise<V>(this._promise.finally(function () {
                     return finallyCallback.call(thisArg, task._supplantableTaskService.isSuperceded(task));
                 }), this, this._chainId);
-            return new SupplantableChainPromise<T>(this._promise.finally(function () {
+            return new SupplantableChainPromise<V>(this._promise.finally(function () {
                 return finallyCallback(task._supplantableTaskService.isSuperceded(task));
             }), this, this._chainId);
         }
     }
 
+    export type ResolveOnlyCallback<V> = (resolve: ng.IQResolveReject<V>) => any;
+    export type ResolveOnlyThisCallback<T, V> = (this: T, resolve: ng.IQResolveReject<V>) => any;
+    export type ResolveRejectCallback<V> = (resolve: ng.IQResolveReject<V>, reject: ng.IQResolveReject<any>) => any;
+    export type ResolveRejectThisCallback<T, V> = (this: T, resolve: ng.IQResolveReject<V>, reject: ng.IQResolveReject<any>) => any;
+    export type ResolveRejectNotifyCallback<V, S> = (resolve: ng.IQResolveReject<V>, reject: ng.IQResolveReject<S>,
+        notify: ng.IQResolveReject<any>) => any;
+    export type ResolveRejectNotifyThisCallback<T, V, S> = (this: T, resolve: ng.IQResolveReject<V>, reject: ng.IQResolveReject<any>,
+        notify: ng.IQResolveReject<S>) => any;
+    export type ResolvePromiseCallback<V> = ResolveOnlyCallback<V> | ResolveRejectCallback<V> | ResolveRejectNotifyCallback<V, any>;
+    export type ResolvePromiseThisCallback<T, V> = ResolveOnlyThisCallback<T, V> | ResolveRejectThisCallback<T, V> |
+        ResolveRejectNotifyThisCallback<T, V, any>;
+
     /**
-     *
+     * Class which implements the supplantablePromiseChainService service.
      * @export
      * @class SupplantablePromiseChainService
      */
@@ -793,201 +775,89 @@ module app {
         readonly [Symbol.toStringTag]: string = ServiceNames.supplantablePromiseChain;
 
         /**
-         *Creates an instance of SupplantablePromiseChainService.
-         * @param {ng.IQService} $q
-         * @param {ng.IIntervalService} $interval
+         * Creates an instance of SupplantablePromiseChainService.
+         * @param {ng.IQService} $q - Injected Angular JS Q service.
+         * @param {ng.IIntervalService} $interval - Injected Angular JS Interval service.
          * @memberof SupplantablePromiseChainService
          */
         constructor(private readonly $q: ng.IQService, private readonly $interval: ng.IIntervalService) {
         }
 
         /**
-         *
-         *
-         * @param {SupplantableChainPromise<any>} task
-         * @returns {boolean}
+         * Tests whether the current promise chain has been superceded.
+         * @param {SupplantableChainPromise<any>} promise - A promise in the current promise chain.
+         * @returns {boolean} True if the current promise chain has been superceded; otherwise, false.
          * @memberof SupplantablePromiseChainService
          */
-        isSuperceded(task: SupplantableChainPromise<any>): boolean {
+        isSuperceded(promise: SupplantableChainPromise<any>): boolean {
             for (let i = 0; i < this._tasks.length; i++) {
-                if (this._tasks[i].IsSameTask(task))
-                    return !this._tasks[i].isSameChain(task);
+                if (this._tasks[i].IsSameTask(promise))
+                    return !this._tasks[i].isSameChain(promise);
             }
             return false;
         }
 
         /**
-         *
-         *
-         * @template T
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>): any; }} resolver
-         * @returns {SupplantableChainPromise<T>}
+         * Starts a new supplantable promise chain.
+         * @template V - The type of value to be resolved.
+         * @param {symbol} taskId - Uniquely identifies a supplantable promise chain.
+         * @param {ResolvePromiseCallback<V>} resolver - Resolves the promised value.
+         * @returns {SupplantableChainPromise<V>} A supplantable chain promise object.
          * @memberof SupplantablePromiseChainService
          */
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>) => any): SupplantableChainPromise<T>;
+        start<V>(taskId: symbol, resolver: ResolvePromiseCallback<V>): SupplantableChainPromise<V>;
         /**
-         *
-         *
-         * @template TThis
-         * @template T
-         * @param {TThis} this
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>): any; }} resolver
-         * @param {(TThis & (TThis extends number ? never : TThis))} thisArg
-         * @returns {SupplantableChainPromise<T>}
+         * Starts a new supplantable promise chain.
+         * @template T - The type of the 'this' variable when the callbacks are invoked.
+         * @template V - The type of value to be resolved.
+         * @this T
+         * @param {symbol} taskId - Uniquely identifies a supplantable promise chain.
+         * @param {ResolvePromiseThisCallback<T, V>} resolver - Resolves the promised value.
+         * @param {T} thisArg - The object to use as the 'this' variable when the callbacks
+         *      are invoked.
+         * @returns {SupplantableChainPromise<V>} A supplantable chain promise object.
          * @memberof SupplantablePromiseChainService
          */
-        start<TThis, T>(this: TThis, taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>) => any,
-            thisArg: TThis & (TThis extends number ? never : TThis)): SupplantableChainPromise<T>;
+        start<T, V>(this: T, taskId: symbol, resolver: ResolvePromiseThisCallback<T, V>, thisArg: T): SupplantableChainPromise<V>;
+        start<V>(taskId: symbol, resolver: ResolvePromiseCallback<V>, thisArg?: any): SupplantableChainPromise<V> {
+            if (arguments.length > 2)
+                return this.startDelayed(taskId, resolver, 0, thisArg);
+            return this.startDelayed(taskId, resolver, 0);
+        }
+
         /**
-         *
-         *
-         * @template T
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>): any; }} resolver
-         * @returns {SupplantableChainPromise<T>}
+         * Starts a new supplantable promise chain.
+         * @template V - The type of value to be resolved.
+         * @param {symbol} taskId - Uniquely identifies a supplantable promise chain.
+         * @param {ResolvePromiseCallback<V>} resolver - Resolves or rejects the promised value.
+         * @param {number} delay - Number of milliseconds to delay before invoking the resolver.
+         * @returns {SupplantableChainPromise<V>} A supplantable chain promise object.
          * @memberof SupplantablePromiseChainService
          */
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>,
-            reject: ng.IQResolveReject<any>) => any): SupplantableChainPromise<T>;
+        startDelayed<V>(taskId: symbol, resolver: ResolvePromiseCallback<V>, delay: number): SupplantableChainPromise<V>;
         /**
-         *
-         *
-         * @template TThis
-         * @template T
-         * @param {TThis} this
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>): any; }} resolver
-         * @param {(TThis & (TThis extends number ? never : TThis))} thisArg
-         * @returns {SupplantableChainPromise<T>}
+         * Starts a new supplantable promise chain.
+         * @template T - The type of the 'this' variable when the callbacks are invoked.
+         * @template V - The type of value to be resolved.
+         * @this T
+         * @param {symbol} taskId - Uniquely identifies a supplantable promise chain.
+         * @param {ResolvePromiseThisCallback<T, V>} resolver - Resolves or rejects the promised value.
+         * @param {number} delay - Number of milliseconds to delay before invoking the resolver.
+         * @param {T} thisArg - The object to use as the 'this' variable when the callbacks are invoked.
+         * @returns {SupplantableChainPromise<V>} A supplantable chain promise object.
          * @memberof SupplantablePromiseChainService
          */
-        start<TThis, T>(this: TThis, taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>) => any,
-            thisArg: TThis & (TThis extends number ? never : TThis)): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template T
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>, notify: ng.IQResolveReject<any>): any; }} resolver
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>,
-            notify: ng.IQResolveReject<any>) => any): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template TThis
-         * @template T
-         * @param {TThis} this
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>, notify: ng.IQResolveReject<any>): any; }} resolver
-         * @param {(TThis & (TThis extends number ? never : TThis))} thisArg
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<TThis, T>(this: TThis, taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>,
-            notify: ng.IQResolveReject<any>) => any, thisArg: TThis & (TThis extends number ? never : TThis)): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template T
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>): any; }} resolver
-         * @param {number} delay
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>) => any, delay: number): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template TThis
-         * @template T
-         * @param {TThis} this
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>): any; }} resolver
-         * @param {number} delay
-         * @param {TThis} thisArg
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<TThis, T>(this: TThis, taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>) => any, delay: number,
-            thisArg: TThis): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template T
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>): any; }} resolver
-         * @param {number} delay
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>) => any,
-            delay: number): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template TThis
-         * @template T
-         * @param {TThis} this
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>): any; }} resolver
-         * @param {number} delay
-         * @param {TThis} thisArg
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<TThis, T>(this: TThis, taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>) => any,
-            delay: number, thisArg: TThis): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template T
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>, notify: ng.IQResolveReject<any>): any; }} resolver
-         * @param {number} delay
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>,
-            notify: ng.IQResolveReject<any>) => any, delay: number): SupplantableChainPromise<T>;
-        /**
-         *
-         *
-         * @template TThis
-         * @template T
-         * @param {TThis} this
-         * @param {symbol} taskId
-         * @param {{ (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>, notify: ng.IQResolveReject<any>): any; }} resolver
-         * @param {number} delay
-         * @param {TThis} thisArg
-         * @returns {SupplantableChainPromise<T>}
-         * @memberof SupplantablePromiseChainService
-         */
-        start<TThis, T>(this: TThis, taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>,
-            notify: ng.IQResolveReject<any>) => any, delay: number, thisArg: TThis): SupplantableChainPromise<T>;
-        start<T>(taskId: symbol, resolver: (resolve: ng.IQResolveReject<T>, reject: ng.IQResolveReject<any>,
-                notify: ng.IQResolveReject<any>) => any, arg2?: any, thisArg?: any): SupplantableChainPromise<T> {
-            const deferred: ng.IDeferred<T> = this.$q.defer<T>();
+        startDelayed<T, V>(this: T, taskId: symbol, resolver: ResolvePromiseThisCallback<T, V>, delay: number,
+            thisArg: T): SupplantableChainPromise<V>;
+        startDelayed<V>(taskId: symbol, resolver: ResolveRejectNotifyCallback<V, any>, delay: number,
+            thisArg?: any): SupplantableChainPromise<V> {
+            const deferred: ng.IDeferred<V> = this.$q.defer<V>();
             const svc: SupplantablePromiseChainService = this;
-            let delay: number;
-            let hasThis: boolean;
-            if (typeof arg2 === 'number') {
-                hasThis = arguments.length > 3;
-                delay = (isNaN(arg2)) ? 0 : arg2;
-            } else {
-                if (arguments.length == 3) {
-                    thisArg = arg2;
-                    hasThis = true;
-                } else
-                    hasThis = arguments.length > 3;
-            }
+            const hasThis: boolean = arguments.length > 3;
+            if (isNaN(delay))
+                delay = 0;
             this.$interval(function () {
-                const resolve: ng.IQResolveReject<T> = function (value?: T): void {
+                const resolve: ng.IQResolveReject<V> = function (value?: V): void {
                     if (arguments.length == 0)
                         deferred.resolve();
                     else
@@ -1009,39 +879,88 @@ module app {
                     return resolver.call(thisArg, resolve, reject, notify);
                 return resolver(resolve, reject, notify);
             }, delay, 1, true);
-            let result: SupplantableChainPromise<T>;
+            let result: SupplantableChainPromise<V>;
             for (let i = 0; i < this._tasks.length; i++) {
                 if (this._tasks[i].IsSameTask(taskId)) {
-                    result = new SupplantableChainPromise<T>(deferred.promise, this._tasks[i]);
+                    result = new SupplantableChainPromise<V>(deferred.promise, this._tasks[i]);
                     this._tasks[i] = result;
                     return result;
                 }
             }
-            result = new SupplantableChainPromise<T>(deferred.promise, taskId, this);
+            result = new SupplantableChainPromise<V>(deferred.promise, taskId, this);
             this._tasks.push(result);
             return result;
         }
     }
 
     /**
-     * Service which tracks updates the current app page title.
+     * Service which provides page-related information and tracks and updates the current app page title.
      * @export
      * @class PageTitleService
      */
-    export class PageTitleService {
+    export class PageLocationService {
         private _pageTitle = 'Lenny\'s GitHub Repositories';
         private _pageSubTitle = '';
         private _regexHref: string = NavPrefix + ModulePaths.regexMatch;
         private _scope: IMainContentControllerScope;
-        readonly [Symbol.toStringTag]: string = ServiceNames.pageTitle;
+        readonly [Symbol.toStringTag]: string = ServiceNames.pageLocation;
 
-        constructor() { }
-        
+        static ConfigureRoutes($routeProvider: ng.route.IRouteProvider): void {
+            $routeProvider.when(ModulePaths.home, {
+                templateUrl: 'home.htm',
+                controller: ControllerNames.staticPage
+            }).when(ModulePaths.git, {
+                templateUrl: 'git.htm',
+                controller: ControllerNames.staticPage
+            }).when(ModulePaths.vscode, {
+                templateUrl: 'vscode.htm',
+                controller: ControllerNames.staticPage
+            }).when(ModulePaths.npm, {
+                templateUrl: 'npm.htm',
+                controller: ControllerNames.staticPage
+            }).when(ModulePaths.regexMatch, {
+                templateUrl: 'regexTester/match.htm',
+                controller: ControllerNames.regexMatch
+            }).when(ModulePaths.regexReplace, {
+                templateUrl: 'regexTester/replace.htm',
+                controller: ControllerNames.regexReplace
+            }).when(ModulePaths.regexSplit, {
+                templateUrl: 'regexTester/split.htm',
+                controller: ControllerNames.regexSplit
+            }).when(ModulePaths.uriBuilder, {
+                templateUrl: 'uriBuilder/uriBuilder.htm',
+                controller: ControllerNames.uriBuilder
+            }).when(ModulePaths.colorBuilder, {
+                templateUrl: 'colorBuilder/colorBuilder.htm',
+                controller: ControllerNames.colorBuilder
+            }).when('/', { redirectTo: ModulePaths.home });
+        }
+
+        constructor($rootScope: ng.IRootScopeService) {
+            const svc: PageLocationService = this;
+            $rootScope.$on('$routeChangeSuccess', function(event: ng.IAngularEvent, current: ng.route.ICurrentRoute): void {
+                switch (current.templateUrl) {
+                    case 'home.htm':
+                        svc.pageTitle('');
+                        break;
+                    case 'git.htm':
+                        svc.pageTitle('GIT Cheat Sheet');
+                        break;
+                    case 'vscode.htm':
+                        svc.pageTitle('VS Code Cheat Sheet');
+                        break;
+                    case 'npm.htm':
+                        svc.pageTitle('NPM Cheat Sheet');
+                        break;
+                }
+            });
+        }
+
         /**
          * Gets or sets the default URL for the regular expression tester page.
          * @param {string} [value] - If defined, this will set the default URL for the regular expression tester page.
          * @returns {string} The default URL for the regular expression tester page.
-         * @memberof PageTitleService
+         * @memberof PageLocationService
          */
         regexHref(value?: string): string {
             if (typeof value === 'string') {
@@ -1056,38 +975,42 @@ module app {
 
         /**
          * Gets or sets the the current page title.
-         * @param {string} [value] - If defined, this wil set the current page title.
+         * @param {string} [value] - If defined, this will set the current page title and the page subtitle will be empty.
          * @returns {string} The current page title.
-         * @memberof PageTitleService
+         * @memberof PageLocationService
          */
-        pageTitle(value?: string): string {
+        pageTitle(value?: string): string;
+        /**
+         * Sets the new page title and subtitle.
+         * @param value - The new page title.
+         * @param subTitle - The new page subtitle.
+         * @returns {string} The current page title.
+         * @memberof PageLocationService
+         */
+        pageTitle(value: string, subTitle: string): string;
+        pageTitle(value?: string, subTitle?: string): string {
             if (typeof value === 'string') {
                 this._pageTitle = ((value = value.trim()).length == 0) ? 'Lenny\'s GitHub Page' : value;
-                if (typeof this._scope !== 'undefined')
+                this._pageSubTitle = (typeof subTitle === 'string') ? subTitle : '';
+                if (typeof this._scope !== 'undefined') {
                     this._scope.pageTitle = this._pageTitle;
+                    this._scope.showSubtitle = (this._scope.subTitle = this._pageSubTitle).length > 0;
+                }
             }
             return this._pageTitle;
         }
 
         /**
-         * Gets or sets the current page subtitle.
-         * @param {string} [value] - If defined, this will set the current page title.
-         * @returns {string} - The current page title or an empty string if there is currently no subtitle.
-         * @memberof PageTitleService
+         * Gets the current page subtitle.
+         * @returns {string} - The current page subtitle title or an empty string if there is currently no subtitle.
+         * @memberof PageLocationService
          */
-        pageSubTitle(value?: string): string {
-            if (typeof value === 'string') {
-                this._pageSubTitle = value;
-                if (typeof this._scope !== 'undefined')
-                    this._scope.showSubtitle = (this._scope.subTitle = this._pageSubTitle).trim().length > 0;
-            }
-            return this._pageSubTitle;
-        }
+        pageSubTitle(value?: string): string { return this._pageSubTitle; }
 
         /**
          * This should only be called by the main controller so the main controller's page title properties can be updated.
          * @param {IMainContentControllerScope} scope - The scope of the main application controller.
-         * @memberof PageTitleService
+         * @memberof PageLocationService
          */
         setScope(scope: IMainContentControllerScope): void {
             if (typeof scope === 'object' && scope !== null) {
@@ -1135,6 +1058,28 @@ module app {
     }
 
     /**
+     * Controller for static pages.
+     * @export
+     * @class StaticPageController
+     * @implements {ng.IController}
+     */
+    export class StaticPageController implements ng.IController {
+        readonly [Symbol.toStringTag]: string = ControllerNames.staticPage;
+        constructor(pageLocationService: PageLocationService, $location: ng.ILocationService) {
+            const path: string = $location.path();
+            if (path == ModulePaths.git)
+                pageLocationService.pageTitle('GIT Cheat Sheet');
+            else if (path == ModulePaths.vscode)
+                pageLocationService.pageTitle('VS Code Cheat Sheet');
+            else if (path == ModulePaths.npm)
+                pageLocationService.pageTitle('NPM Cheat Sheet');
+            else
+                pageLocationService.pageTitle('');
+        }
+        $doCheck(): void { }
+    }
+
+    /**
      * The main application controller.
      * @export
      * @class MainContentController
@@ -1149,10 +1094,10 @@ module app {
          * @param {PageTitleService} pageTitleService
          * @memberof MainContentController
          */
-        constructor(private readonly $scope: IMainContentControllerScope, pageTitleService: PageTitleService) {
+        constructor(private readonly $scope: IMainContentControllerScope, pageLocationService: PageLocationService) {
             const ctrl: MainContentController = this;
             $scope.regexHref = NavPrefix + ModulePaths.regexMatch;
-            pageTitleService.setScope($scope);
+            pageLocationService.setScope($scope);
         }
         $doCheck(): void { }
     }
@@ -1161,33 +1106,9 @@ module app {
         .config(['$locationProvider', '$routeProvider', function ($locationProvider: ng.ILocationProvider,
                 $routeProvider: ng.route.IRouteProvider) {
             $locationProvider.hashPrefix(HashPrefix);
-            $routeProvider.when(ModulePaths.home, {
-                templateUrl: 'home/home.htm',
-                controller: ControllerNames.homePage
-            }).when(ModulePaths.git, {
-                templateUrl: 'git.htm'
-            }).when(ModulePaths.vscode, {
-                templateUrl: 'vscode.htm'
-            }).when(ModulePaths.npm, {
-                templateUrl: 'npm.htm'
-            }).when(ModulePaths.regexMatch, {
-                templateUrl: 'regexTester/match.htm',
-                controller: ControllerNames.regexMatch
-            }).when(ModulePaths.regexReplace, {
-                templateUrl: 'regexTester/replace.htm',
-                controller: ControllerNames.regexReplace
-            }).when(ModulePaths.regexSplit, {
-                templateUrl: 'regexTester/split.htm',
-                controller: ControllerNames.regexSplit
-            }).when(ModulePaths.uriBuilder, {
-                templateUrl: 'uriBuilder/uriBuilder.htm',
-                controller: ControllerNames.uriBuilder
-            }).when(ModulePaths.colorBuilder, {
-                templateUrl: 'colorBuilder/colorBuilder.htm',
-                controller: ControllerNames.colorBuilder
-            }).when('/', { redirectTo: ModulePaths.home });
+            PageLocationService.ConfigureRoutes($routeProvider);
         }])
         .service(ServiceNames.supplantablePromiseChain, ['$q', '$interval', SupplantablePromiseChainService])
-        .service(ServiceNames.pageTitle, PageTitleService)
-        .controller(ControllerNames.mainContent, ['$scope', ServiceNames.pageTitle, MainContentController]);
+        .service(ServiceNames.pageLocation, PageLocationService)
+        .controller(ControllerNames.mainContent, ['$scope', ServiceNames.pageLocation, MainContentController]);
 }

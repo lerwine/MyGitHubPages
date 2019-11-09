@@ -9,7 +9,25 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:4200",
-            "webRoot": "${workspaceFolder}",
+            "webRoot": "${workspaceFolder}/src",
+            "breakOnLoad": true,
+            "sourceMaps": true
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Run main app tests on loalhost",
+            "url": "http://localhost:4200/jasmine-standalone/appSpecRunner.html",
+            "webRoot": "${workspaceFolder}/src",
+            "breakOnLoad": true,
+            "sourceMaps": true
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Run regestTester tests on loalhost",
+            "url": "http://localhost:4200/jasmine-standalone/regexTesterSpecRunner.html",
+            "webRoot": "${workspaceFolder}/src",
             "breakOnLoad": true,
             "sourceMaps": true
         }

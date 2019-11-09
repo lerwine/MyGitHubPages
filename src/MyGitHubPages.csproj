@@ -76,7 +76,7 @@
     <Content Include="colorBuilder\colorBuilder.htm" />
     <Content Include="favicon.ico" />
     <Content Include="git.htm" />
-    <Content Include="home\home.htm" />
+    <Content Include="home.htm" />
     <Content Include="images\dave-gandy\chevron-up.svg" />
     <Content Include="images\dave-gandy\copy-document.svg" />
     <Content Include="images\dave-gandy\cut.svg" />
@@ -1212,7 +1212,6 @@
     <TypeScriptCompile Include="App\TextEditControl.ts" />
     <TypeScriptCompile Include="App\UriBuilder.ts" />
     <TypeScriptCompile Include="colorBuilder\colorBuilder.ts" />
-    <TypeScriptCompile Include="home\home.ts" />
     <TypeScriptCompile Include="jasmine-standalone\spec\appSpec.ts" />
     <TypeScriptCompile Include="jasmine-standalone\spec\regexTesterSpec.ts" />
     <TypeScriptCompile Include="regexTester\regexTester.ts" />

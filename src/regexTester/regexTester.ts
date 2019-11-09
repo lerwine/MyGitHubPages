@@ -4,7 +4,7 @@
 /// <reference path="../app.ts"/>
 
 /**
- * The JavaScript module corresponding to the MyGitHubPages.regexTester angular js module.
+ * The commonjs module corresponding to the MyGitHubPages.regexTester angular js module.
  * @module regexTester
  */
 module regexTester {
@@ -468,10 +468,10 @@ module regexTester {
         flags(value?: RegexFlags | string): RegexFlags {
             switch (typeof value) {
                 case 'string':
-                    this.startPatternParse(this._pattern, new RegexFlags(value));
+                    this.startPatternParse(this._pattern, new RegexFlags(<string>value));
                     break;
                 case 'object':
-                    this.startPatternParse(this._pattern, value);
+                    this.startPatternParse(this._pattern, <RegexFlags>value);
                     break;
             }
             return this._flags;
@@ -652,78 +652,78 @@ module regexTester {
             }
 
             const svc: RegexParserService = this;
-            /**
-             * @todo Finish documenting this
-             */
-            this.supplantingTask.start(this._taskId, function (resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
-                reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
-            }, );
-            // this.$q(function (resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
-            //         reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
-            //     try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId); } catch { }
-            //     if (parseId !== svc._parseId)
-            //         reject(<IRegexParseCanceledResult>{
-            //             pattern: pattern,
-            //             flags: flags,
-            //             operationCanceled: true,
-            //             previous: previous,
-            //             reason: 'Operation canceled'
-            //         });
-            //     else if (typeof arg0 === 'string') {
-            //         try {
-            //             resolve({
-            //                 pattern: pattern,
-            //                 flags: flags,
-            //                 regex: new RegExp(pattern),
-            //                 previous: previous
-            //             });
-            //         } catch (e) {
-            //             reject(<IRegexParseFailResult>{
-            //                 pattern: pattern,
-            //                 flags: flags,
-            //                 previous: previous,
-            //                 reason: e
-            //             });
-            //         }
-            //     } else
-            //         resolve({
-            //             pattern: pattern,
-            //             flags: flags,
-            //             regex: arg0,
-            //             previous: previous
-            //         });
-            // }).then(function (result: IRegexParseSuccessResult) {
-            //     if (parseId === svc._parseId) {
-            //         svc._hasFault = svc._isParsing = false;
-            //         svc._faultReason = undefined;
-            //         svc._regex = result.regex;
-            //         if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source || result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase || result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode || result.regex.sticky !== previous.regex.sticky)
-            //             try { svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged2, previous.regex, result.regex, parseId); } catch { }
-            //         try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
-            //         try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId); } catch { }
-            //     } else {
-            //         try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
-            //         try {
-            //             svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, <IRegexParseCanceledResult>{
-            //                 pattern: pattern,
-            //                 flags: flags,
-            //                 operationCanceled: true,
-            //                 previous: previous,
-            //                 reason: 'Operation canceled'
-            //             }, parseId);
-            //         } catch { }
-            //     }
-            // }, function (result: IRegexParseCanceledResult | IRegexParseFailResult) {
-            //     if (parseId === svc._parseId) {
-            //         svc._isParsing = false;
-            //         if (!svc.isParseCancel(result)) {
-            //             svc._hasFault = true;
-            //             svc._faultReason = result.reason;
-            //             try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError2, result, parseId); } catch { }
-            //         }
-            //     }
-            //     try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId); } catch { }
-            // });
+            this.supplantingTask.start<IRegexParseSuccessResult>(this._taskId,
+                function(resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
+                        reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
+                    try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId); } catch { }
+                    if (parseId !== svc._parseId)
+                        reject(<IRegexParseCanceledResult>{
+                            pattern: pattern,
+                            flags: flags,
+                            operationCanceled: true,
+                            previous: previous,
+                            reason: 'Operation canceled'
+                        });
+                    else if (typeof arg0 === 'string') {
+                        try {
+                            resolve({
+                                pattern: pattern,
+                                flags: flags,
+                                regex: new RegExp(pattern),
+                                previous: previous
+                            });
+                        } catch (e) {
+                            reject(<IRegexParseFailResult>{
+                                pattern: pattern,
+                                flags: flags,
+                                previous: previous,
+                                reason: e
+                            });
+                        }
+                    } else
+                        resolve({
+                            pattern: pattern,
+                            flags: flags,
+                            regex: arg0,
+                            previous: previous
+                        });
+            }).then(function (result: IRegexParseSuccessResult) {
+                if (parseId === svc._parseId) {
+                    svc._hasFault = svc._isParsing = false;
+                    svc._faultReason = undefined;
+                    svc._regex = result.regex;
+                    if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source ||
+                            result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase ||
+                            result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
+                            result.regex.sticky !== previous.regex.sticky)
+                        try {
+                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged2, previous.regex, result.regex, parseId);
+                        } catch { }
+                    try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
+                    try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId); } catch { }
+                } else {
+                    try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
+                    try {
+                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, <IRegexParseCanceledResult>{
+                            pattern: pattern,
+                            flags: flags,
+                            operationCanceled: true,
+                            previous: previous,
+                            reason: 'Operation canceled'
+                        }, parseId);
+                    } catch { }
+                }
+            }, function (result: IRegexParseCanceledResult | IRegexParseFailResult) {
+                if (parseId === svc._parseId) {
+                    svc._isParsing = false;
+                    if (!svc.isParseCancel(result)) {
+                        svc._hasFault = true;
+                        svc._faultReason = result.reason;
+                        try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError2, result, parseId); } catch { }
+                    }
+                }
+                try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId); } catch { }
+            });
 
             return this._regex;
         }
@@ -1009,12 +1009,12 @@ module regexTester {
         /**
          * Creates an instance of RegexController.
          * @param {IRegexMatchControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageTitleService} pageTitleService
+         * @param {app.PageLocationService} pageLocationService
          * @memberof RegexMatchController
          */
         constructor(protected readonly $scope: TScope, protected readonly regexParser: RegexParserService,
-                pageTitleService: app.PageTitleService) {
-            pageTitleService.pageTitle('Regular Expression Evaluator');
+                pageLocationService: app.PageLocationService, subTitle: string) {
+            pageLocationService.pageTitle('Regular Expression Evaluator', subTitle);
             regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
             regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
             regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
@@ -1055,13 +1055,13 @@ module regexTester {
             this.$scope.flags = this.regexParser.flags().flags;
         }
 
-        //protected onRegexPatternChanged(event: ng.IAngularEvent, oldValue: string, newValue: string): void { }
+        // protected onRegexPatternChanged(event: ng.IAngularEvent, oldValue: string, newValue: string): void { }
 
         protected onStartRegexPatternParse(event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void {
             this.$scope.showParseError = false;
             this.$scope.isParsing = this.regexParser.isParsing();
         }
-        
+
         protected onEndRegexPatternParse(event: ng.IAngularEvent, result: RegexParseResult): void {
             this.$scope.isParsing = this.regexParser.isParsing();
             if (this.regexParser.hasFault()) {
@@ -1097,13 +1097,12 @@ module regexTester {
         /**
          * Creates an instance of RegexMatchController.
          * @param {IRegexMatchControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageTitleService} pageTitleService
+         * @param {app.PageLocationService} pageLocationService
          * @memberof RegexMatchController
          */
-        constructor($scope: IRegexMatchControllerScope, regexParser: RegexParserService, pageTitleService: app.PageTitleService) {
-            super($scope, regexParser, pageTitleService);
-            pageTitleService.pageSubTitle('Match');
-            pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
+        constructor($scope: IRegexMatchControllerScope, regexParser: RegexParserService, pageLocationService: app.PageLocationService) {
+            super($scope, regexParser, pageLocationService, 'Match');
+            pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
         }
     }
 
@@ -1126,16 +1125,15 @@ module regexTester {
     export class RegexReplaceController extends RegexController<IRegexReplaceControllerScope> {
         readonly [Symbol.toStringTag]: string = app.ControllerNames.regexMatch;
 
-        /**
+        /**`
          * Creates an instance of RegexReplaceController.
          * @param {IRegexReplaceControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageTitleService} pageTitleService
+         * @param {app.PageLocationService} pageLocationService
          * @memberof RegexReplaceController
          */
-        constructor($scope: IRegexReplaceControllerScope, regexParser: RegexParserService, pageTitleService: app.PageTitleService) {
-            super($scope, regexParser, pageTitleService);
-            pageTitleService.pageSubTitle('Replace');
-            pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
+        constructor($scope: IRegexReplaceControllerScope, regexParser: RegexParserService,  pageLocationService: app.PageLocationService) {
+            super($scope, regexParser, pageLocationService, 'Replace');
+            pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
         }
     }
 
@@ -1161,21 +1159,20 @@ module regexTester {
         /**
          * Creates an instance of RegexSplitController.
          * @param {IRegexSplitControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageTitleService} pageTitleService
+         * @param {app.PageLocationService} pageLocationService
          * @memberof RegexSplitController
          */
-        constructor($scope: IRegexSplitControllerScope, regexParser: RegexParserService, pageTitleService: app.PageTitleService) {
-            super($scope, regexParser, pageTitleService);
-            pageTitleService.pageSubTitle('Split');
-            pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
+        constructor($scope: IRegexSplitControllerScope, regexParser: RegexParserService, pageLocationService: app.PageLocationService) {
+            super($scope, regexParser, pageLocationService, 'Split');
+            pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
         }
     }
 
     app.mainModule.controller(app.ControllerNames.regexMatch,
-            ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageTitle, RegexMatchController])
+            ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageLocation, RegexMatchController])
         .controller(app.ControllerNames.regexReplace,
-            ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageTitle, RegexReplaceController])
+            ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageLocation, RegexReplaceController])
         .controller(app.ControllerNames.regexSplit,
-            ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageTitle, RegexSplitController])
+            ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageLocation, RegexSplitController])
         .service(app.ServiceNames.regexParser, RegexParserService);
 }

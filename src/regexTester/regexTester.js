@@ -249,6 +249,97 @@ var regexTester;
             }
             const svc = this;
             this.supplantingTask.start(this._taskId, function (resolve, reject) {
+                try {
+                    svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId);
+                }
+                catch (_a) { }
+                if (parseId !== svc._parseId)
+                    reject({
+                        pattern: pattern,
+                        flags: flags,
+                        operationCanceled: true,
+                        previous: previous,
+                        reason: 'Operation canceled'
+                    });
+                else if (typeof arg0 === 'string') {
+                    try {
+                        resolve({
+                            pattern: pattern,
+                            flags: flags,
+                            regex: new RegExp(pattern),
+                            previous: previous
+                        });
+                    }
+                    catch (e) {
+                        reject({
+                            pattern: pattern,
+                            flags: flags,
+                            previous: previous,
+                            reason: e
+                        });
+                    }
+                }
+                else
+                    resolve({
+                        pattern: pattern,
+                        flags: flags,
+                        regex: arg0,
+                        previous: previous
+                    });
+            }).then(function (result) {
+                if (parseId === svc._parseId) {
+                    svc._hasFault = svc._isParsing = false;
+                    svc._faultReason = undefined;
+                    svc._regex = result.regex;
+                    if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source ||
+                        result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase ||
+                        result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
+                        result.regex.sticky !== previous.regex.sticky)
+                        try {
+                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged2, previous.regex, result.regex, parseId);
+                        }
+                        catch (_a) { }
+                    try {
+                        svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId);
+                    }
+                    catch (_b) { }
+                    try {
+                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId);
+                    }
+                    catch (_c) { }
+                }
+                else {
+                    try {
+                        svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId);
+                    }
+                    catch (_d) { }
+                    try {
+                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, {
+                            pattern: pattern,
+                            flags: flags,
+                            operationCanceled: true,
+                            previous: previous,
+                            reason: 'Operation canceled'
+                        }, parseId);
+                    }
+                    catch (_e) { }
+                }
+            }, function (result) {
+                if (parseId === svc._parseId) {
+                    svc._isParsing = false;
+                    if (!svc.isParseCancel(result)) {
+                        svc._hasFault = true;
+                        svc._faultReason = result.reason;
+                        try {
+                            svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError2, result, parseId);
+                        }
+                        catch (_a) { }
+                    }
+                }
+                try {
+                    svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId);
+                }
+                catch (_b) { }
             });
             return this._regex;
         }
@@ -327,10 +418,10 @@ var regexTester;
         return typeof value.regex !== 'undefined';
     }
     class RegexController {
-        constructor($scope, regexParser, pageTitleService) {
+        constructor($scope, regexParser, pageLocationService, subTitle) {
             this.$scope = $scope;
             this.regexParser = regexParser;
-            pageTitleService.pageTitle('Regular Expression Evaluator');
+            pageLocationService.pageTitle('Regular Expression Evaluator', subTitle);
             regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
             regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
             regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
@@ -399,35 +490,32 @@ var regexTester;
     }
     regexTester.RegexController = RegexController;
     class RegexMatchController extends RegexController {
-        constructor($scope, regexParser, pageTitleService) {
-            super($scope, regexParser, pageTitleService);
+        constructor($scope, regexParser, pageLocationService) {
+            super($scope, regexParser, pageLocationService, 'Match');
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
-            pageTitleService.pageSubTitle('Match');
-            pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
+            pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
         }
     }
     regexTester.RegexMatchController = RegexMatchController;
     class RegexReplaceController extends RegexController {
-        constructor($scope, regexParser, pageTitleService) {
-            super($scope, regexParser, pageTitleService);
+        constructor($scope, regexParser, pageLocationService) {
+            super($scope, regexParser, pageLocationService, 'Replace');
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
-            pageTitleService.pageSubTitle('Replace');
-            pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
+            pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
         }
     }
     regexTester.RegexReplaceController = RegexReplaceController;
     class RegexSplitController extends RegexController {
-        constructor($scope, regexParser, pageTitleService) {
-            super($scope, regexParser, pageTitleService);
+        constructor($scope, regexParser, pageLocationService) {
+            super($scope, regexParser, pageLocationService, 'Split');
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
-            pageTitleService.pageSubTitle('Split');
-            pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
+            pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
         }
     }
     regexTester.RegexSplitController = RegexSplitController;
-    app.mainModule.controller(app.ControllerNames.regexMatch, ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageTitle, RegexMatchController])
-        .controller(app.ControllerNames.regexReplace, ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageTitle, RegexReplaceController])
-        .controller(app.ControllerNames.regexSplit, ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageTitle, RegexSplitController])
+    app.mainModule.controller(app.ControllerNames.regexMatch, ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageLocation, RegexMatchController])
+        .controller(app.ControllerNames.regexReplace, ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageLocation, RegexReplaceController])
+        .controller(app.ControllerNames.regexSplit, ['$scope', app.ServiceNames.regexParser, app.ServiceNames.pageLocation, RegexSplitController])
         .service(app.ServiceNames.regexParser, RegexParserService);
 })(regexTester || (regexTester = {}));
 //# sourceMappingURL=regexTester.js.map

@@ -13,89 +13,89 @@ describe('MyGitHubPages app', function () {
         angular.mock.module('MyGitHubPages');
     });
     describe('PageTitleService', function () {
-        it('Injectable', inject(function ($rootScope: ng.IRootScopeService, pageTitleService: app.PageTitleService) {
-            expect(pageTitleService).toBeDefined();
-            expect(pageTitleService).not.toBeNull();
-            expect(pageTitleService.pageTitle()).toEqual(defaultPageTitle);
-            expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
-            expect(pageTitleService.regexHref()).toEqual(defaultRegexHref);
-            expect(pageTitleService[Symbol.toStringTag]).toEqual('pageTitleService');
+        it('Injectable', inject(function ($rootScope: ng.IRootScopeService, pageLocationService: app.PageLocationService) {
+            expect(pageLocationService).toBeDefined();
+            expect(pageLocationService).not.toBeNull();
+            expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
+            expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
+            expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
+            expect(pageLocationService[Symbol.toStringTag]).toEqual('pageTitleService');
         }));
         describe('Members', function () {
-            let pageTitleService: app.PageTitleService;
+            let pageLocationService: app.PageLocationService;
             let scope: app.IMainContentControllerScope;
-            beforeEach(inject(function ($rootScope: ng.IRootScopeService, _pageTitleService_: app.PageTitleService) {
-                pageTitleService = _pageTitleService_;
+            beforeEach(inject(function ($rootScope: ng.IRootScopeService, _pageLocationService: app.PageLocationService) {
+                pageLocationService = _pageLocationService;
                 scope = <app.IMainContentControllerScope>$rootScope.$new();
             }));
             it('setScope', function () {
-                pageTitleService.setScope(scope);
+                pageLocationService.setScope(scope);
                 expect(scope.pageTitle).toEqual(defaultPageTitle);
-                expect(pageTitleService.pageTitle()).toEqual(defaultPageTitle);
+                expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
                 expect(scope.subTitle).toEqual(defultSubTitle);
-                expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
+                expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
                 expect(scope.showSubtitle).toEqual(false);
                 expect(scope.regexHref).toEqual(defaultRegexHref);
-                expect(pageTitleService.regexHref()).toEqual(defaultRegexHref);
+                expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
             });
             describe('pageTitle', function () {
                 it('Modify before setScope', function () {
                     expect(scope.pageTitle).toBeUndefined();
                     let expected: string = 'New Title';
-                    expect(pageTitleService.pageTitle(expected)).toEqual(expected);
-                    expect(pageTitleService.pageTitle()).toEqual(expected);
-                    pageTitleService.setScope(scope);
+                    expect(pageLocationService.pageTitle(expected)).toEqual(expected);
+                    expect(pageLocationService.pageTitle()).toEqual(expected);
+                    pageLocationService.setScope(scope);
                     expect(scope.pageTitle).toEqual(expected);
-                    expect(pageTitleService.pageTitle()).toEqual(expected);
+                    expect(pageLocationService.pageTitle()).toEqual(expected);
                     expect(scope.subTitle).toEqual(defultSubTitle);
-                    expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
+                    expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
                     expect(scope.showSubtitle).toEqual(false);
                     expect(scope.regexHref).toEqual(defaultRegexHref);
-                    expect(pageTitleService.regexHref()).toEqual(defaultRegexHref);
+                    expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
                 });
                 it('Modify after setScope', function () {
                     expect(scope.pageTitle).toBeUndefined();
-                    pageTitleService.setScope(scope);
+                    pageLocationService.setScope(scope);
                     let expected: string = 'New Title';
-                    expect(pageTitleService.pageTitle(expected)).toEqual(expected);
-                    expect(pageTitleService.pageTitle()).toEqual(expected);
+                    expect(pageLocationService.pageTitle(expected)).toEqual(expected);
+                    expect(pageLocationService.pageTitle()).toEqual(expected);
                     expect(scope.pageTitle).toEqual(expected);
                     expect(scope.subTitle).toEqual(defultSubTitle);
-                    expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
+                    expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
                     expect(scope.showSubtitle).toEqual(false);
                     expect(scope.regexHref).toEqual(defaultRegexHref);
-                    expect(pageTitleService.regexHref()).toEqual(defaultRegexHref);
+                    expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
                 });
             });
             describe('pageSubTitle', function () {
                 it('Modify before setScope', function () {
                     expect(scope.subTitle).toBeUndefined();
                     let expected: string = 'New Sub-Title';
-                    expect(pageTitleService.pageSubTitle(expected)).toEqual(expected);
-                    expect(pageTitleService.pageSubTitle()).toEqual(expected);
-                    pageTitleService.setScope(scope);
+                    expect(pageLocationService.pageSubTitle(expected)).toEqual(expected);
+                    expect(pageLocationService.pageSubTitle()).toEqual(expected);
+                    pageLocationService.setScope(scope);
                     expect(scope.subTitle).toEqual(expected);
                     expect(scope.showSubtitle).toEqual(true);
-                    expect(pageTitleService.pageSubTitle()).toEqual(expected);
+                    expect(pageLocationService.pageSubTitle()).toEqual(expected);
                     expect(scope.pageTitle).toEqual(defaultPageTitle);
-                    expect(pageTitleService.pageTitle()).toEqual(defaultPageTitle);
+                    expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
                     expect(scope.regexHref).toEqual(defaultRegexHref);
-                    expect(pageTitleService.regexHref()).toEqual(defaultRegexHref);
+                    expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
                 });
                 it('Modify after setScope', function () {
                     expect(scope.subTitle).toBeUndefined();
-                    pageTitleService.setScope(scope);
+                    pageLocationService.setScope(scope);
                     let expected: string = 'New Sub-Title';
-                    expect(pageTitleService.pageSubTitle(expected)).toEqual(expected);
-                    expect(pageTitleService.pageSubTitle()).toEqual(expected);
+                    expect(pageLocationService.pageSubTitle(expected)).toEqual(expected);
+                    expect(pageLocationService.pageSubTitle()).toEqual(expected);
                     expect(scope.subTitle).toEqual(expected);
                     expect(scope.showSubtitle).toEqual(true);
                     expect(scope.pageTitle).toEqual(defaultPageTitle);
-                    expect(pageTitleService.pageTitle()).toEqual(defaultPageTitle);
+                    expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
                     expect(scope.regexHref).toEqual(defaultRegexHref);
-                    expect(pageTitleService.regexHref()).toEqual(defaultRegexHref);
-                    expect(pageTitleService.pageSubTitle(defultSubTitle)).toEqual(defultSubTitle);
-                    expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
+                    expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
+                    expect(pageLocationService.pageSubTitle(defultSubTitle)).toEqual(defultSubTitle);
+                    expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
                     expect(scope.subTitle).toEqual(defultSubTitle);
                     expect(scope.showSubtitle).toEqual(false);
                 });
@@ -104,44 +104,44 @@ describe('MyGitHubPages app', function () {
                 it('Modify before setScope', function () {
                     expect(scope.regexHref).toBeUndefined();
                     let expected: string = '#!/new/href';
-                    expect(pageTitleService.regexHref(expected)).toEqual(expected);
-                    expect(pageTitleService.regexHref()).toEqual(expected);
-                    pageTitleService.setScope(scope);
+                    expect(pageLocationService.regexHref(expected)).toEqual(expected);
+                    expect(pageLocationService.regexHref()).toEqual(expected);
+                    pageLocationService.setScope(scope);
                     expect(scope.regexHref).toEqual(expected);
-                    expect(pageTitleService.regexHref()).toEqual(expected);
+                    expect(pageLocationService.regexHref()).toEqual(expected);
                     expect(scope.pageTitle).toEqual(defaultPageTitle);
-                    expect(pageTitleService.pageTitle()).toEqual(defaultPageTitle);
+                    expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
                     expect(scope.subTitle).toEqual(defultSubTitle);
-                    expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
+                    expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
                     expect(scope.showSubtitle).toEqual(false);
                 });
                 it('Modify after setScope', function () {
                     expect(scope.regexHref).toBeUndefined();
-                    pageTitleService.setScope(scope);
+                    pageLocationService.setScope(scope);
                     let expected: string = '#!/new/href';
-                    expect(pageTitleService.regexHref(expected)).toEqual(expected);
-                    expect(pageTitleService.regexHref()).toEqual(expected);
+                    expect(pageLocationService.regexHref(expected)).toEqual(expected);
+                    expect(pageLocationService.regexHref()).toEqual(expected);
                     expect(scope.regexHref).toEqual(expected);
                     expect(scope.pageTitle).toEqual(defaultPageTitle);
-                    expect(pageTitleService.pageTitle()).toEqual(defaultPageTitle);
+                    expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
                     expect(scope.subTitle).toEqual(defultSubTitle);
-                    expect(pageTitleService.pageSubTitle()).toEqual(defultSubTitle);
+                    expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
                     expect(scope.showSubtitle).toEqual(false);
                 });
             });
         });
     });
     describe('MainContentController', function () {
-        let pageTitleService: app.PageTitleService;
+        let pageLocationService: app.PageLocationService;
         let scope: app.IMainContentControllerScope;
         let controllerSvc: ng.IControllerService;
-        beforeEach(inject(function ($rootScope: ng.IRootScopeService, $controller: ng.IControllerService, _pageTitleService_: app.PageTitleService) {
-            pageTitleService = _pageTitleService_;
+        beforeEach(inject(function ($rootScope: ng.IRootScopeService, $controller: ng.IControllerService, _pageLocationService: app.PageLocationService) {
+            pageLocationService = _pageLocationService;
             scope = <app.IMainContentControllerScope>$rootScope.$new();
             controllerSvc = $controller;
         }));
         it("Constructor", function () {
-            let mainContentController: app.MainContentController = <app.MainContentController>controllerSvc('mainContentController', { $scope: scope, pageTitleService: pageTitleService });
+            let mainContentController: app.MainContentController = <app.MainContentController>controllerSvc('mainContentController', { $scope: scope, pageLocationService: pageLocationService });
             expect(mainContentController).toBeDefined();
             expect(mainContentController).not.toBeNull();
             expect(scope.pageTitle).toEqual(defaultPageTitle);
