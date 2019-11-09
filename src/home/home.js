@@ -5,8 +5,8 @@ var home;
             this[Symbol.toStringTag] = app.ControllerNames.homePage;
         }
         controller($scope, pageTitleService) {
-            pageTitleService.pageTitle("");
-            pageTitleService.pageSubTitle("");
+            pageTitleService.pageTitle('');
+            pageTitleService.pageSubTitle('');
         }
         $doCheck() { }
     }

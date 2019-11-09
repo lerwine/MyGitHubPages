@@ -1,20 +1,31 @@
 var app;
 (function (app) {
-    app.ModuleNames = { app: "MyGitHubPages", home: "MyGitHubPages.home", regexTester: "MyGitHubPages.regexTester", uriBuilder: "MyGitHubPages.uriBuilder", colorBuilder: "MyGitHubPages.colorBuilder" };
-    app.ModulePaths = { home: "/home", regexMatch: "/regex/match", regexReplace: "/regex/replace", regexSplit: "/regex/split", uriBuilder: "/uri", colorBuilder: "/color" };
+    app.ModuleNames = {
+        app: 'MyGitHubPages', home: 'MyGitHubPages.home', regexTester: 'MyGitHubPages.regexTester', uriBuilder: 'MyGitHubPages.uriBuilder',
+        colorBuilder: 'MyGitHubPages.colorBuilder'
+    };
+    app.ModulePaths = {
+        home: '/home', git: '/git', vscode: '/vscode', npm: '/npm', regexMatch: '/regex/match', regexReplace: '/regex/replace',
+        regexSplit: '/regex/split', uriBuilder: '/uri', colorBuilder: '/color'
+    };
     app.ControllerNames = {
-        mainContent: "mainContentController", homePage: "homePageController", regexMatch: "regexMatchController", regexReplace: "regexReplaceController", regexSplit: "regexSplitController", uriBuilder: "uriBuilderPageController",
-        colorBuilder: "colorBuilderPageController"
+        mainContent: 'mainContentController', homePage: 'homePageController', regexMatch: 'regexMatchController',
+        regexReplace: 'regexReplaceController', regexSplit: 'regexSplitController', uriBuilder: 'uriBuilderPageController',
+        colorBuilder: 'colorBuilderPageController'
     };
-    app.ServiceNames = { supplantablePromiseChain: "supplantablePromiseChainService", pageTitle: "pageTitleService", mainNavigationProvider: "mainNavigationProvider", regexParser: "regexParser" };
+    app.ServiceNames = {
+        supplantablePromiseChain: 'supplantablePromiseChainService', pageTitle: 'pageTitleService',
+        mainNavigationProvider: 'mainNavigationProvider', regexParser: 'regexParser'
+    };
     app.EventNames = {
-        setPageTitle: "MyGitHubPages.setPageTitle", topNavChanged: "MyGitHubPages.topNavChanged", regexPatternChanged2: "MyGitHubPages.regexPatternChanged", regexFlagsChanged2: "MyGitHubPages.regexFlagsChanged",
-        startRegexPatternParse2: "MyGitHubPages.startRegexPatternParse", endRegexPatternParse2: "MyGitHubPages.endRegexPatternParse", regexPatternParseError2: "MyGitHubPages.regexPatternParseError", regexPatternParseSuccess: "MyGitHubPages.regexPatternParseSuccess",
-        regexObjectChanged2: "MyGitHubPages.regexObjectChanged"
+        setPageTitle: 'MyGitHubPages.setPageTitle', topNavChanged: 'MyGitHubPages.topNavChanged',
+        regexPatternChanged2: 'MyGitHubPages.regexPatternChanged', regexFlagsChanged2: 'MyGitHubPages.regexFlagsChanged',
+        startRegexPatternParse2: 'MyGitHubPages.startRegexPatternParse', endRegexPatternParse2: 'MyGitHubPages.endRegexPatternParse',
+        regexPatternParseError2: 'MyGitHubPages.regexPatternParseError', regexPatternParseSuccess: 'MyGitHubPages.regexPatternParseSuccess',
+        regexObjectChanged2: 'MyGitHubPages.regexObjectChanged'
     };
-    app.HashPrefix = "!";
-    app.NavPrefix = "#!";
-    ;
+    app.HashPrefix = '!';
+    app.NavPrefix = '#!';
     class PromiseChainSupersededError extends Error {
         constructor(message) { super(message); }
     }
@@ -23,7 +34,7 @@ var app;
         constructor(_promise, arg1, arg2) {
             this._promise = _promise;
             this._instanceId = Symbol();
-            if (typeof arg1 === "symbol") {
+            if (typeof arg1 === 'symbol') {
                 this._taskId = arg1;
                 this._chainId = Symbol();
                 this._supplantableTaskService = arg2;
@@ -31,7 +42,7 @@ var app;
             else {
                 this._taskId = arg1._taskId;
                 this._supplantableTaskService = arg1._supplantableTaskService;
-                if (typeof arg2 !== "symbol")
+                if (typeof arg2 !== 'symbol')
                     this._chainId = Symbol();
                 else {
                     this._chainId = arg2;
@@ -40,15 +51,19 @@ var app;
                 }
             }
         }
-        IsSameTask(arg0) { return this._taskId === ((typeof arg0 === "symbol") ? arg0 : arg0._taskId); }
-        isSameChain(task) { return this._chainId === ((typeof task === "symbol") ? task : task._chainId); }
+        IsSameTask(arg0) {
+            return this._taskId === ((typeof arg0 === 'symbol') ? arg0 : arg0._taskId);
+        }
+        isSameChain(task) {
+            return this._chainId === ((typeof task === 'symbol') ? task : task._chainId);
+        }
         then(successCallback, arg1, arg2, thisArg) {
             let errorCallback;
             let notifyCallback;
             let hasThis;
-            if (typeof arg1 === "function") {
+            if (typeof arg1 === 'function') {
                 errorCallback = arg1;
-                if (typeof arg2 === "function") {
+                if (typeof arg2 === 'function') {
                     hasThis = arguments.length > 3;
                     notifyCallback = arg2;
                 }
@@ -58,7 +73,7 @@ var app;
                         thisArg = arg2;
                 }
             }
-            else if (typeof arg2 === "function") {
+            else if (typeof arg2 === 'function') {
                 hasThis = arguments.length > 3;
                 notifyCallback = arg2;
             }
@@ -71,9 +86,9 @@ var app;
                 if (hasThis)
                     thisArg = arg1;
             }
-            let task = this;
-            if (typeof notifyCallback === "function") {
-                if (typeof errorCallback === "function")
+            const task = this;
+            if (typeof notifyCallback === 'function') {
+                if (typeof errorCallback === 'function')
                     return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
                         if (task._supplantableTaskService.isSuperceded(task))
                             throw new PromiseChainSupersededError();
@@ -126,7 +141,7 @@ var app;
                     return notifyCallback(state);
                 }), this, this._chainId);
             }
-            if (typeof errorCallback === "function")
+            if (typeof errorCallback === 'function')
                 return new SupplantableChainPromise(this._promise.then(function (promiseValue) {
                     if (task._supplantableTaskService.isSuperceded(task))
                         throw new PromiseChainSupersededError();
@@ -162,16 +177,24 @@ var app;
             }), this, this._chainId);
         }
         catch(onRejected, thisArg) {
-            let task = this;
+            const task = this;
             if (arguments.length > 1)
-                return new SupplantableChainPromise(this._promise.catch(function (reason) { return onRejected.call(thisArg, reason); }), this, this._chainId);
-            return new SupplantableChainPromise(this._promise.catch(function (reason) { return onRejected(reason); }), this, this._chainId);
+                return new SupplantableChainPromise(this._promise.catch(function (reason) {
+                    return onRejected.call(thisArg, reason);
+                }), this, this._chainId);
+            return new SupplantableChainPromise(this._promise.catch(function (reason) {
+                return onRejected(reason);
+            }), this, this._chainId);
         }
         finally(finallyCallback, thisArg) {
-            let task = this;
+            const task = this;
             if (arguments.length > 1)
-                return new SupplantableChainPromise(this._promise.finally(function () { return finallyCallback.call(thisArg, task._supplantableTaskService.isSuperceded(task)); }), this, this._chainId);
-            return new SupplantableChainPromise(this._promise.finally(function () { return finallyCallback(task._supplantableTaskService.isSuperceded(task)); }), this, this._chainId);
+                return new SupplantableChainPromise(this._promise.finally(function () {
+                    return finallyCallback.call(thisArg, task._supplantableTaskService.isSuperceded(task));
+                }), this, this._chainId);
+            return new SupplantableChainPromise(this._promise.finally(function () {
+                return finallyCallback(task._supplantableTaskService.isSuperceded(task));
+            }), this, this._chainId);
         }
     }
     app.SupplantableChainPromise = SupplantableChainPromise;
@@ -190,11 +213,11 @@ var app;
             return false;
         }
         start(taskId, resolver, arg2, thisArg) {
-            let deferred = this.$q.defer();
-            let svc = this;
+            const deferred = this.$q.defer();
+            const svc = this;
             let delay;
             let hasThis;
-            if (typeof arg2 === "number") {
+            if (typeof arg2 === 'number') {
                 hasThis = arguments.length > 3;
                 delay = (isNaN(arg2)) ? 0 : arg2;
             }
@@ -207,19 +230,19 @@ var app;
                     hasThis = arguments.length > 3;
             }
             this.$interval(function () {
-                let resolve = function (value) {
+                const resolve = function (value) {
                     if (arguments.length == 0)
                         deferred.resolve();
                     else
                         deferred.resolve(value);
                 };
-                let reject = function (reason) {
+                const reject = function (reason) {
                     if (arguments.length == 0)
                         deferred.reject();
                     else
                         deferred.reject(reason);
                 };
-                let notify = function (state) {
+                const notify = function (state) {
                     if (arguments.length == 0)
                         deferred.notify();
                     else
@@ -245,39 +268,39 @@ var app;
     app.SupplantablePromiseChainService = SupplantablePromiseChainService;
     class PageTitleService {
         constructor() {
-            this._pageTitle = "Lenny's GitHub Repositories";
-            this._pageSubTitle = "";
+            this._pageTitle = 'Lenny\'s GitHub Repositories';
+            this._pageSubTitle = '';
             this._regexHref = app.NavPrefix + app.ModulePaths.regexMatch;
             this[Symbol.toStringTag] = app.ServiceNames.pageTitle;
         }
         regexHref(value) {
-            if (typeof value === "string") {
+            if (typeof value === 'string') {
                 if ((value = value.trim()).length > 0) {
                     this._regexHref = value;
-                    if (typeof this._scope !== "undefined")
+                    if (typeof this._scope !== 'undefined')
                         this._scope.regexHref = this._regexHref;
                 }
             }
             return this._regexHref;
         }
         pageTitle(value) {
-            if (typeof value === "string") {
-                this._pageTitle = ((value = value.trim()).length == 0) ? "Lenny's GitHub Page" : value;
-                if (typeof this._scope !== "undefined")
+            if (typeof value === 'string') {
+                this._pageTitle = ((value = value.trim()).length == 0) ? 'Lenny\'s GitHub Page' : value;
+                if (typeof this._scope !== 'undefined')
                     this._scope.pageTitle = this._pageTitle;
             }
             return this._pageTitle;
         }
         pageSubTitle(value) {
-            if (typeof value === "string") {
+            if (typeof value === 'string') {
                 this._pageSubTitle = value;
-                if (typeof this._scope !== "undefined")
+                if (typeof this._scope !== 'undefined')
                     this._scope.showSubtitle = (this._scope.subTitle = this._pageSubTitle).trim().length > 0;
             }
             return this._pageSubTitle;
         }
         setScope(scope) {
-            if (typeof scope === "object" && scope !== null) {
+            if (typeof scope === 'object' && scope !== null) {
                 (this._scope = scope).pageTitle = this._pageTitle;
                 scope.showSubtitle = (scope.subTitle = this._pageSubTitle).trim().length > 0;
                 this._scope.regexHref = this._regexHref;
@@ -289,7 +312,7 @@ var app;
         constructor($scope, pageTitleService) {
             this.$scope = $scope;
             this[Symbol.toStringTag] = app.ControllerNames.mainContent;
-            let ctrl = this;
+            const ctrl = this;
             $scope.regexHref = app.NavPrefix + app.ModulePaths.regexMatch;
             pageTitleService.setScope($scope);
         }
@@ -302,6 +325,12 @@ var app;
             $routeProvider.when(app.ModulePaths.home, {
                 templateUrl: 'home/home.htm',
                 controller: app.ControllerNames.homePage
+            }).when(app.ModulePaths.git, {
+                templateUrl: 'git.htm'
+            }).when(app.ModulePaths.vscode, {
+                templateUrl: 'vscode.htm'
+            }).when(app.ModulePaths.npm, {
+                templateUrl: 'npm.htm'
             }).when(app.ModulePaths.regexMatch, {
                 templateUrl: 'regexTester/match.htm',
                 controller: app.ControllerNames.regexMatch

@@ -3,6 +3,10 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="../app.ts"/>
 
+/**
+ * The JavaScript module corresponding to the MyGitHubPages.colorBuilder angular js module.
+ * @module colorBuilder
+ */
 module colorBuilder {
     export interface IColorBuilderPageControllerScope extends ng.IScope {
 

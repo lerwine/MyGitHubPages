@@ -7,8 +7,8 @@ var regexTester;
             this._multiline = false;
             this._unicode = false;
             this._sticky = false;
-            this._flags = "";
-            if (typeof flags === "object") {
+            this._flags = '';
+            if (typeof flags === 'object') {
                 if (flags !== null) {
                     this._flags = ((this._global = flags.global) === true) ? 'g' : '';
                     if ((this._ignoreCase = flags.ignoreCase) == true)
@@ -22,20 +22,23 @@ var regexTester;
                     return;
                 }
             }
-            else if (typeof flags === "string" && flags.trim().length > 0) {
-                let allFlags = "gimuy";
-                let arr = ['g', 'i', 'm', 'u', 'y'].map((value) => { return { i: flags.indexOf(value), c: value }; });
+            else if (typeof flags === 'string' && flags.trim().length > 0) {
+                const allFlags = 'gimuy';
+                let arr = ['g', 'i', 'm', 'u', 'y'].map((value) => {
+                    return { i: flags.indexOf(value), c: value };
+                });
                 this._global = arr[0].i > -1;
                 this._ignoreCase = arr[1].i > -1;
                 this._multiline = arr[2].i > -1;
                 this._unicode = arr[3].i > -1;
                 this._sticky = arr[4].i > -1;
                 if ((arr = arr.filter((value) => value.i > -1)).length == 0)
-                    this._flags = "";
+                    this._flags = '';
                 else if (arr.length == 1)
                     this._flags = arr[0].c;
                 else
-                    this._flags = arr.filter((value) => value.i > -1).sort((a, b) => a.i - b.i)
+                    this._flags = arr.filter((value) => value.i > -1)
+                        .sort((a, b) => a.i - b.i)
                         .reduce((previousValue, currentValue) => {
                         if (previousValue.i == currentValue.i)
                             return previousValue;
@@ -44,7 +47,7 @@ var regexTester;
                 return;
             }
             this._global = this._ignoreCase = this._multiline = this._sticky = this._sticky = false;
-            this._flags = "";
+            this._flags = '';
         }
         get global() { return this._global; }
         setGlobal(value) {
@@ -80,56 +83,57 @@ var regexTester;
     }
     regexTester.RegexFlags = RegexFlags;
     class RegexParserService {
-        constructor($rootScope, $q) {
+        constructor($rootScope, supplantingTask) {
             this.$rootScope = $rootScope;
-            this.$q = $q;
+            this.supplantingTask = supplantingTask;
             this._flags = new RegexFlags();
-            this._pattern = "(?:)";
+            this._pattern = '(?:)';
             this._isParsing = false;
             this._hasFault = false;
+            this._taskId = Symbol();
             this[Symbol.toStringTag] = app.ServiceNames.regexParser;
-            let initialResults = { pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags) };
+            const initialResults = {
+                pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
+            };
             this._regex = initialResults.regex;
         }
         flags(value) {
-            let oldValue;
             switch (typeof value) {
-                case "string":
+                case 'string':
                     this.startPatternParse(this._pattern, new RegexFlags(value));
                     break;
-                case "object":
+                case 'object':
                     this.startPatternParse(this._pattern, value);
                     break;
             }
             return this._flags;
         }
         global(value) {
-            if (typeof value === "boolean" && value !== this._flags.global)
+            if (typeof value === 'boolean' && value !== this._flags.global)
                 this.flags(this._flags.setGlobal(value));
             return this._flags.global;
         }
         ignoreCase(value) {
-            if (typeof value === "boolean" && value !== this._flags.ignoreCase)
+            if (typeof value === 'boolean' && value !== this._flags.ignoreCase)
                 this.flags(this._flags.setIgnoreCase(value));
             return this._flags.ignoreCase;
         }
         multiline(value) {
-            if (typeof value === "boolean" && value !== this._flags.multiline)
+            if (typeof value === 'boolean' && value !== this._flags.multiline)
                 this.flags(this._flags.setMultiline(value));
             return this._flags.multiline;
         }
         sticky(value) {
-            if (typeof value === "boolean" && value !== this._flags.sticky)
+            if (typeof value === 'boolean' && value !== this._flags.sticky)
                 this.flags(this._flags.setSticky(value));
             return this._flags.sticky;
         }
         unicode(value) {
-            if (typeof value === "boolean" && value !== this._flags.unicode)
+            if (typeof value === 'boolean' && value !== this._flags.unicode)
                 this.flags(this._flags.setUnicode(value));
             return this._flags.unicode;
         }
         pattern(value) {
-            let oldValue;
             if (typeof value === 'string')
                 this.startPatternParse(value, this._flags);
             return this._pattern;
@@ -138,20 +142,22 @@ var regexTester;
         hasFault() { return this._hasFault; }
         faultReason() { return this._faultReason; }
         startPatternParse(arg0, flags) {
-            let parseId = Symbol();
-            let previous = {
+            const parseId = Symbol();
+            const previous = {
                 flags: this._flags,
                 pattern: this._pattern,
                 regex: this._regex
             };
             let pattern;
-            if (typeof arg0 === "string") {
+            if (typeof arg0 === 'string') {
                 this._pattern = pattern = arg0;
                 this._flags = flags;
                 if (arg0 === previous.pattern) {
                     if (flags.flags === previous.flags.flags)
                         return;
-                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky) {
+                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
+                        flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
+                        flags.sticky == previous.flags.sticky) {
                         try {
                             this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, this._parseId);
                         }
@@ -204,7 +210,9 @@ var regexTester;
                         catch (_g) { }
                 }
                 else if (pattern === previous.pattern) {
-                    if (flags.flags === previous.flags.flags || (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky))
+                    if (flags.flags === previous.flags.flags || (flags.global == previous.flags.global &&
+                        flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline &&
+                        flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky))
                         return;
                     this._parseId = parseId;
                     this._isParsing = true;
@@ -217,7 +225,9 @@ var regexTester;
                     this._parseId = parseId;
                     this._isParsing = true;
                     this._pattern = pattern;
-                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky)
+                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
+                        flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
+                        flags.sticky == previous.flags.sticky)
                         this._flags = flags = previous.flags;
                     else {
                         try {
@@ -237,158 +247,90 @@ var regexTester;
                         catch (_l) { }
                 }
             }
-            let svc = this;
-            this.$q(function (resolve, reject) {
-                try {
-                    svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId);
-                }
-                catch (_a) { }
-                if (parseId !== svc._parseId)
-                    reject({
-                        pattern: pattern,
-                        flags: flags,
-                        operationCanceled: true,
-                        previous: previous,
-                        reason: "Operation canceled"
-                    });
-                else if (typeof arg0 === "string") {
-                    try {
-                        resolve({
-                            pattern: pattern,
-                            flags: flags,
-                            regex: new RegExp(pattern),
-                            previous: previous
-                        });
-                    }
-                    catch (e) {
-                        reject({
-                            pattern: pattern,
-                            flags: flags,
-                            previous: previous,
-                            reason: e
-                        });
-                    }
-                }
-                else
-                    resolve({
-                        pattern: pattern,
-                        flags: flags,
-                        regex: arg0,
-                        previous: previous
-                    });
-            }).then(function (result) {
-                if (parseId === svc._parseId) {
-                    svc._hasFault = svc._isParsing = false;
-                    svc._faultReason = undefined;
-                    svc._regex = result.regex;
-                    if (typeof arg0 === "string" || result.regex.source !== previous.regex.source || result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase || result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode || result.regex.sticky !== previous.regex.sticky)
-                        try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged2, previous.regex, result.regex, parseId);
-                        }
-                        catch (_a) { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId);
-                    }
-                    catch (_b) { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId);
-                    }
-                    catch (_c) { }
-                }
-                else {
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId);
-                    }
-                    catch (_d) { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, {
-                            pattern: pattern,
-                            flags: flags,
-                            operationCanceled: true,
-                            previous: previous,
-                            reason: "Operation canceled"
-                        }, parseId);
-                    }
-                    catch (_e) { }
-                }
-            }, function (result) {
-                if (parseId === svc._parseId) {
-                    svc._isParsing = false;
-                    if (!svc.isParseCancel(result)) {
-                        svc._hasFault = true;
-                        svc._faultReason = result.reason;
-                        try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError2, result, parseId);
-                        }
-                        catch (_a) { }
-                    }
-                }
-                try {
-                    svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId);
-                }
-                catch (_b) { }
+            const svc = this;
+            this.supplantingTask.start(this._taskId, function (resolve, reject) {
             });
             return this._regex;
         }
         regex(value) {
-            if (typeof value === "object" && value !== null && value instanceof RegExp)
+            if (typeof value === 'object' && value !== null && value instanceof RegExp)
                 this.startPatternParse(value);
             return this._regex;
         }
-        isParseSuccess(result) { return typeof result.regex === "object"; }
-        isParseCancel(result) { return result.operationCanceled === true; }
+        isParseSuccess(result) {
+            return typeof result.regex === 'object';
+        }
+        isParseCancel(result) {
+            return result.operationCanceled === true;
+        }
         onRegexFlagsChanged($scope, callbackFn, thisObj) {
             if (arguments.length < 3) {
                 $scope.$on(app.EventNames.regexFlagsChanged2, callbackFn);
             }
             else {
-                $scope.$on(app.EventNames.regexFlagsChanged2, (event, oldValue, newValue) => { callbackFn.call(thisObj, event, oldValue, newValue); });
+                $scope.$on(app.EventNames.regexFlagsChanged2, (event, oldValue, newValue) => {
+                    callbackFn.call(thisObj, event, oldValue, newValue);
+                });
             }
         }
         onRegexPatternChanged($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
                 $scope.$on(app.EventNames.regexPatternChanged2, callbackFn);
             else
-                $scope.$on(app.EventNames.regexPatternChanged2, (event, oldValue, newValue) => { callbackFn.call(thisObj, event, oldValue, newValue); });
+                $scope.$on(app.EventNames.regexPatternChanged2, (event, oldValue, newValue) => {
+                    callbackFn.call(thisObj, event, oldValue, newValue);
+                });
         }
         onStartRegexPatternParse($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
                 $scope.$on(app.EventNames.startRegexPatternParse2, callbackFn);
             else
-                $scope.$on(app.EventNames.startRegexPatternParse2, (event, pattern, flags) => { callbackFn.call(thisObj, event, pattern, flags); });
+                $scope.$on(app.EventNames.startRegexPatternParse2, (event, pattern, flags) => {
+                    callbackFn.call(thisObj, event, pattern, flags);
+                });
         }
         onRegexObjectChanged($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
                 $scope.$on(app.EventNames.regexObjectChanged2, callbackFn);
             else
-                $scope.$on(app.EventNames.regexObjectChanged2, (event, oldValue, newValue) => { callbackFn.call(thisObj, event, oldValue, newValue); });
+                $scope.$on(app.EventNames.regexObjectChanged2, (event, oldValue, newValue) => {
+                    callbackFn.call(thisObj, event, oldValue, newValue);
+                });
         }
         onRegexPatternParseError($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
                 $scope.$on(app.EventNames.regexPatternParseError2, callbackFn);
             else
-                $scope.$on(app.EventNames.regexPatternParseError2, (event, result) => { callbackFn.call(thisObj, event, result); });
+                $scope.$on(app.EventNames.regexPatternParseError2, (event, result) => {
+                    callbackFn.call(thisObj, event, result);
+                });
         }
         onRegexPatternParseSuccess($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
                 $scope.$on(app.EventNames.regexPatternParseSuccess, callbackFn);
             else
-                $scope.$on(app.EventNames.regexPatternParseSuccess, (event, result) => { callbackFn.call(thisObj, event, result); });
+                $scope.$on(app.EventNames.regexPatternParseSuccess, (event, result) => {
+                    callbackFn.call(thisObj, event, result);
+                });
         }
         onEndRegexPatternParse($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
                 $scope.$on(app.EventNames.endRegexPatternParse2, callbackFn);
             else
-                $scope.$on(app.EventNames.endRegexPatternParse2, (event, result, isAborted) => { callbackFn.call(thisObj, event, result, isAborted); });
+                $scope.$on(app.EventNames.endRegexPatternParse2, (event, result, isAborted) => {
+                    callbackFn.call(thisObj, event, result, isAborted);
+                });
         }
     }
     regexTester.RegexParserService = RegexParserService;
-    function isParseOperationSuccess(value) { return typeof value.regex !== "undefined"; }
+    function isParseOperationSuccess(value) {
+        return typeof value.regex !== 'undefined';
+    }
     class RegexController {
         constructor($scope, regexParser, pageTitleService) {
             this.$scope = $scope;
             this.regexParser = regexParser;
-            pageTitleService.pageTitle("Regular Expression Evaluator");
+            pageTitleService.pageTitle('Regular Expression Evaluator');
             regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
             regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
             regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
@@ -398,7 +340,7 @@ var regexTester;
                 this.setError(regexParser.faultReason());
             else {
                 $scope.showParseError = false;
-                $scope.parseErrorMessage = "";
+                $scope.parseErrorMessage = '';
             }
         }
         get global() { return this.regexParser.global(); }
@@ -415,15 +357,15 @@ var regexTester;
         set pattern(value) { this.regexParser.pattern(value); }
         setError(reason) {
             switch (typeof reason) {
-                case "undefined":
+                case 'undefined':
                     break;
-                case "object":
+                case 'object':
                     if (reason !== null) {
                         this.setError(JSON.stringify(reason));
                         return;
                     }
                     break;
-                case "string":
+                case 'string':
                     if ((this.$scope.parseErrorMessage = reason.trim()).length > 0) {
                         this.$scope.showParseError = true;
                         return;
@@ -433,9 +375,11 @@ var regexTester;
                     this.setError(JSON.stringify(reason));
                     return;
             }
-            this.setError("Unknown parse failure.");
+            this.setError('Unknown parse failure.');
         }
-        onRegexFlagsChanged(event, oldValue, newValue) { this.$scope.flags = this.regexParser.flags().flags; }
+        onRegexFlagsChanged(event, oldValue, newValue) {
+            this.$scope.flags = this.regexParser.flags().flags;
+        }
         onStartRegexPatternParse(event, pattern, flags) {
             this.$scope.showParseError = false;
             this.$scope.isParsing = this.regexParser.isParsing();
@@ -448,7 +392,7 @@ var regexTester;
             }
             else {
                 this.$scope.showParseError = false;
-                this.$scope.parseErrorMessage = "";
+                this.$scope.parseErrorMessage = '';
             }
         }
         $doCheck() { }
@@ -458,7 +402,7 @@ var regexTester;
         constructor($scope, regexParser, pageTitleService) {
             super($scope, regexParser, pageTitleService);
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
-            pageTitleService.pageSubTitle("Match");
+            pageTitleService.pageSubTitle('Match');
             pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
         }
     }
@@ -467,7 +411,7 @@ var regexTester;
         constructor($scope, regexParser, pageTitleService) {
             super($scope, regexParser, pageTitleService);
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
-            pageTitleService.pageSubTitle("Replace");
+            pageTitleService.pageSubTitle('Replace');
             pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
         }
     }
@@ -476,7 +420,7 @@ var regexTester;
         constructor($scope, regexParser, pageTitleService) {
             super($scope, regexParser, pageTitleService);
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
-            pageTitleService.pageSubTitle("Split");
+            pageTitleService.pageSubTitle('Split');
             pageTitleService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
         }
     }

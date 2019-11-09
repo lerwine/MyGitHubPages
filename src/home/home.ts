@@ -3,6 +3,10 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="../app.ts"/>
 
+/**
+ * The JavaScript module corresponding to the MyGitHubPages.home angular js module.
+ * @module regexTester
+ */
 module home {
     export interface IHomePageControllerScope extends ng.IScope {
 
@@ -11,8 +15,8 @@ module home {
     export class HomePageController implements ng.IController {
         readonly [Symbol.toStringTag]: string = app.ControllerNames.homePage;
         controller($scope: IHomePageControllerScope, pageTitleService: app.PageTitleService) {
-            pageTitleService.pageTitle("");
-            pageTitleService.pageSubTitle("");
+            pageTitleService.pageTitle('');
+            pageTitleService.pageSubTitle('');
         }
         $doCheck(): void { }
     }

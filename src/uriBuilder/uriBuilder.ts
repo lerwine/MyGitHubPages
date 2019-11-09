@@ -3,6 +3,10 @@
 /// <reference path="../Scripts/typings/bootstrap/index.d.ts"/>
 /// <reference path="../app.ts"/>
 
+/**
+ * The JavaScript module corresponding to the MyGitHubPages.uriBuilder angular js module.
+ * @module uriBuilder
+ */
 module uriBuilder {
     export interface IUriBuilderPageControllerScope extends ng.IScope {
 

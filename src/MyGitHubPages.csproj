@@ -75,6 +75,7 @@
     <Content Include="ColorBuilder.html" />
     <Content Include="colorBuilder\colorBuilder.htm" />
     <Content Include="favicon.ico" />
+    <Content Include="git.htm" />
     <Content Include="home\home.htm" />
     <Content Include="images\dave-gandy\chevron-up.svg" />
     <Content Include="images\dave-gandy\copy-document.svg" />
@@ -1151,6 +1152,7 @@
     <Content Include="appConfig.json" />
     <Content Include="images\open-iconic\ICON-LICENSE" />
     <Content Include="images\open-iconic\README.md" />
+    <Content Include="npm.htm" />
     <Content Include="RegexTester.html" />
     <Content Include="regexTester\match.htm" />
     <Content Include="regexTester\replace.htm" />
@@ -1194,6 +1196,7 @@
     <Content Include="lib\twitter-bootstrap\js\bootstrap.min.js" />
     <Content Include="UriBuilder.html" />
     <Content Include="uriBuilder\uriBuilder.htm" />
+    <Content Include="vscode.htm" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
