@@ -1,3 +1,0 @@
-C:\Users\lerwi\GitHub\MyGitHubPages\script\obj\Debug\script.njsproj.CoreCompileInputs.cache
-C:\Users\lerwi\GitHub\MyGitHubPages\script\bin\Microsoft.NodejsTools.WebRole.dll
-C:\Users\lerwi\GitHub\MyGitHubPages\script\obj\Debug\script.njsprojAssemblyReference.cache
