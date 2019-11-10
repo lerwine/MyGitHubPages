@@ -441,13 +441,13 @@ module regexTester {
         get lineNumber(): number { return this._lineNumber; }
         constructor(private _text: string, private _lineNumber: number) { }
         static toJsLines(source: string): JsLine[] {
-            if (typeof source !== "string")
-                return [new JsLine("null", 0)];
+            if (typeof source !== 'string')
+                return [new JsLine('null', 0)];
             if (source.length == 0)
                 return [new JsLine('""', 1)];
-            let lines: JsLine[] = [];
+            const lines: JsLine[] = [];
             let lineNumber = 1;
-            for (let m: RegExpMatchArray = source.match(JsLine._re); typeof m === "object" && m !== null; m = source.match(JsLine._re)) {
+            for (let m: RegExpMatchArray = source.match(JsLine._re); typeof m === 'object' && m !== null; m = source.match(JsLine._re)) {
                 lines.push(new JsLine(JSON.stringify(m[0]), lineNumber++));
                 source = source.substr(m[0].length);
             }
@@ -457,6 +457,21 @@ module regexTester {
         }
     }
 
+    export class EvaluationState {
+        private _isEvaluated = false;
+        private _token = Symbol();
+
+        get isEvaluated(): boolean { return this._isEvaluated; }
+        set isEvaluated(value: boolean) {
+            if (this._isEvaluated === value)
+                return;
+            this._isEvaluated = value;
+            if (value)
+            this._token = Symbol();
+        }
+
+        get token(): symbol { return this._token; }
+    }
     export class MatchGroup {
         private _text: JsLine[];
         private _isMatch: boolean;
@@ -465,7 +480,7 @@ module regexTester {
         get isMatch(): boolean { throw new Error('Property not implemented'); }
         constructor(private _groupNumber: number, text?: string | null) {
             this._text = JsLine.toJsLines(text);
-            this._isMatch = (typeof text === "string");
+            this._isMatch = (typeof text === 'string');
         }
     }
 
@@ -475,19 +490,24 @@ module regexTester {
      * @class RegexParserService
      */
     export class RegexParserService {
-        //private _parseId: symbol;
+        // private _parseId: symbol;
         private _flags: RegexFlags = new RegexFlags();
         private _pattern = '(?:)';
-        private _inputText: string;
-        private _matchIndex: number = -1;
-        private _groups: MatchGroup[] = [];
-        private _success = false;
-        private _replacedText: JsLine[] = [];
-        //private _isParsing = false;
+        private _inputText = '';
+        private _matchGroups: RegExpMatchArray | null = null;
+        private _matchEvaluation = new EvaluationState();
+        private _replacementEvaluation = new EvaluationState();
+        private _replaceWith = '';
+        private _replacedText = '';
+        private _splitEvaluation = new EvaluationState();
+        private _splitLimit = NaN;
+        private _splitText: string[] = [];
+        // private _isParsing = false;
         private _regex: RegExp;
+        private _regexChangeToken = Symbol();
         private _hasFault = false;
         private _faultReason: any;
-        //private readonly _taskId: symbol = Symbol();
+        // private readonly _taskId: symbol = Symbol();
         private _mode: RegexEvaluationMode = RegexEvaluationMode.match;
 
         readonly [Symbol.toStringTag]: string = app.ServiceNames.regexParser;
@@ -499,9 +519,9 @@ module regexTester {
          * @memberof RegexParserService
          */
         constructor(private readonly $rootScope: ng.IRootScopeService) {
-            //const initialResults: IRegexParseSuccessResult = {
+            // const initialResults: IRegexParseSuccessResult = {
             //    pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
-            //};
+            // };
             this._regex = new RegExp(this._pattern, this._flags.flags);
         }
 
@@ -527,10 +547,13 @@ module regexTester {
             }
             if (flags.flags === this._flags.flags)
                 return this._flags;
-            if (flags.global === this._flags.global && flags.ignoreCase === this._flags.ignoreCase && flags.multiline === this._flags.multiline && flags.sticky === this._flags.sticky && flags.unicode === this._flags.unicode) {
+            if (flags.global === this._flags.global && flags.ignoreCase === this._flags.ignoreCase &&
+                    flags.multiline === this._flags.multiline && flags.sticky === this._flags.sticky &&
+                    flags.unicode === this._flags.unicode) {
                 this._flags = flags;
                 return this._flags;
             }
+            this._regexChangeToken = Symbol();
             this.parsePattern();
             return this._flags;
         }
@@ -596,9 +619,23 @@ module regexTester {
         }
 
         mode(value?: RegexEvaluationMode): RegexEvaluationMode {
-            if (typeof value === "number" && (isNaN(value) || value === this._mode))
+            if (typeof value === 'number' && (isNaN(value) || value === this._mode))
                 return this._mode;
             this._mode = value;
+            switch (this._mode) {
+                case RegexEvaluationMode.replace:
+                    if (this._replacementEvaluated)
+                        return this._mode;
+                    break;
+                case RegexEvaluationMode.split:
+                    if (this._splitEvaluated)
+                        return this._mode;
+                    break;
+                default:
+                    if (this._matchEvaluated)
+                        return this._mode;
+                    break;
+            }
             this.evaluatePattern();
             return this._mode;
         }
@@ -612,6 +649,7 @@ module regexTester {
         pattern(value?: string): string {
             if (typeof value !== 'string' || value === this._pattern)
                 return this._pattern;
+            this._regexChangeToken = Symbol();
             this._pattern = value;
             this.parsePattern();
             return this._pattern;
@@ -620,56 +658,45 @@ module regexTester {
         inputText(value?: string): string {
             if (typeof value !== 'string' || value === this._inputText)
                 return this._inputText;
+            this._regexChangeToken = Symbol();
             this._inputText = value;
             this.evaluatePattern();
             return this._inputText;
         }
 
-        parsePattern(): void {
-            try {
-                this._regex = new RegExp(this._pattern, this._flags.flags);
-                this._hasFault = false;
-                this._faultReason = "";
-            } catch (e) {
-                this._hasFault = true;
-                this._faultReason = e;
-            }
+        regexChangeToken(): symbol { return this._regexChangeToken; }
+
+        replaceWith(value?: string): string {
+            if (typeof value !== 'string' || value === this._replaceWith)
+                return this._replaceWith;
+            this._replacementEvaluation.isEvaluated = false;
+            this._replacedText = this._inputText.replace(this._inputText, this._replaceWith);
+            return this._replaceWith;
         }
-        
-        evaluatePattern(): void {
-            this._matchIndex = -1;
-            this._success = false;
-            if (this._mode === RegexEvaluationMode.replace)
-                while (this._replacedText.length > 0)
-                    this._replacedText.pop();
-            switch (this._mode) {
-                case RegexEvaluationMode.replace:
-                    break;
-                case RegexEvaluationMode.split:
-                    break;
-                default:
-                    while (this._groups.length > 0)
-                        this._groups.pop();
-                    break;
-            }
-            if (this._hasFault)
-                return;
-            switch (this._mode) {
-                case RegexEvaluationMode.replace:
-                    break;
-                case RegexEvaluationMode.split:
-                    break;
-                default:
-                    let matchArr: RegExpMatchArray = this._inputText.match(this._regex);
-                    if (typeof matchArr !== "object" || matchArr === null)
-                        return;
-                    this._success = true;
-                    this._matchIndex = matchArr.index;
-                    for (let i: number = 0; i < matchArr.length; i++)
-                        this._groups.push(new MatchGroup(i, matchArr[i]));
-                    break;
-            }
+
+        splitLimit(value?: number): number {
+            if (typeof value !== 'number' || value === this._splitLimit)
+                return this._splitLimit;
+            this._splitEvaluation.isEvaluated = false;
+            if (isNaN(this._splitLimit))
+                this._splitText = this._inputText.split(this._regex);
+            else
+                this._splitText = this._inputText.split(this._regex, this._splitLimit);
+            return this._splitLimit;
         }
+
+        matchEvaluationToken(): symbol { return this._matchEvaluation.token; }
+        replacementEvaluationToken(): symbol { return this._replacementEvaluation.token; }
+        splitEvaluationToken(): symbol { return this._splitEvaluation.token; }
+        matchEvaluated(): boolean { return this._matchEvaluation.isEvaluated; }
+        replacementEvaluated(): boolean { return this._replacementEvaluation.isEvaluated; }
+        splitEvaluated(): boolean { return this._splitEvaluation.isEvaluated; }
+
+        matchGroups(): RegExpMatchArray | null { return this._matchGroups; }
+
+        replacedText(): string { return this._replacedText; }
+
+        splitText(): ReadonlyArray<string> { return this._splitText; }
 
         ///**
         // * Indicates whether the current regular expression pattern is still being parsed.
@@ -691,6 +718,42 @@ module regexTester {
          * @memberof RegexParserService
          */
         faultReason(): any { return this._faultReason; }
+
+        parsePattern(): void {
+            try {
+                this._regex = new RegExp(this._pattern, this._flags.flags);
+                this._hasFault = false;
+                this._faultReason = '';
+            } catch (e) {
+                this._hasFault = true;
+                this._faultReason = e;
+            }
+        }
+
+        evaluatePattern(): void {
+            this._matchEvaluation.isEvaluated = false;
+            this._replacementEvaluation.isEvaluated = false;
+            this._splitEvaluation.isEvaluated = false;
+            if (this._hasFault)
+                return;
+            switch (this._mode) {
+                case RegexEvaluationMode.replace:
+                    this._replacedText = this._inputText.replace(this._inputText, this._replaceWith);
+                    this._replacementEvaluation.isEvaluated = true;
+                    break;
+                case RegexEvaluationMode.split:
+                    if (isNaN(this._splitLimit))
+                        this._splitText = this._inputText.split(this._regex);
+                    else
+                        this._splitText = this._inputText.split(this._regex, this._splitLimit);
+                    this._splitEvaluation.isEvaluated = true;
+                    break;
+                default:
+                    this._matchGroups = this._inputText.match(this._regex);
+                    this._matchEvaluation.isEvaluated = true;
+                    break;
+            }
+        }
 
         //private startPatternParse(regex: RegExp): void;
         //private startPatternParse(pattern: string, flags: RegexFlags): void;
@@ -861,7 +924,7 @@ module regexTester {
                 this._flags = new RegexFlags(value);
                 this._pattern = value.source;
                 this._hasFault = false;
-                this._faultReason = "";
+                this._faultReason = '';
             }
             return this._regex;
         }
@@ -1108,28 +1171,70 @@ module regexTester {
         flags: string;
         parseErrorMessage: string;
         showParseError: boolean;
+        inputLines: JsLine[];
+        success: boolean;
     }
 
     export abstract class RegexController<TScope extends IRegexControllerScope> implements ng.IController {
         abstract readonly [Symbol.toStringTag]: string;
+        protected abstract onRegexChange(): void;
 
         get global(): boolean { return this.regexParser.global(); }
-        set global(value: boolean) { this.regexParser.global(value); }
+        set global(value: boolean) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.global(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+        }
 
         get ignoreCase(): boolean { return this.regexParser.ignoreCase(); }
-        set ignoreCase(value: boolean) { this.regexParser.ignoreCase(value); }
+        set ignoreCase(value: boolean) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.ignoreCase(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+        }
 
         get multiline(): boolean { return this.regexParser.multiline(); }
-        set multiline(value: boolean) { this.regexParser.multiline(value); }
+        set multiline(value: boolean) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.multiline(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+        }
 
         get unicode(): boolean { return this.regexParser.unicode(); }
-        set unicode(value: boolean) { this.regexParser.unicode(value); }
+        set unicode(value: boolean) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.unicode(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+        }
 
         get sticky(): boolean { return this.regexParser.sticky(); }
-        set sticky(value: boolean) { this.regexParser.sticky(value); }
+        set sticky(value: boolean) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.sticky(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+        }
 
         get pattern(): string { return this.regexParser.pattern(); }
-        set pattern(value: string) { this.regexParser.pattern(value); }
+        set pattern(value: string) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.pattern(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+        }
+
+        get inputText(): string { return this.regexParser.inputText(); }
+        set inputText(value: string) {
+            const token = this.regexParser.regexChangeToken();
+            this.regexParser.inputText(value);
+            if (token !== this.regexParser.regexChangeToken())
+                this.onRegexChange();
+            this.$scope.inputLines = JsLine.toJsLines(this.regexParser.inputText());
+        }
 
         /**
          * Creates an instance of RegexController.
@@ -1151,6 +1256,7 @@ module regexTester {
                 $scope.showParseError = false;
                 $scope.parseErrorMessage = '';
             }
+            $scope.inputLines = JsLine.toJsLines(regexParser.inputText());
         }
 
         private setError(reason: any): void {
@@ -1207,7 +1313,8 @@ module regexTester {
      * @extends {IRegexControllerScope}
      */
     export interface IRegexMatchControllerScope extends IRegexControllerScope {
-
+        groups: MatchGroup[];
+        matchIndex: number;
     }
 
     /**
@@ -1228,6 +1335,30 @@ module regexTester {
         constructor($scope: IRegexMatchControllerScope, regexParser: RegexParserService, pageLocationService: app.PageLocationService) {
             super($scope, regexParser, pageLocationService, 'Match');
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
+            const m = regexParser.matchGroups();
+            $scope.groups = [];
+            if (typeof m !== "object" || m === null) {
+                $scope.matchIndex = -1;
+                $scope.success = false;
+            } else {
+                $scope.success = true;
+                $scope.matchIndex = m.index;
+                for (let n = 0; n < m.length; n++)
+                    $scope.groups.push(new MatchGroup(n, m[n]));
+            }
+        }
+        protected onRegexChange(): void {
+            const m = this.regexParser.matchGroups();
+            this.$scope.groups = [];
+            if (typeof m !== "object" || m === null) {
+                this.$scope.matchIndex = -1;
+                this.$scope.success = false;
+            } else {
+                this.$scope.success = true;
+                this.$scope.matchIndex = m.index;
+                for (let n = 0; n < m.length; n++)
+                    this.$scope.groups.push(new MatchGroup(n, m[n]));
+            }
         }
     }
 
