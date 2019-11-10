@@ -83,9 +83,9 @@ var regexTester;
     }
     regexTester.RegexFlags = RegexFlags;
     class RegexParserService {
-        constructor($rootScope, supplantingTask) {
+        constructor($rootScope, supplantablePromiseChainService) {
             this.$rootScope = $rootScope;
-            this.supplantingTask = supplantingTask;
+            this.supplantablePromiseChainService = supplantablePromiseChainService;
             this._flags = new RegexFlags();
             this._pattern = '(?:)';
             this._isParsing = false;
@@ -248,7 +248,7 @@ var regexTester;
                 }
             }
             const svc = this;
-            this.supplantingTask.start(this._taskId, function (resolve, reject) {
+            this.supplantablePromiseChainService.start(this._taskId, function (resolve, reject) {
                 try {
                     svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId);
                 }

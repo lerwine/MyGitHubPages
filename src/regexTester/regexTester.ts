@@ -448,11 +448,11 @@ module regexTester {
         /**
          * Creates an instance of RegexParserService.
          * @param {ng.IRootScopeService} $rootScope
-         * @param {app.SupplantableTaskService} supplantingTask
+         * @param {app.SupplantableTaskService} supplantablePromiseChainService
          * @memberof RegexParserService
          */
         constructor(private readonly $rootScope: ng.IRootScopeService,
-                private readonly supplantingTask: app.SupplantablePromiseChainService) {
+                private readonly supplantablePromiseChainService: app.SupplantablePromiseChainService) {
             const initialResults: IRegexParseSuccessResult = {
                 pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
             };
@@ -652,7 +652,7 @@ module regexTester {
             }
 
             const svc: RegexParserService = this;
-            this.supplantingTask.start<IRegexParseSuccessResult>(this._taskId,
+            this.supplantablePromiseChainService.start<IRegexParseSuccessResult>(this._taskId,
                 function(resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
                         reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
                     try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId); } catch { }
