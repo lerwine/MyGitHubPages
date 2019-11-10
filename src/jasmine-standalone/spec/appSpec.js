@@ -5,14 +5,14 @@ describe('MyGitHubPages app', function () {
     beforeEach(function () {
         angular.mock.module('MyGitHubPages');
     });
-    describe('PageTitleService', function () {
+    describe('PageLocationService', function () {
         it('Injectable', inject(function ($rootScope, pageLocationService) {
             expect(pageLocationService).toBeDefined();
             expect(pageLocationService).not.toBeNull();
             expect(pageLocationService.pageTitle()).toEqual(defaultPageTitle);
             expect(pageLocationService.pageSubTitle()).toEqual(defultSubTitle);
             expect(pageLocationService.regexHref()).toEqual(defaultRegexHref);
-            expect(pageLocationService[Symbol.toStringTag]).toEqual('pageTitleService');
+            expect(pageLocationService[Symbol.toStringTag]).toEqual('pageLocationService');
         }));
         describe('Members', function () {
             let pageLocationService;

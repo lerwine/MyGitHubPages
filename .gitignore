@@ -1,12 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
-/dist
-/tmp
-/out-tsc
 
 # dependencies
-/node_modules
+node_modules/**
 
 # IDEs and editors
 /.idea
@@ -18,24 +14,21 @@
 *.sublime-workspace
 
 # IDE - Visual Studio
-.vs/*
-obj/*
-bin/*
+.vs/
+obj/
+bin/
 *.csproj.user
+*.njsproj.user
 *.suo
 
 # IDE - VSCode
-.vscode/*
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
 # misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
 npm-debug.log
 yarn-error.log
 testem.log
