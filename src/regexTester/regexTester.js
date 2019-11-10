@@ -159,7 +159,7 @@ var regexTester;
                         flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
                         flags.sticky == previous.flags.sticky) {
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, this._parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, this._parseId);
                         }
                         catch (_a) { }
                         return;
@@ -167,7 +167,7 @@ var regexTester;
                     this._parseId = parseId;
                     this._isParsing = true;
                     try {
-                        this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId);
+                        this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
                     }
                     catch (_b) { }
                 }
@@ -176,18 +176,18 @@ var regexTester;
                     this._isParsing = true;
                     if (flags.flags !== previous.flags.flags) {
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
                         }
                         catch (_c) { }
                         if (this._parseId === parseId)
                             try {
-                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, arg0, parseId);
+                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId);
                             }
                             catch (_d) { }
                     }
                     else
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, arg0, parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId);
                         }
                         catch (_e) { }
                 }
@@ -200,12 +200,12 @@ var regexTester;
                     this._isParsing = true;
                     if ((this._flags = flags).flags !== previous.flags.flags)
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
                         }
                         catch (_f) { }
                     if (this._parseId === parseId && pattern !== previous.pattern)
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, pattern, parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
                         }
                         catch (_g) { }
                 }
@@ -217,7 +217,7 @@ var regexTester;
                     this._parseId = parseId;
                     this._isParsing = true;
                     try {
-                        this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId);
+                        this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
                     }
                     catch (_h) { }
                 }
@@ -231,18 +231,18 @@ var regexTester;
                         this._flags = flags = previous.flags;
                     else {
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
                         }
                         catch (_j) { }
                         if (this._parseId === parseId)
                             try {
-                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, pattern, parseId);
+                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
                             }
                             catch (_k) { }
                     }
                     if (this._parseId === parseId)
                         try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, pattern, parseId);
+                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
                         }
                         catch (_l) { }
                 }
@@ -250,7 +250,7 @@ var regexTester;
             const svc = this;
             this.supplantablePromiseChainService.start(this._taskId, function (resolve, reject) {
                 try {
-                    svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId);
+                    svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse, pattern, flags, parseId);
                 }
                 catch (_a) { }
                 if (parseId !== svc._parseId)
@@ -296,7 +296,7 @@ var regexTester;
                         result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
                         result.regex.sticky !== previous.regex.sticky)
                         try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged2, previous.regex, result.regex, parseId);
+                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged, previous.regex, result.regex, parseId);
                         }
                         catch (_a) { }
                     try {
@@ -304,7 +304,7 @@ var regexTester;
                     }
                     catch (_b) { }
                     try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId);
+                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId);
                     }
                     catch (_c) { }
                 }
@@ -314,7 +314,7 @@ var regexTester;
                     }
                     catch (_d) { }
                     try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, {
+                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, {
                             pattern: pattern,
                             flags: flags,
                             operationCanceled: true,
@@ -331,13 +331,13 @@ var regexTester;
                         svc._hasFault = true;
                         svc._faultReason = result.reason;
                         try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError2, result, parseId);
+                            svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError, result, parseId);
                         }
                         catch (_a) { }
                     }
                 }
                 try {
-                    svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId);
+                    svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId);
                 }
                 catch (_b) { }
             });
@@ -356,43 +356,43 @@ var regexTester;
         }
         onRegexFlagsChanged($scope, callbackFn, thisObj) {
             if (arguments.length < 3) {
-                $scope.$on(app.EventNames.regexFlagsChanged2, callbackFn);
+                $scope.$on(app.EventNames.regexFlagsChanged, callbackFn);
             }
             else {
-                $scope.$on(app.EventNames.regexFlagsChanged2, (event, oldValue, newValue) => {
+                $scope.$on(app.EventNames.regexFlagsChanged, (event, oldValue, newValue) => {
                     callbackFn.call(thisObj, event, oldValue, newValue);
                 });
             }
         }
         onRegexPatternChanged($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternChanged2, callbackFn);
+                $scope.$on(app.EventNames.regexPatternChanged, callbackFn);
             else
-                $scope.$on(app.EventNames.regexPatternChanged2, (event, oldValue, newValue) => {
+                $scope.$on(app.EventNames.regexPatternChanged, (event, oldValue, newValue) => {
                     callbackFn.call(thisObj, event, oldValue, newValue);
                 });
         }
         onStartRegexPatternParse($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
-                $scope.$on(app.EventNames.startRegexPatternParse2, callbackFn);
+                $scope.$on(app.EventNames.startRegexPatternParse, callbackFn);
             else
-                $scope.$on(app.EventNames.startRegexPatternParse2, (event, pattern, flags) => {
+                $scope.$on(app.EventNames.startRegexPatternParse, (event, pattern, flags) => {
                     callbackFn.call(thisObj, event, pattern, flags);
                 });
         }
         onRegexObjectChanged($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexObjectChanged2, callbackFn);
+                $scope.$on(app.EventNames.regexObjectChanged, callbackFn);
             else
-                $scope.$on(app.EventNames.regexObjectChanged2, (event, oldValue, newValue) => {
+                $scope.$on(app.EventNames.regexObjectChanged, (event, oldValue, newValue) => {
                     callbackFn.call(thisObj, event, oldValue, newValue);
                 });
         }
         onRegexPatternParseError($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternParseError2, callbackFn);
+                $scope.$on(app.EventNames.regexPatternParseError, callbackFn);
             else
-                $scope.$on(app.EventNames.regexPatternParseError2, (event, result) => {
+                $scope.$on(app.EventNames.regexPatternParseError, (event, result) => {
                     callbackFn.call(thisObj, event, result);
                 });
         }
@@ -406,9 +406,9 @@ var regexTester;
         }
         onEndRegexPatternParse($scope, callbackFn, thisObj) {
             if (arguments.length < 3)
-                $scope.$on(app.EventNames.endRegexPatternParse2, callbackFn);
+                $scope.$on(app.EventNames.endRegexPatternParse, callbackFn);
             else
-                $scope.$on(app.EventNames.endRegexPatternParse2, (event, result, isAborted) => {
+                $scope.$on(app.EventNames.endRegexPatternParse, (event, result, isAborted) => {
                     callbackFn.call(thisObj, event, result, isAborted);
                 });
         }

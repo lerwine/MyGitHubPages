@@ -182,252 +182,292 @@ module regexTester {
         }
     }
 
-    /**
-     * Results of regular expression pattern parsing.
-     * @export
-     * @interface IRegexParseResult
-     */
-    export interface IRegexParseResult {
-        /**
-         * Regex option flags used when constructing the RegExp object.
-         * @type {RegexFlags}
-         * @memberof IRegexParseResult
-         */
-        flags: RegexFlags;
+    ///**
+    // * Results of regular expression pattern parsing.
+    // * @export
+    // * @interface IRegexParseResult
+    // */
+    //export interface IRegexParseResult {
+    //    /**
+    //     * Regex option flags used when constructing the RegExp object.
+    //     * @type {RegexFlags}
+    //     * @memberof IRegexParseResult
+    //     */
+    //    flags: RegexFlags;
 
-        /**
-         * The regular expression pattern that was parsed.
-         * @type {string}
-         * @memberof IRegexParseResult
-         */
-        pattern: string;
+    //    /**
+    //     * The regular expression pattern that was parsed.
+    //     * @type {string}
+    //     * @memberof IRegexParseResult
+    //     */
+    //    pattern: string;
 
-        /**
-         * The result of the previous successfully parsed pattern.
-         * @type {IRegexParseSuccessResult}
-         * @memberof IRegexParseResult
-         */
-        previous?: IRegexParseSuccessResult & { previous?: undefined };
+    //    /**
+    //     * The result of the previous successfully parsed pattern.
+    //     * @type {IRegexParseSuccessResult}
+    //     * @memberof IRegexParseResult
+    //     */
+    //    previous?: IRegexParseSuccessResult & { previous?: undefined };
 
-        /**
-         * Indicates whether the source pattern or flags was changed before parsing was completed.
-         * @type {boolean}
-         * @memberof IRegexParseResult
-         */
-        operationCanceled?: boolean;
+    //    /**
+    //     * Indicates whether the source pattern or flags was changed before parsing was completed.
+    //     * @type {boolean}
+    //     * @memberof IRegexParseResult
+    //     */
+    //    operationCanceled?: boolean;
+    //}
+
+    ///**
+    // * Results of a successful regular expression pattern parsing.
+    // * @export
+    // * @interface IRegexParseSuccessResult
+    // * @extends {IRegexParseResult}
+    // */
+    //export interface IRegexParseSuccessResult extends IRegexParseResult {
+    //    /**
+    //     * The constructed regular expression object.
+    //     * @type {RegExp}
+    //     * @memberof IRegexParseSuccessResult
+    //     */
+    //    regex: RegExp;
+
+    //    /**
+    //     * Indicates that neither the source pattern nor flags was not changed before parsing was completed.
+    //     * @type {false}
+    //     * @memberof IRegexParseSuccessResult
+    //     */
+    //    operationCanceled?: false;
+    //}
+
+    ///**
+    // * Results of a failed regular expression parsing.
+    // * @export
+    // * @interface IRegexParseFailResult
+    // * @extends {IRegexParseResult}
+    // */
+    //export interface IRegexParseFailResult extends IRegexParseResult {
+    //    /**
+    //     * The reason for the failure.
+    //     * @type {*}
+    //     * @memberof IRegexParseFailResult
+    //     */
+    //    reason: any;
+
+    //    /**
+    //     * Indicates that neither the source pattern nor flags was not changed before parsing was completed.
+    //     * @type {false}
+    //     * @memberof IRegexParseFailResult
+    //     */
+    //    operationCanceled?: false;
+    //}
+
+    ///**
+    // * Results of a regular expression parsing that did not complete before the source pattern and/or flags was changed.
+    // * @export
+    // * @interface IRegexSourceChangedResult
+    // * @extends {IRegexParseResult}
+    // */
+    //export interface IRegexParseCanceledResult extends IRegexParseResult {
+    //    /**
+    //     * Indicates that the source pattern and/or flags was changed before parsing was completed.
+    //     * @type {"Operation canceled"}
+    //     * @memberof IRegexSourceChangedResult
+    //     */
+    //    reason: 'Operation canceled';
+
+    //    /**
+    //     * Indicates that the source pattern and/or flags was changed before parsing was completed.
+    //     * @type {true}
+    //     * @memberof IRegexSourceChangedResult
+    //     */
+    //    operationCanceled: true;
+    //}
+
+    ///**
+    // * Types of regular expression parsing results.
+    // * @typedef RegexParseResult
+    // */
+    //export type RegexParseResult = IRegexParseSuccessResult | IRegexParseCanceledResult | IRegexParseFailResult;
+
+    ///**
+    // * Callback method for a RegexFlags change event.
+    // * @callback RegexFlagsChangedListener
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {string} oldValue - The previous regular expression flags.
+    // * @param {string} newValue - The current regular expression flags.
+    // */
+    //export type RegexFlagsChangedListener = ((event: ng.IAngularEvent, oldValue: RegexFlags, newValue: RegexFlags) => void) & Function;
+
+    ///**
+    // * Callback method for a RegexFlags change event.
+    // * @callback ThisRegexFlagsChangedListener
+    // * @template T
+    // * @this T
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {string} oldValue - The previous regular expression flags.
+    // * @param {string} newValue - The current regular expression flags.
+    // */
+    //export type ThisRegexFlagsChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: RegexFlags,
+    //    newValue: RegexFlags) => void) & Function;
+
+    ///**
+    // * Callback method for a regular expression pattern change event.
+    // * @callback RegexFlagsChangedListener
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {string} oldValue - The previous regular expression pattern.
+    // * @param {string} newValue - The current regular expression pattern.
+    // */
+    //export type RegexPatternChangedListener = ((event: ng.IAngularEvent, oldValue: string, newValue: string) => void) & Function;
+
+    ///**
+    // * Callback method for a regular expression pattern change event.
+    // * @callback ThisRegexPatternChangedListener
+    // * @template T
+    // * @this T
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {string} oldValue - The previous regular expression pattern.
+    // * @param {string} newValue - The current regular expression pattern.
+    // */
+    //export type ThisRegexPatternChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: string,
+    //    newValue: string) => void) & Function;
+
+    ///**
+    // * Callback method for when a regular expression pattern is about to be parsed.
+    // * @callback StartRegexPatternParseListener
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {string} pattern - The regular expression pattern to be parsed.
+    // * @param {RegexFlags} flags - The flags to be used when the RegExp object is constructed.
+    // */
+    //export type StartRegexPatternParseListener = ((event: ng.IAngularEvent, pattern: string, flags: RegexFlags) => void) & Function;
+
+    ///**
+    // * Callback method for when a regular expression pattern is about to be parsed.
+    // * @callback ThisStartRegexPatternParseListener
+    // * @template T
+    // * @this T
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {string} pattern - The regular expression pattern to be parsed.
+    // * @param {RegexFlags} flags - The flags to be used when the RegExp object is constructed.
+    // */
+    //export type ThisStartRegexPatternParseListener<T> = ((this: T, event: ng.IAngularEvent, pattern: string,
+    //    flags: RegexFlags) => void) & Function;
+
+    ///**
+    // * Callback method for a RegExp object change event.
+    // * @callback RegexObjectChangedListener
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {IRegexParseSuccessResult} result - Regex pattern parsing result.
+    // */
+    //export type RegexObjectChangedListener = ((event: ng.IAngularEvent, oldValue: RegExp, newValue: RegExp) => void) & Function;
+
+    ///**
+    // * Callback method for a RegExp object change event.
+    // * @callback ThisRegexObjectChangedListener
+    // * @template T
+    // * @this T
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {IRegexParseSuccessResult} result - Regex pattern parsing result.
+    // */
+    //export type ThisRegexObjectChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: RegExp,
+    //    newValue: RegExp) => void) & Function;
+
+    //export type RegexPatternParseSuccessListener = ((event: ng.IAngularEvent, result: IRegexParseSuccessResult) => void) & Function;
+    //export type ThisRegexPatternParseSuccessListener<T> = ((this: T, event: ng.IAngularEvent,
+    //    result: IRegexParseSuccessResult) => void) & Function;
+
+    ///**
+    // * Callback method for a regular expression pattern error event.
+    // * @callback ThisRegexPatternParseErrorListener
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {IRegexParseFailResult} result - Regex pattern parsing failure result.
+    // */
+    //export type RegexPatternParseErrorListener = ((event: ng.IAngularEvent, result: IRegexParseFailResult) => void) & Function;
+
+    ///**
+    // * Callback method for a regular expression pattern error event.
+    // * @callback ThisRegexPatternParseErrorListener
+    // * @template T
+    // * @this T
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {IRegexParseFailResult} result - Regex pattern parsing failure result.
+    // */
+    //export type ThisRegexPatternParseErrorListener<T> = ((this: T, event: ng.IAngularEvent,
+    //    result: IRegexParseFailResult) => void) & Function;
+
+    ///**
+    // * Callback method for a regular expression parsing completion event.
+    // * @callback EndRegexPatternParseListener
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {RegexParseResult} result - Regex pattern parsing result.
+    // */
+    //export type EndRegexPatternParseListener = ((event: ng.IAngularEvent, result: RegexParseResult, isAborted: boolean) => void) & Function;
+
+    ///**
+    // * Callback method for a regular expression parsing completion event.
+    // * @callback ThisEndRegexPatternParseListener
+    // * @template T
+    // * @this T
+    // * @param {ng.IAngularEvent} event - Information about the source of the event.
+    // * @param {RegexParseResult} result - Regex pattern parsing result.
+    // */
+    //export type ThisEndRegexPatternParseListener<T> = ((this: T, event: ng.IAngularEvent, result: RegexParseResult,
+    //    isAborted: boolean) => void) & Function;
+
+    ///**
+    // * Callback method for current regular expression parsing completion.
+    // * @callback ParserReadyListener
+    // * @param {RegexParseResult} result - Regex pattern parsing result.
+    // */
+    //export type ParserReadyListener = ((result: RegexParseResult) => void) & Function;
+
+    ///**
+    // * Callback method for current regular expression parsing completion.
+    // * @callback ThisParserReadyListener
+    // * @template T
+    // * @this T
+    // * @param {RegexParseResult} result - Regex pattern parsing result.
+    // */
+    //export type ThisParserReadyListener<T> = ((this: T, result: RegexParseResult) => void) & Function;
+
+    export enum RegexEvaluationMode {
+        match,
+        replace,
+        split
     }
 
-    /**
-     * Results of a successful regular expression pattern parsing.
-     * @export
-     * @interface IRegexParseSuccessResult
-     * @extends {IRegexParseResult}
-     */
-    export interface IRegexParseSuccessResult extends IRegexParseResult {
-        /**
-         * The constructed regular expression object.
-         * @type {RegExp}
-         * @memberof IRegexParseSuccessResult
-         */
-        regex: RegExp;
-
-        /**
-         * Indicates that neither the source pattern nor flags was not changed before parsing was completed.
-         * @type {false}
-         * @memberof IRegexParseSuccessResult
-         */
-        operationCanceled?: false;
+    export class JsLine {
+        private static _re: RegExp = /^[^\r\n]*(\r\n?|\n)/;
+        get text(): string { return this._text; }
+        get lineNumber(): number { return this._lineNumber; }
+        constructor(private _text: string, private _lineNumber: number) { }
+        static toJsLines(source: string): JsLine[] {
+            if (typeof source !== "string")
+                return [new JsLine("null", 0)];
+            if (source.length == 0)
+                return [new JsLine('""', 1)];
+            let lines: JsLine[] = [];
+            let lineNumber = 1;
+            for (let m: RegExpMatchArray = source.match(JsLine._re); typeof m === "object" && m !== null; m = source.match(JsLine._re)) {
+                lines.push(new JsLine(JSON.stringify(m[0]), lineNumber++));
+                source = source.substr(m[0].length);
+            }
+            if (source.length > 0)
+                lines.push(new JsLine(JSON.stringify(source), lineNumber));
+            return lines;
+        }
     }
 
-    /**
-     * Results of a failed regular expression parsing.
-     * @export
-     * @interface IRegexParseFailResult
-     * @extends {IRegexParseResult}
-     */
-    export interface IRegexParseFailResult extends IRegexParseResult {
-        /**
-         * The reason for the failure.
-         * @type {*}
-         * @memberof IRegexParseFailResult
-         */
-        reason: any;
-
-        /**
-         * Indicates that neither the source pattern nor flags was not changed before parsing was completed.
-         * @type {false}
-         * @memberof IRegexParseFailResult
-         */
-        operationCanceled?: false;
+    export class MatchGroup {
+        private _text: JsLine[];
+        private _isMatch: boolean;
+        get groupNumber(): number { return this._groupNumber; }
+        get text(): string { throw new Error('Property not implemented'); }
+        get isMatch(): boolean { throw new Error('Property not implemented'); }
+        constructor(private _groupNumber: number, text?: string | null) {
+            this._text = JsLine.toJsLines(text);
+            this._isMatch = (typeof text === "string");
+        }
     }
-
-    /**
-     * Results of a regular expression parsing that did not complete before the source pattern and/or flags was changed.
-     * @export
-     * @interface IRegexSourceChangedResult
-     * @extends {IRegexParseResult}
-     */
-    export interface IRegexParseCanceledResult extends IRegexParseResult {
-        /**
-         * Indicates that the source pattern and/or flags was changed before parsing was completed.
-         * @type {"Operation canceled"}
-         * @memberof IRegexSourceChangedResult
-         */
-        reason: 'Operation canceled';
-
-        /**
-         * Indicates that the source pattern and/or flags was changed before parsing was completed.
-         * @type {true}
-         * @memberof IRegexSourceChangedResult
-         */
-        operationCanceled: true;
-    }
-
-    /**
-     * Types of regular expression parsing results.
-     * @typedef RegexParseResult
-     */
-    export type RegexParseResult = IRegexParseSuccessResult | IRegexParseCanceledResult | IRegexParseFailResult;
-
-    /**
-     * Callback method for a RegexFlags change event.
-     * @callback RegexFlagsChangedListener
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {string} oldValue - The previous regular expression flags.
-     * @param {string} newValue - The current regular expression flags.
-     */
-    export type RegexFlagsChangedListener = ((event: ng.IAngularEvent, oldValue: RegexFlags, newValue: RegexFlags) => void) & Function;
-
-    /**
-     * Callback method for a RegexFlags change event.
-     * @callback ThisRegexFlagsChangedListener
-     * @template T
-     * @this T
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {string} oldValue - The previous regular expression flags.
-     * @param {string} newValue - The current regular expression flags.
-     */
-    export type ThisRegexFlagsChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: RegexFlags,
-        newValue: RegexFlags) => void) & Function;
-
-    /**
-     * Callback method for a regular expression pattern change event.
-     * @callback RegexFlagsChangedListener
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {string} oldValue - The previous regular expression pattern.
-     * @param {string} newValue - The current regular expression pattern.
-     */
-    export type RegexPatternChangedListener = ((event: ng.IAngularEvent, oldValue: string, newValue: string) => void) & Function;
-
-    /**
-     * Callback method for a regular expression pattern change event.
-     * @callback ThisRegexPatternChangedListener
-     * @template T
-     * @this T
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {string} oldValue - The previous regular expression pattern.
-     * @param {string} newValue - The current regular expression pattern.
-     */
-    export type ThisRegexPatternChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: string,
-        newValue: string) => void) & Function;
-
-    /**
-     * Callback method for when a regular expression pattern is about to be parsed.
-     * @callback StartRegexPatternParseListener
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {string} pattern - The regular expression pattern to be parsed.
-     * @param {RegexFlags} flags - The flags to be used when the RegExp object is constructed.
-     */
-    export type StartRegexPatternParseListener = ((event: ng.IAngularEvent, pattern: string, flags: RegexFlags) => void) & Function;
-
-    /**
-     * Callback method for when a regular expression pattern is about to be parsed.
-     * @callback ThisStartRegexPatternParseListener
-     * @template T
-     * @this T
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {string} pattern - The regular expression pattern to be parsed.
-     * @param {RegexFlags} flags - The flags to be used when the RegExp object is constructed.
-     */
-    export type ThisStartRegexPatternParseListener<T> = ((this: T, event: ng.IAngularEvent, pattern: string,
-        flags: RegexFlags) => void) & Function;
-
-    /**
-     * Callback method for a RegExp object change event.
-     * @callback RegexObjectChangedListener
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {IRegexParseSuccessResult} result - Regex pattern parsing result.
-     */
-    export type RegexObjectChangedListener = ((event: ng.IAngularEvent, oldValue: RegExp, newValue: RegExp) => void) & Function;
-
-    /**
-     * Callback method for a RegExp object change event.
-     * @callback ThisRegexObjectChangedListener
-     * @template T
-     * @this T
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {IRegexParseSuccessResult} result - Regex pattern parsing result.
-     */
-    export type ThisRegexObjectChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: RegExp,
-        newValue: RegExp) => void) & Function;
-
-    export type RegexPatternParseSuccessListener = ((event: ng.IAngularEvent, result: IRegexParseSuccessResult) => void) & Function;
-    export type ThisRegexPatternParseSuccessListener<T> = ((this: T, event: ng.IAngularEvent,
-        result: IRegexParseSuccessResult) => void) & Function;
-
-    /**
-     * Callback method for a regular expression pattern error event.
-     * @callback ThisRegexPatternParseErrorListener
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {IRegexParseFailResult} result - Regex pattern parsing failure result.
-     */
-    export type RegexPatternParseErrorListener = ((event: ng.IAngularEvent, result: IRegexParseFailResult) => void) & Function;
-
-    /**
-     * Callback method for a regular expression pattern error event.
-     * @callback ThisRegexPatternParseErrorListener
-     * @template T
-     * @this T
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {IRegexParseFailResult} result - Regex pattern parsing failure result.
-     */
-    export type ThisRegexPatternParseErrorListener<T> = ((this: T, event: ng.IAngularEvent,
-        result: IRegexParseFailResult) => void) & Function;
-
-    /**
-     * Callback method for a regular expression parsing completion event.
-     * @callback EndRegexPatternParseListener
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {RegexParseResult} result - Regex pattern parsing result.
-     */
-    export type EndRegexPatternParseListener = ((event: ng.IAngularEvent, result: RegexParseResult, isAborted: boolean) => void) & Function;
-
-    /**
-     * Callback method for a regular expression parsing completion event.
-     * @callback ThisEndRegexPatternParseListener
-     * @template T
-     * @this T
-     * @param {ng.IAngularEvent} event - Information about the source of the event.
-     * @param {RegexParseResult} result - Regex pattern parsing result.
-     */
-    export type ThisEndRegexPatternParseListener<T> = ((this: T, event: ng.IAngularEvent, result: RegexParseResult,
-        isAborted: boolean) => void) & Function;
-
-    /**
-     * Callback method for current regular expression parsing completion.
-     * @callback ParserReadyListener
-     * @param {RegexParseResult} result - Regex pattern parsing result.
-     */
-    export type ParserReadyListener = ((result: RegexParseResult) => void) & Function;
-
-    /**
-     * Callback method for current regular expression parsing completion.
-     * @callback ThisParserReadyListener
-     * @template T
-     * @this T
-     * @param {RegexParseResult} result - Regex pattern parsing result.
-     */
-    export type ThisParserReadyListener<T> = ((this: T, result: RegexParseResult) => void) & Function;
 
     /**
      * Service for parsing regular expression patterns.
@@ -435,14 +475,21 @@ module regexTester {
      * @class RegexParserService
      */
     export class RegexParserService {
-        private _parseId: symbol;
+        //private _parseId: symbol;
         private _flags: RegexFlags = new RegexFlags();
         private _pattern = '(?:)';
-        private _isParsing = false;
+        private _inputText: string;
+        private _matchIndex: number = -1;
+        private _groups: MatchGroup[] = [];
+        private _success = false;
+        private _replacedText: JsLine[] = [];
+        //private _isParsing = false;
         private _regex: RegExp;
         private _hasFault = false;
         private _faultReason: any;
-        private readonly _taskId: symbol = Symbol();
+        //private readonly _taskId: symbol = Symbol();
+        private _mode: RegexEvaluationMode = RegexEvaluationMode.match;
+
         readonly [Symbol.toStringTag]: string = app.ServiceNames.regexParser;
 
         /**
@@ -451,12 +498,11 @@ module regexTester {
          * @param {app.SupplantableTaskService} supplantablePromiseChainService
          * @memberof RegexParserService
          */
-        constructor(private readonly $rootScope: ng.IRootScopeService,
-                private readonly supplantablePromiseChainService: app.SupplantablePromiseChainService) {
-            const initialResults: IRegexParseSuccessResult = {
-                pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
-            };
-            this._regex = initialResults.regex;
+        constructor(private readonly $rootScope: ng.IRootScopeService) {
+            //const initialResults: IRegexParseSuccessResult = {
+            //    pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
+            //};
+            this._regex = new RegExp(this._pattern, this._flags.flags);
         }
 
         /**
@@ -466,14 +512,26 @@ module regexTester {
          * @memberof RegexParserService
          */
         flags(value?: RegexFlags | string): RegexFlags {
+            let flags: RegexFlags;
             switch (typeof value) {
                 case 'string':
-                    this.startPatternParse(this._pattern, new RegexFlags(<string>value));
+                    flags = new RegexFlags(<string>value);
                     break;
                 case 'object':
-                    this.startPatternParse(this._pattern, <RegexFlags>value);
+                    if (value == null)
+                        return this._flags;
+                    flags = <RegexFlags>value;
                     break;
+                default:
+                    return this._flags;
             }
+            if (flags.flags === this._flags.flags)
+                return this._flags;
+            if (flags.global === this._flags.global && flags.ignoreCase === this._flags.ignoreCase && flags.multiline === this._flags.multiline && flags.sticky === this._flags.sticky && flags.unicode === this._flags.unicode) {
+                this._flags = flags;
+                return this._flags;
+            }
+            this.parsePattern();
             return this._flags;
         }
 
@@ -537,6 +595,14 @@ module regexTester {
             return this._flags.unicode;
         }
 
+        mode(value?: RegexEvaluationMode): RegexEvaluationMode {
+            if (typeof value === "number" && (isNaN(value) || value === this._mode))
+                return this._mode;
+            this._mode = value;
+            this.evaluatePattern();
+            return this._mode;
+        }
+
         /**
          * Gets or sets the regular expression pattern.
          * @param {string} [value] - The new regular expression pattern.
@@ -544,17 +610,73 @@ module regexTester {
          * @memberof RegexParserService
          */
         pattern(value?: string): string {
-            if (typeof value === 'string')
-                this.startPatternParse(value, this._flags);
+            if (typeof value !== 'string' || value === this._pattern)
+                return this._pattern;
+            this._pattern = value;
+            this.parsePattern();
             return this._pattern;
         }
 
-        /**
-         * Indicates whether the current regular expression pattern is still being parsed.
-         * @returns {boolean} true if the current regular expression pattern is still being parsed; otherwise, false.
-         * @memberof RegexParserService
-         */
-        isParsing(): boolean { return this._isParsing; }
+        inputText(value?: string): string {
+            if (typeof value !== 'string' || value === this._inputText)
+                return this._inputText;
+            this._inputText = value;
+            this.evaluatePattern();
+            return this._inputText;
+        }
+
+        parsePattern(): void {
+            try {
+                this._regex = new RegExp(this._pattern, this._flags.flags);
+                this._hasFault = false;
+                this._faultReason = "";
+            } catch (e) {
+                this._hasFault = true;
+                this._faultReason = e;
+            }
+        }
+        
+        evaluatePattern(): void {
+            this._matchIndex = -1;
+            this._success = false;
+            if (this._mode === RegexEvaluationMode.replace)
+                while (this._replacedText.length > 0)
+                    this._replacedText.pop();
+            switch (this._mode) {
+                case RegexEvaluationMode.replace:
+                    break;
+                case RegexEvaluationMode.split:
+                    break;
+                default:
+                    while (this._groups.length > 0)
+                        this._groups.pop();
+                    break;
+            }
+            if (this._hasFault)
+                return;
+            switch (this._mode) {
+                case RegexEvaluationMode.replace:
+                    break;
+                case RegexEvaluationMode.split:
+                    break;
+                default:
+                    let matchArr: RegExpMatchArray = this._inputText.match(this._regex);
+                    if (typeof matchArr !== "object" || matchArr === null)
+                        return;
+                    this._success = true;
+                    this._matchIndex = matchArr.index;
+                    for (let i: number = 0; i < matchArr.length; i++)
+                        this._groups.push(new MatchGroup(i, matchArr[i]));
+                    break;
+            }
+        }
+
+        ///**
+        // * Indicates whether the current regular expression pattern is still being parsed.
+        // * @returns {boolean} true if the current regular expression pattern is still being parsed; otherwise, false.
+        // * @memberof RegexParserService
+        // */
+        //isParsing(): boolean { return this._isParsing; }
 
         /**
          * Indicates whether the last regular expression parsing failed.
@@ -570,163 +692,163 @@ module regexTester {
          */
         faultReason(): any { return this._faultReason; }
 
-        private startPatternParse(regex: RegExp): void;
-        private startPatternParse(pattern: string, flags: RegexFlags): void;
-        private startPatternParse(arg0: string | RegExp, flags?: RegexFlags): RegExp {
-            const parseId: symbol = Symbol();
-            const previous: IRegexParseSuccessResult & { previous?: undefined } = {
-                flags: this._flags,
-                pattern: this._pattern,
-                regex: this._regex
-            };
-            let pattern: string;
-            if (typeof arg0 === 'string') {
-                this._pattern = pattern = arg0;
-                this._flags = flags;
-                if (arg0 === previous.pattern) {
-                    if (flags.flags === previous.flags.flags)
-                        return;
-                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
-                            flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
-                            flags.sticky == previous.flags.sticky) {
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, this._parseId);
-                        } catch { }
-                        return;
-                    }
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId); } catch { }
-                } else {
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    if (flags.flags !== previous.flags.flags) {
-                        try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId); } catch { }
-                        if (this._parseId === parseId)
-                            try {
-                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, arg0, parseId);
-                            } catch { }
-                    } else
-                        try { this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, arg0, parseId); } catch { }
-                }
-            } else {
-                this._pattern = pattern = (this._regex = arg0).source;
-                this._flags = flags = new RegexFlags(arg0);
-                if (this._hasFault) {
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    if ((this._flags = flags).flags !== previous.flags.flags)
-                        try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId); } catch { }
-                    if (this._parseId === parseId && pattern !== previous.pattern)
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, pattern, parseId);
-                        } catch { }
-                } else if (pattern === previous.pattern) {
-                    if (flags.flags === previous.flags.flags || (flags.global == previous.flags.global &&
-                            flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline &&
-                            flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky))
-                        return;
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId); } catch { }
-                } else {
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    this._pattern = pattern;
-                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
-                            flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
-                            flags.sticky == previous.flags.sticky)
-                        this._flags = flags = previous.flags;
-                    else {
-                        try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged2, previous.flags, flags, parseId); } catch { }
-                        if (this._parseId === parseId)
-                            try {
-                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, pattern, parseId);
-                            } catch { }
-                    }
-                    if (this._parseId === parseId)
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged2, previous.pattern, pattern, parseId);
-                        } catch { }
-                }
-            }
+        //private startPatternParse(regex: RegExp): void;
+        //private startPatternParse(pattern: string, flags: RegexFlags): void;
+        //private startPatternParse(arg0: string | RegExp, flags?: RegexFlags): RegExp {
+        //    const parseId: symbol = Symbol();
+        //    const previous: IRegexParseSuccessResult & { previous?: undefined } = {
+        //        flags: this._flags,
+        //        pattern: this._pattern,
+        //        regex: this._regex
+        //    };
+        //    let pattern: string;
+        //    if (typeof arg0 === 'string') {
+        //        this._pattern = pattern = arg0;
+        //        this._flags = flags;
+        //        if (arg0 === previous.pattern) {
+        //            if (flags.flags === previous.flags.flags)
+        //                return;
+        //            if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
+        //                    flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
+        //                    flags.sticky == previous.flags.sticky) {
+        //                try {
+        //                    this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, this._parseId);
+        //                } catch { }
+        //                return;
+        //            }
+        //            this._parseId = parseId;
+        //            this._isParsing = true;
+        //            try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
+        //        } else {
+        //            this._parseId = parseId;
+        //            this._isParsing = true;
+        //            if (flags.flags !== previous.flags.flags) {
+        //                try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
+        //                if (this._parseId === parseId)
+        //                    try {
+        //                        this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId);
+        //                    } catch { }
+        //            } else
+        //                try { this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId); } catch { }
+        //        }
+        //    } else {
+        //        this._pattern = pattern = (this._regex = arg0).source;
+        //        this._flags = flags = new RegexFlags(arg0);
+        //        if (this._hasFault) {
+        //            this._parseId = parseId;
+        //            this._isParsing = true;
+        //            if ((this._flags = flags).flags !== previous.flags.flags)
+        //                try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
+        //            if (this._parseId === parseId && pattern !== previous.pattern)
+        //                try {
+        //                    this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
+        //                } catch { }
+        //        } else if (pattern === previous.pattern) {
+        //            if (flags.flags === previous.flags.flags || (flags.global == previous.flags.global &&
+        //                    flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline &&
+        //                    flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky))
+        //                return;
+        //            this._parseId = parseId;
+        //            this._isParsing = true;
+        //            try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
+        //        } else {
+        //            this._parseId = parseId;
+        //            this._isParsing = true;
+        //            this._pattern = pattern;
+        //            if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
+        //                    flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
+        //                    flags.sticky == previous.flags.sticky)
+        //                this._flags = flags = previous.flags;
+        //            else {
+        //                try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
+        //                if (this._parseId === parseId)
+        //                    try {
+        //                        this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
+        //                    } catch { }
+        //            }
+        //            if (this._parseId === parseId)
+        //                try {
+        //                    this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
+        //                } catch { }
+        //        }
+        //    }
 
-            const svc: RegexParserService = this;
-            this.supplantablePromiseChainService.start<IRegexParseSuccessResult>(this._taskId,
-                function(resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
-                        reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
-                    try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse2, pattern, flags, parseId); } catch { }
-                    if (parseId !== svc._parseId)
-                        reject(<IRegexParseCanceledResult>{
-                            pattern: pattern,
-                            flags: flags,
-                            operationCanceled: true,
-                            previous: previous,
-                            reason: 'Operation canceled'
-                        });
-                    else if (typeof arg0 === 'string') {
-                        try {
-                            resolve({
-                                pattern: pattern,
-                                flags: flags,
-                                regex: new RegExp(pattern),
-                                previous: previous
-                            });
-                        } catch (e) {
-                            reject(<IRegexParseFailResult>{
-                                pattern: pattern,
-                                flags: flags,
-                                previous: previous,
-                                reason: e
-                            });
-                        }
-                    } else
-                        resolve({
-                            pattern: pattern,
-                            flags: flags,
-                            regex: arg0,
-                            previous: previous
-                        });
-            }).then(function (result: IRegexParseSuccessResult) {
-                if (parseId === svc._parseId) {
-                    svc._hasFault = svc._isParsing = false;
-                    svc._faultReason = undefined;
-                    svc._regex = result.regex;
-                    if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source ||
-                            result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase ||
-                            result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
-                            result.regex.sticky !== previous.regex.sticky)
-                        try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged2, previous.regex, result.regex, parseId);
-                        } catch { }
-                    try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
-                    try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId); } catch { }
-                } else {
-                    try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, <IRegexParseCanceledResult>{
-                            pattern: pattern,
-                            flags: flags,
-                            operationCanceled: true,
-                            previous: previous,
-                            reason: 'Operation canceled'
-                        }, parseId);
-                    } catch { }
-                }
-            }, function (result: IRegexParseCanceledResult | IRegexParseFailResult) {
-                if (parseId === svc._parseId) {
-                    svc._isParsing = false;
-                    if (!svc.isParseCancel(result)) {
-                        svc._hasFault = true;
-                        svc._faultReason = result.reason;
-                        try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError2, result, parseId); } catch { }
-                    }
-                }
-                try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse2, result, parseId); } catch { }
-            });
+        //    const svc: RegexParserService = this;
+        //    this.supplantablePromiseChainService.start<IRegexParseSuccessResult>(this._taskId,
+        //        function(resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
+        //                reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
+        //            try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse, pattern, flags, parseId); } catch { }
+        //            if (parseId !== svc._parseId)
+        //                reject(<IRegexParseCanceledResult>{
+        //                    pattern: pattern,
+        //                    flags: flags,
+        //                    operationCanceled: true,
+        //                    previous: previous,
+        //                    reason: 'Operation canceled'
+        //                });
+        //            else if (typeof arg0 === 'string') {
+        //                try {
+        //                    resolve({
+        //                        pattern: pattern,
+        //                        flags: flags,
+        //                        regex: new RegExp(pattern),
+        //                        previous: previous
+        //                    });
+        //                } catch (e) {
+        //                    reject(<IRegexParseFailResult>{
+        //                        pattern: pattern,
+        //                        flags: flags,
+        //                        previous: previous,
+        //                        reason: e
+        //                    });
+        //                }
+        //            } else
+        //                resolve({
+        //                    pattern: pattern,
+        //                    flags: flags,
+        //                    regex: arg0,
+        //                    previous: previous
+        //                });
+        //    }).then(function (result: IRegexParseSuccessResult) {
+        //        if (parseId === svc._parseId) {
+        //            svc._hasFault = svc._isParsing = false;
+        //            svc._faultReason = undefined;
+        //            svc._regex = result.regex;
+        //            if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source ||
+        //                    result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase ||
+        //                    result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
+        //                    result.regex.sticky !== previous.regex.sticky)
+        //                try {
+        //                    svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged, previous.regex, result.regex, parseId);
+        //                } catch { }
+        //            try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
+        //            try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId); } catch { }
+        //        } else {
+        //            try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
+        //            try {
+        //                svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, <IRegexParseCanceledResult>{
+        //                    pattern: pattern,
+        //                    flags: flags,
+        //                    operationCanceled: true,
+        //                    previous: previous,
+        //                    reason: 'Operation canceled'
+        //                }, parseId);
+        //            } catch { }
+        //        }
+        //    }, function (result: IRegexParseCanceledResult | IRegexParseFailResult) {
+        //        if (parseId === svc._parseId) {
+        //            svc._isParsing = false;
+        //            if (!svc.isParseCancel(result)) {
+        //                svc._hasFault = true;
+        //                svc._faultReason = result.reason;
+        //                try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError, result, parseId); } catch { }
+        //            }
+        //        }
+        //        try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId); } catch { }
+        //    });
 
-            return this._regex;
-        }
+        //    return this._regex;
+        //}
 
         /**
          * Gets or sets the Regular Expression object.
@@ -735,242 +857,246 @@ module regexTester {
          * @memberof RegexParserService
          */
         regex(value?: RegExp): RegExp {
-            if (typeof value === 'object' && value !== null && value instanceof RegExp)
-                this.startPatternParse(value);
+            if (typeof value === 'object' && value !== null && value instanceof RegExp) {
+                this._flags = new RegexFlags(value);
+                this._pattern = value.source;
+                this._hasFault = false;
+                this._faultReason = "";
+            }
             return this._regex;
         }
 
-        /**
-         * Indicates whether the results indicate a successful regular expression parsing.
-         * @param {RegexParseResult} result - The regular expression pattern parse result object.
-         * @returns {result is IRegexParseSuccessResult} true if the RegExp object was successfully constructed; otherwise, false.
-         * @memberof RegexParserService
-         */
-        isParseSuccess(result: RegexParseResult): result is IRegexParseSuccessResult {
-            return typeof (<IRegexParseSuccessResult>result).regex === 'object';
-        }
+        ///**
+        // * Indicates whether the results indicate a successful regular expression parsing.
+        // * @param {RegexParseResult} result - The regular expression pattern parse result object.
+        // * @returns {result is IRegexParseSuccessResult} true if the RegExp object was successfully constructed; otherwise, false.
+        // * @memberof RegexParserService
+        // */
+        //isParseSuccess(result: RegexParseResult): result is IRegexParseSuccessResult {
+        //    return typeof (<IRegexParseSuccessResult>result).regex === 'object';
+        //}
 
-        isParseCancel(result: RegexParseResult): result is IRegexParseCanceledResult {
-            return (<IRegexParseCanceledResult>result).operationCanceled === true;
-        }
+        //isParseCancel(result: RegexParseResult): result is IRegexParseCanceledResult {
+        //    return (<IRegexParseCanceledResult>result).operationCanceled === true;
+        //}
 
-        /**
-         * Listens for the flags change event.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {RegexFlagsChangedListener} callbackFn - The callback method to invoke when the flags change event is raised.
-         * @memberof RegexParserService
-         */
-        onRegexFlagsChanged($scope: ng.IScope, callbackFn: RegexFlagsChangedListener): void;
+        ///**
+        // * Listens for the flags change event.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {RegexFlagsChangedListener} callbackFn - The callback method to invoke when the flags change event is raised.
+        // * @memberof RegexParserService
+        // */
+        //onRegexFlagsChanged($scope: ng.IScope, callbackFn: RegexFlagsChangedListener): void;
 
-        /**
-         * Listens for the flags change event.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisRegexFlagsChangedListener<T>} callbackFn - The callback method to invoke when the flags value has changed.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onRegexFlagsChanged<T>($scope: ng.IScope, callbackFn: ThisRegexFlagsChangedListener<T>, thisObj: T): void;
-        onRegexFlagsChanged($scope: ng.IScope, callbackFn: RegexFlagsChangedListener | ThisRegexFlagsChangedListener<any>,
-                thisObj?: any): void {
-            if (arguments.length < 3) {
-                $scope.$on(app.EventNames.regexFlagsChanged2, callbackFn);
-            } else {
-                $scope.$on(app.EventNames.regexFlagsChanged2, (event: ng.IAngularEvent, oldValue: RegexFlags,
-                        newValue: RegexFlags): void => {
-                    callbackFn.call(thisObj, event, oldValue, newValue);
-                });
-            }
-        }
+        ///**
+        // * Listens for the flags change event.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisRegexFlagsChangedListener<T>} callbackFn - The callback method to invoke when the flags value has changed.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onRegexFlagsChanged<T>($scope: ng.IScope, callbackFn: ThisRegexFlagsChangedListener<T>, thisObj: T): void;
+        //onRegexFlagsChanged($scope: ng.IScope, callbackFn: RegexFlagsChangedListener | ThisRegexFlagsChangedListener<any>,
+        //        thisObj?: any): void {
+        //    if (arguments.length < 3) {
+        //        $scope.$on(app.EventNames.regexFlagsChanged, callbackFn);
+        //    } else {
+        //        $scope.$on(app.EventNames.regexFlagsChanged, (event: ng.IAngularEvent, oldValue: RegexFlags,
+        //                newValue: RegexFlags): void => {
+        //            callbackFn.call(thisObj, event, oldValue, newValue);
+        //        });
+        //    }
+        //}
 
-        /**
-         * Listens for the regular expression pattern change event.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {RegexPatternChangedListener} callbackFn - The callback method to invoke when the regular expression pattern has changed.
-         * @memberof RegexParserService
-         */
-        onRegexPatternChanged($scope: ng.IScope, callbackFn: RegexPatternChangedListener): void;
+        ///**
+        // * Listens for the regular expression pattern change event.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {RegexPatternChangedListener} callbackFn - The callback method to invoke when the regular expression pattern has changed.
+        // * @memberof RegexParserService
+        // */
+        //onRegexPatternChanged($scope: ng.IScope, callbackFn: RegexPatternChangedListener): void;
 
-        /**
-         * Listens for the regular expression pattern change event.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisRegexPatternChangedListener<T>} callbackFn - The callback method to invoke when the regular expression pattern has
-         *      changed.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onRegexPatternChanged<T>($scope: ng.IScope, callbackFn: ThisRegexPatternChangedListener<T>, thisObj: T): void;
-        onRegexPatternChanged($scope: ng.IScope, callbackFn: RegexPatternChangedListener | ThisRegexPatternChangedListener<any>,
-                thisObj?: any): void {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternChanged2, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexPatternChanged2, (event: ng.IAngularEvent, oldValue: string, newValue: string): void => {
-                    callbackFn.call(thisObj, event, oldValue, newValue);
-                });
-        }
+        ///**
+        // * Listens for the regular expression pattern change event.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisRegexPatternChangedListener<T>} callbackFn - The callback method to invoke when the regular expression pattern has
+        // *      changed.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onRegexPatternChanged<T>($scope: ng.IScope, callbackFn: ThisRegexPatternChangedListener<T>, thisObj: T): void;
+        //onRegexPatternChanged($scope: ng.IScope, callbackFn: RegexPatternChangedListener | ThisRegexPatternChangedListener<any>,
+        //        thisObj?: any): void {
+        //    if (arguments.length < 3)
+        //        $scope.$on(app.EventNames.regexPatternChanged, callbackFn);
+        //    else
+        //        $scope.$on(app.EventNames.regexPatternChanged, (event: ng.IAngularEvent, oldValue: string, newValue: string): void => {
+        //            callbackFn.call(thisObj, event, oldValue, newValue);
+        //        });
+        //}
 
-        /**
-         * Listens for the event that is raised before a an attempt to construct new RegExp for the regex property.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {StartRegexPatternParseListener} callbackFn - The callback method to invoke before an attempt to construct new RegExp
-         *      for the regex property.
-         * @memberof RegexParserService
-         */
-        onStartRegexPatternParse($scope: ng.IScope, callbackFn: StartRegexPatternParseListener): void;
+        ///**
+        // * Listens for the event that is raised before a an attempt to construct new RegExp for the regex property.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {StartRegexPatternParseListener} callbackFn - The callback method to invoke before an attempt to construct new RegExp
+        // *      for the regex property.
+        // * @memberof RegexParserService
+        // */
+        //onStartRegexPatternParse($scope: ng.IScope, callbackFn: StartRegexPatternParseListener): void;
 
-        /**
-         * Listens for the event that is raised before a an attempt to construct new RegExp for the regex property.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisStartRegexPatternParseListener<T>} callbackFn - The callback method to invoke before an attempt to construct new
-         *      RegExp for the regex property.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onStartRegexPatternParse<T>($scope: ng.IScope, callbackFn: ThisStartRegexPatternParseListener<T>, thisObj: T): void;
-        onStartRegexPatternParse($scope: ng.IScope, callbackFn: StartRegexPatternParseListener | ThisStartRegexPatternParseListener<any>,
-                thisObj?: any): void {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.startRegexPatternParse2, callbackFn);
-            else
-                $scope.$on(app.EventNames.startRegexPatternParse2, (event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void => {
-                    callbackFn.call(thisObj, event, pattern, flags);
-                });
-        }
+        ///**
+        // * Listens for the event that is raised before a an attempt to construct new RegExp for the regex property.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisStartRegexPatternParseListener<T>} callbackFn - The callback method to invoke before an attempt to construct new
+        // *      RegExp for the regex property.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onStartRegexPatternParse<T>($scope: ng.IScope, callbackFn: ThisStartRegexPatternParseListener<T>, thisObj: T): void;
+        //onStartRegexPatternParse($scope: ng.IScope, callbackFn: StartRegexPatternParseListener | ThisStartRegexPatternParseListener<any>,
+        //        thisObj?: any): void {
+        //    if (arguments.length < 3)
+        //        $scope.$on(app.EventNames.startRegexPatternParse, callbackFn);
+        //    else
+        //        $scope.$on(app.EventNames.startRegexPatternParse, (event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void => {
+        //            callbackFn.call(thisObj, event, pattern, flags);
+        //        });
+        //}
 
-        /**
-         * Listens for the parsed regex object change event.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {RegexObjectChangedListener} callbackFn - The callback method to invoke when the parsed regex object has changed.
-         * @memberof RegexParserService
-         */
-        onRegexObjectChanged($scope: ng.IScope, callbackFn: RegexObjectChangedListener): void;
+        ///**
+        // * Listens for the parsed regex object change event.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {RegexObjectChangedListener} callbackFn - The callback method to invoke when the parsed regex object has changed.
+        // * @memberof RegexParserService
+        // */
+        //onRegexObjectChanged($scope: ng.IScope, callbackFn: RegexObjectChangedListener): void;
 
-        /**
-         * Listens for the parsed regex object change event.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisRegexObjectChangedListener<T>} callbackFn - The callback method to invoke when the parsed regex object has changed.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onRegexObjectChanged<T>($scope: ng.IScope, callbackFn: ThisRegexObjectChangedListener<T>, thisObj: T): void;
-        onRegexObjectChanged($scope: ng.IScope, callbackFn: RegexObjectChangedListener | ThisRegexObjectChangedListener<any>,
-                thisObj?: any): void {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexObjectChanged2, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexObjectChanged2, (event: ng.IAngularEvent, oldValue: RegExp, newValue: RegExp): void => {
-                    callbackFn.call(thisObj, event, oldValue, newValue);
-                });
-        }
+        ///**
+        // * Listens for the parsed regex object change event.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisRegexObjectChangedListener<T>} callbackFn - The callback method to invoke when the parsed regex object has changed.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onRegexObjectChanged<T>($scope: ng.IScope, callbackFn: ThisRegexObjectChangedListener<T>, thisObj: T): void;
+        //onRegexObjectChanged($scope: ng.IScope, callbackFn: RegexObjectChangedListener | ThisRegexObjectChangedListener<any>,
+        //        thisObj?: any): void {
+        //    if (arguments.length < 3)
+        //        $scope.$on(app.EventNames.regexObjectChanged, callbackFn);
+        //    else
+        //        $scope.$on(app.EventNames.regexObjectChanged, (event: ng.IAngularEvent, oldValue: RegExp, newValue: RegExp): void => {
+        //            callbackFn.call(thisObj, event, oldValue, newValue);
+        //        });
+        //}
 
-        /**
-         * Listens for the regular expression pattern parse error event.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {RegexPatternParseErrorListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
-         *      failed.
-         * @memberof RegexParserService
-         */
-        onRegexPatternParseError($scope: ng.IScope, callbackFn: RegexPatternParseErrorListener): void;
+        ///**
+        // * Listens for the regular expression pattern parse error event.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {RegexPatternParseErrorListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
+        // *      failed.
+        // * @memberof RegexParserService
+        // */
+        //onRegexPatternParseError($scope: ng.IScope, callbackFn: RegexPatternParseErrorListener): void;
 
-        /**
-         * Listens for the regular expression pattern parse error event.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisRegexPatternParseErrorListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
-         *      parsing failed.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onRegexPatternParseError<T>($scope: ng.IScope, callbackFn: ThisRegexPatternParseErrorListener<T>, thisObj: T): void;
-        onRegexPatternParseError($scope: ng.IScope, callbackFn: RegexPatternParseErrorListener | ThisRegexPatternParseErrorListener<any>,
-                thisObj?: any): void {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternParseError2, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexPatternParseError2, (event: ng.IAngularEvent, result: IRegexParseFailResult): void => {
-                    callbackFn.call(thisObj, event, result);
-                });
-        }
+        ///**
+        // * Listens for the regular expression pattern parse error event.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisRegexPatternParseErrorListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
+        // *      parsing failed.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onRegexPatternParseError<T>($scope: ng.IScope, callbackFn: ThisRegexPatternParseErrorListener<T>, thisObj: T): void;
+        //onRegexPatternParseError($scope: ng.IScope, callbackFn: RegexPatternParseErrorListener | ThisRegexPatternParseErrorListener<any>,
+        //        thisObj?: any): void {
+        //    if (arguments.length < 3)
+        //        $scope.$on(app.EventNames.regexPatternParseError, callbackFn);
+        //    else
+        //        $scope.$on(app.EventNames.regexPatternParseError, (event: ng.IAngularEvent, result: IRegexParseFailResult): void => {
+        //            callbackFn.call(thisObj, event, result);
+        //        });
+        //}
 
-        /**
-         * Listens for the regular expression pattern parse error event.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {RegexPatternParseErrorListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
-         *      failed.
-         * @memberof RegexParserService
-         */
-        onRegexPatternParseSuccess($scope: ng.IScope, callbackFn: RegexPatternParseSuccessListener): void;
+        ///**
+        // * Listens for the regular expression pattern parse error event.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {RegexPatternParseErrorListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
+        // *      failed.
+        // * @memberof RegexParserService
+        // */
+        //onRegexPatternParseSuccess($scope: ng.IScope, callbackFn: RegexPatternParseSuccessListener): void;
 
-        /**
-         * Listens for the regular expression pattern parse error event.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisRegexPatternParseErrorListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
-         *      parsing failed.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onRegexPatternParseSuccess<T>($scope: ng.IScope, callbackFn: ThisRegexPatternParseSuccessListener<T>, thisObj: T): void;
-        onRegexPatternParseSuccess($scope: ng.IScope,
-                callbackFn: RegexPatternParseSuccessListener | ThisRegexPatternParseSuccessListener<any>, thisObj?: any): void {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternParseSuccess, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexPatternParseSuccess, (event: ng.IAngularEvent, result: IRegexParseSuccessResult): void => {
-                        callbackFn.call(thisObj, event, result);
-                });
-        }
+        ///**
+        // * Listens for the regular expression pattern parse error event.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisRegexPatternParseErrorListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
+        // *      parsing failed.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onRegexPatternParseSuccess<T>($scope: ng.IScope, callbackFn: ThisRegexPatternParseSuccessListener<T>, thisObj: T): void;
+        //onRegexPatternParseSuccess($scope: ng.IScope,
+        //        callbackFn: RegexPatternParseSuccessListener | ThisRegexPatternParseSuccessListener<any>, thisObj?: any): void {
+        //    if (arguments.length < 3)
+        //        $scope.$on(app.EventNames.regexPatternParseSuccess, callbackFn);
+        //    else
+        //        $scope.$on(app.EventNames.regexPatternParseSuccess, (event: ng.IAngularEvent, result: IRegexParseSuccessResult): void => {
+        //                callbackFn.call(thisObj, event, result);
+        //        });
+        //}
 
-        /**
-         * Listens for the regular expression pattern parsing completion event.
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {EndRegexPatternParseListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
-         *      attempt has completed.
-         * @memberof RegexParserService
-         */
-        onEndRegexPatternParse($scope: ng.IScope, callbackFn: EndRegexPatternParseListener): void;
+        ///**
+        // * Listens for the regular expression pattern parsing completion event.
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {EndRegexPatternParseListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
+        // *      attempt has completed.
+        // * @memberof RegexParserService
+        // */
+        //onEndRegexPatternParse($scope: ng.IScope, callbackFn: EndRegexPatternParseListener): void;
 
-        /**
-         * Listens for the regular expression pattern parsing completion event.
-         * @template T
-         * @param {ng.IScope} $scope - The scope to listen on.
-         * @param {ThisEndRegexPatternParseListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
-         *      parsing attempt has completed.
-         * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-         * @memberof RegexParserService
-         */
-        onEndRegexPatternParse<T>($scope: ng.IScope, callbackFn: ThisEndRegexPatternParseListener<T>, thisObj: T): void;
-        onEndRegexPatternParse($scope: ng.IScope, callbackFn: EndRegexPatternParseListener | ThisEndRegexPatternParseListener<any>,
-                thisObj?: any): void {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.endRegexPatternParse2, callbackFn);
-            else
-                $scope.$on(app.EventNames.endRegexPatternParse2, (event: ng.IAngularEvent, result: RegexParseResult,
-                        isAborted: boolean): void => {
-                    callbackFn.call(thisObj, event, result, isAborted);
-                });
-        }
+        ///**
+        // * Listens for the regular expression pattern parsing completion event.
+        // * @template T
+        // * @param {ng.IScope} $scope - The scope to listen on.
+        // * @param {ThisEndRegexPatternParseListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
+        // *      parsing attempt has completed.
+        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
+        // * @memberof RegexParserService
+        // */
+        //onEndRegexPatternParse<T>($scope: ng.IScope, callbackFn: ThisEndRegexPatternParseListener<T>, thisObj: T): void;
+        //onEndRegexPatternParse($scope: ng.IScope, callbackFn: EndRegexPatternParseListener | ThisEndRegexPatternParseListener<any>,
+        //        thisObj?: any): void {
+        //    if (arguments.length < 3)
+        //        $scope.$on(app.EventNames.endRegexPatternParse, callbackFn);
+        //    else
+        //        $scope.$on(app.EventNames.endRegexPatternParse, (event: ng.IAngularEvent, result: RegexParseResult,
+        //                isAborted: boolean): void => {
+        //            callbackFn.call(thisObj, event, result, isAborted);
+        //        });
+        //}
     }
 
-    interface IParseOperationSuccess {
-        regex: RegExp;
-        previous?: RegexParseResult;
-    }
+    //interface IParseOperationSuccess {
+    //    regex: RegExp;
+    //    previous?: RegexParseResult;
+    //}
 
-    interface IParseOperationFail {
-        reason?: any;
-        previous?: RegexParseResult;
-    }
+    //interface IParseOperationFail {
+    //    reason?: any;
+    //    previous?: RegexParseResult;
+    //}
 
-    type ParseOperation = IParseOperationSuccess | IParseOperationFail;
+    //type ParseOperation = IParseOperationSuccess | IParseOperationFail;
 
-    function isParseOperationSuccess(value: ParseOperation): value is IParseOperationSuccess {
-        return typeof (<IParseOperationSuccess>value).regex !== 'undefined';
-    }
+    //function isParseOperationSuccess(value: ParseOperation): value is IParseOperationSuccess {
+    //    return typeof (<IParseOperationSuccess>value).regex !== 'undefined';
+    //}
 
     /**
      * Defines the scope common to all regular expression controllers.
@@ -980,7 +1106,6 @@ module regexTester {
      */
     export interface IRegexControllerScope extends ng.IScope {
         flags: string;
-        isParsing: boolean;
         parseErrorMessage: string;
         showParseError: boolean;
     }
@@ -1015,10 +1140,10 @@ module regexTester {
         constructor(protected readonly $scope: TScope, protected readonly regexParser: RegexParserService,
                 pageLocationService: app.PageLocationService, subTitle: string) {
             pageLocationService.pageTitle('Regular Expression Evaluator', subTitle);
-            regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
-            regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
-            regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
-            $scope.isParsing = regexParser.isParsing();
+            //regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
+            //regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
+            //regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
+            //$scope.isParsing = regexParser.isParsing();
             $scope.flags = regexParser.flags().flags;
             if (regexParser.hasFault())
                 this.setError(regexParser.faultReason());
@@ -1051,27 +1176,27 @@ module regexTester {
             this.setError('Unknown parse failure.');
         }
 
-        protected onRegexFlagsChanged(event: ng.IAngularEvent, oldValue: RegexFlags, newValue: RegexFlags): void {
-            this.$scope.flags = this.regexParser.flags().flags;
-        }
+        //protected onRegexFlagsChanged(event: ng.IAngularEvent, oldValue: RegexFlags, newValue: RegexFlags): void {
+        //    this.$scope.flags = this.regexParser.flags().flags;
+        //}
 
         // protected onRegexPatternChanged(event: ng.IAngularEvent, oldValue: string, newValue: string): void { }
 
-        protected onStartRegexPatternParse(event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void {
-            this.$scope.showParseError = false;
-            this.$scope.isParsing = this.regexParser.isParsing();
-        }
+        //protected onStartRegexPatternParse(event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void {
+        //    this.$scope.showParseError = false;
+        //    this.$scope.isParsing = this.regexParser.isParsing();
+        //}
 
-        protected onEndRegexPatternParse(event: ng.IAngularEvent, result: RegexParseResult): void {
-            this.$scope.isParsing = this.regexParser.isParsing();
-            if (this.regexParser.hasFault()) {
-                this.$scope.showParseError = true;
-                this.setError(this.regexParser.faultReason());
-            } else {
-                this.$scope.showParseError = false;
-                this.$scope.parseErrorMessage = '';
-            }
-        }
+        //protected onEndRegexPatternParse(event: ng.IAngularEvent, result: RegexParseResult): void {
+        //    this.$scope.isParsing = this.regexParser.isParsing();
+        //    if (this.regexParser.hasFault()) {
+        //        this.$scope.showParseError = true;
+        //        this.setError(this.regexParser.faultReason());
+        //    } else {
+        //        this.$scope.showParseError = false;
+        //        this.$scope.parseErrorMessage = '';
+        //    }
+        //}
 
         $doCheck(): void { }
     }
