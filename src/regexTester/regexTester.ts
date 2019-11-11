@@ -456,22 +456,6 @@ module regexTester {
             return lines;
         }
     }
-
-    export class EvaluationState {
-        private _isEvaluated = false;
-        private _token = Symbol();
-
-        get isEvaluated(): boolean { return this._isEvaluated; }
-        set isEvaluated(value: boolean) {
-            if (this._isEvaluated === value)
-                return;
-            this._isEvaluated = value;
-            if (value)
-            this._token = Symbol();
-        }
-
-        get token(): symbol { return this._token; }
-    }
     export class MatchGroup {
         private _text: JsLine[];
         private _isMatch: boolean;
@@ -485,30 +469,144 @@ module regexTester {
     }
 
     /**
+     * Class to track changes to a value.
+     * @class
+     * @template T - The type of value to be tracked.
+     */
+    export class ValueVersion<V> {
+        private _equalityCb: (x: V, y: V) => boolean;
+        private _versionToken: symbol = Symbol();
+
+        /**
+         * Gets or sets the current value.
+         * @memberof ValueVersion;
+         * @type {V}
+         */
+        get value(): V { return this._value; }
+        set value(value: V) {
+            if (this._equalityCb(this._value, value) === true)
+                return;
+            this._value = value;
+            this._versionToken = Symbol();
+        }
+        
+        /**
+         * Gets a symbol that is used to track when the associated value has changed.
+         * @memberof ValueVersion;
+         * @type {symbol}
+         */
+        get versionToken(): symbol { return this._versionToken; }
+
+        constructor(private _value: V, equalityCb?: (x: V, y: V) => boolean) {
+            this._equalityCb = (typeof equalityCb === "function") ? equalityCb : function (x: V, y: V) {
+                return x === y;
+            };
+        }
+
+        /**
+         * Sets the current value
+         * @param value - The value to set.
+         * @returns {boolean} true if the value has changed; otherwise, false if the current value was the same.
+         */
+        protected setValue(value: V): boolean {
+            let token: symbol = this._versionToken;
+            this.value = value;
+            return token !== this._versionToken;
+        }
+    }
+    
+    export class ValueProducer<R> {
+        private _versionToken: symbol = Symbol();
+        /**
+         * Gets or sets the current value.
+         * @memberof ValueVersion;
+         * @type {R}
+         */
+        get value(): R { return this._value; }
+        set value(value: R) {
+            if (this._resultEqualityCb(this._value, value) === true)
+                return;
+            this._value = value;
+            this._versionToken = Symbol();
+        }
+
+        /**
+         * Gets a symbol that is used to track when the associated value has changed.
+         * @memberof ValueVersion;
+         * @type {symbol}
+         */
+        get versionToken(): symbol { return this._versionToken; }
+
+        private constructor(private readonly _resultEqualityCb: (x: R, y: R) => boolean, private readonly _producers: ValueProducer<any>[],
+            private readonly _resolver?: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, producerResults: { value: any; token: symbol; }[]) => void) {
+        }
+        getValue($q: ng.IQService): ng.IPromise<{ value: R; token: symbol; }> {
+            if (this._producers.length == 0)
+        }
+        static create<V1, V2, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, v1: V1, v2: V2) => void, equalityComparer: (x: R, y: R) => boolean, p1: ValueProducer<V1>, p2: ValueProducer<V2>): ValueProducer<R>
+        static create<V1, V2, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, v1: V1, v2: V2) => void, p1: ValueProducer<V1>, p2: ValueProducer<V2>): ValueProducer<R>
+        static create<V, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void, equalityComparer: (x: R, y: R) => boolean, producer: ValueProducer<V>): ValueProducer<R>;
+        static create<V, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void, producer: ValueProducer<V>): ValueProducer<R>;
+        static create<R>(equalityComparer?: (x: R, y: R) => boolean): ValueProducer<R>;
+        static create(arg0?: ((resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<any>, ...values: any[]) => void) | ((x: any, y: any) => boolean), arg1?: ValueProducer<any> | ((x: any, y: any) => boolean), ...producers: ValueProducer<any>[]): ValueProducer<any> {
+            if (arguments.length == 0)
+                return new ValueProducer<any>(function (x: any, y: any): boolean { return x === y; }, []);
+            if (arguments.length == 1)
+                return new ValueProducer<any>(<(x: any, y: any) => boolean>arg0, []);
+            if (typeof arg1 === "function")
+                return new ValueProducer<any>(<(x: any, y: any) => boolean>arg1, producers, <(resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void>arg0);
+            return new ValueProducer<any>(function (x: any, y: any): boolean { return x === y; }, (typeof producers === "object" && producers !== null && producers.length > 0) ? [arg1].concat(producers) : [arg1], <(resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void>arg0);
+        }
+    }
+
+    export class EvaluationState<R> {
+        private _versionTokens: symbol[];
+        private _result: ValueVersion<R>;
+
+        get result(): R { return this._result.value; }
+
+        private constructor(private readonly _resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, ...components: ValueVersion<any>[]) => void, private readonly _resultEqualityCb: (x: R, y: R) => boolean, private readonly _components: ValueVersion<any>[]) { }
+
+        static create<V0, C0 extends ValueVersion<V0>, V1, C1 extends ValueVersion<V1>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c0: C0, c1: C1) => void, resultEqualityCb: (x: R, y: R) => boolean, c0: C0, c1: C1): EvaluationState<R>;
+        static create<V0, C0 extends ValueVersion<V0>, V1, C1 extends ValueVersion<V1>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c0: C0, c1: C1) => void, c0: C0, c1: C1): EvaluationState<R>;
+        static create<V, C extends ValueVersion<V>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c: C) => void, resultEqualityCb: (x: R, y: R) => boolean, c: C): EvaluationState<R>;
+        static create<V, C extends ValueVersion<V>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c: C) => void, c: C): EvaluationState<R>;
+        static create<R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, ...components: ValueVersion<any>[]) => void, arg1: ValueVersion<any> | ((x: R, y: R) => boolean), ...argN: any[]): EvaluationState<R> {
+            if (typeof arg1 === "function")
+                return new EvaluationState<R>(resolver, arg1, argN);
+            return new EvaluationState<R>(resolver, function (x: R, y: R): boolean { return x === y; }, (typeof argN === "object" && argN !== null && argN.length > 0) ? [arg1].concat(argN) : [arg1]);
+        }
+
+        checkChange($q: ng.IQService): ng.IPromise<{ value: R, isChanged?: boolean }>  {
+            return $q<{ value: R, isChanged?: boolean }>(function (resolve: ng.IQResolveReject<{ value: R, isChanged?: boolean }>, reject: ng.IQResolveReject<any>) {
+
+            });
+        }
+    }
+    
+    /**
      * Service for parsing regular expression patterns.
      * @export
      * @class RegexParserService
      */
     export class RegexParserService {
         // private _parseId: symbol;
-        private _flags: RegexFlags = new RegexFlags();
-        private _pattern = '(?:)';
-        private _inputText = '';
-        private _matchGroups: RegExpMatchArray | null = null;
+        private _flags: ValueVersion<RegexFlags> = new ValueVersion<RegexFlags>(new RegexFlags(), function (x: RegexFlags, y: RegexFlags): boolean {
+        });
+        private _pattern: ValueVersion<string> = new ValueVersion<string>('(?:)');
+        private _inputText: ValueVersion<string> = new ValueVersion<string>('');
+        private _matchGroups: ValueVersion<RegExpMatchArray | null> = new ValueVersion<RegExpMatchArray | null>(null);
         private _matchEvaluation = new EvaluationState();
         private _replacementEvaluation = new EvaluationState();
-        private _replaceWith = '';
-        private _replacedText = '';
+        private _replaceWith: ValueVersion<string> = new ValueVersion<string>('');
+        private _replacedText: ValueVersion<string> = new ValueVersion<string>('');
         private _splitEvaluation = new EvaluationState();
-        private _splitLimit = NaN;
-        private _splitText: string[] = [];
-        // private _isParsing = false;
-        private _regex: RegExp;
-        private _regexChangeToken = Symbol();
-        private _hasFault = false;
-        private _faultReason: any;
-        // private readonly _taskId: symbol = Symbol();
-        private _mode: RegexEvaluationMode = RegexEvaluationMode.match;
+        private _splitLimit: ValueVersion<number> = new ValueVersion<number>(NaN);
+        private _splitText: ValueVersion<string[]> = new ValueVersion<string[]>([]);
+        private _regex: ValueVersion<RegExp>;
+        private _hasFault: ValueVersion<boolean> = new ValueVersion<boolean>(false);
+        private _faultReason: ValueVersion<any>;
+        private _mode: ValueVersion<RegexEvaluationMode> = new ValueVersion<RegexEvaluationMode>(RegexEvaluationMode.match);
 
         readonly [Symbol.toStringTag]: string = app.ServiceNames.regexParser;
 
