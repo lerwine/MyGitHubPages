@@ -1505,7 +1505,7 @@ describe('MyGitHubPages regexTester', function () {
                     cB.resolve(1);
                     const token: symbol = target.versionToken;
                     target.getValueAsync(q).then(function(promiseValue: { value: number; token: symbol; }): void {
-                        expect(promiseValue.value).toEqual(5);
+                        expect(promiseValue.value).toEqual(3);
                         expect(token).toEqual(promiseValue.token);
                         done();
                     }, function(reason: any): void {

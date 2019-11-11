@@ -1540,7 +1540,7 @@ describe('MyGitHubPages regexTester', function () {
                     cB.resolve(1);
                     const token = target.versionToken;
                     target.getValueAsync(q).then(function (promiseValue) {
-                        expect(promiseValue.value).toEqual(5);
+                        expect(promiseValue.value).toEqual(3);
                         expect(token).toEqual(promiseValue.token);
                         done();
                     }, function (reason) {
