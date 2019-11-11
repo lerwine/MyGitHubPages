@@ -182,259 +182,6 @@ module regexTester {
         }
     }
 
-    ///**
-    // * Results of regular expression pattern parsing.
-    // * @export
-    // * @interface IRegexParseResult
-    // */
-    //export interface IRegexParseResult {
-    //    /**
-    //     * Regex option flags used when constructing the RegExp object.
-    //     * @type {RegexFlags}
-    //     * @memberof IRegexParseResult
-    //     */
-    //    flags: RegexFlags;
-
-    //    /**
-    //     * The regular expression pattern that was parsed.
-    //     * @type {string}
-    //     * @memberof IRegexParseResult
-    //     */
-    //    pattern: string;
-
-    //    /**
-    //     * The result of the previous successfully parsed pattern.
-    //     * @type {IRegexParseSuccessResult}
-    //     * @memberof IRegexParseResult
-    //     */
-    //    previous?: IRegexParseSuccessResult & { previous?: undefined };
-
-    //    /**
-    //     * Indicates whether the source pattern or flags was changed before parsing was completed.
-    //     * @type {boolean}
-    //     * @memberof IRegexParseResult
-    //     */
-    //    operationCanceled?: boolean;
-    //}
-
-    ///**
-    // * Results of a successful regular expression pattern parsing.
-    // * @export
-    // * @interface IRegexParseSuccessResult
-    // * @extends {IRegexParseResult}
-    // */
-    //export interface IRegexParseSuccessResult extends IRegexParseResult {
-    //    /**
-    //     * The constructed regular expression object.
-    //     * @type {RegExp}
-    //     * @memberof IRegexParseSuccessResult
-    //     */
-    //    regex: RegExp;
-
-    //    /**
-    //     * Indicates that neither the source pattern nor flags was not changed before parsing was completed.
-    //     * @type {false}
-    //     * @memberof IRegexParseSuccessResult
-    //     */
-    //    operationCanceled?: false;
-    //}
-
-    ///**
-    // * Results of a failed regular expression parsing.
-    // * @export
-    // * @interface IRegexParseFailResult
-    // * @extends {IRegexParseResult}
-    // */
-    //export interface IRegexParseFailResult extends IRegexParseResult {
-    //    /**
-    //     * The reason for the failure.
-    //     * @type {*}
-    //     * @memberof IRegexParseFailResult
-    //     */
-    //    reason: any;
-
-    //    /**
-    //     * Indicates that neither the source pattern nor flags was not changed before parsing was completed.
-    //     * @type {false}
-    //     * @memberof IRegexParseFailResult
-    //     */
-    //    operationCanceled?: false;
-    //}
-
-    ///**
-    // * Results of a regular expression parsing that did not complete before the source pattern and/or flags was changed.
-    // * @export
-    // * @interface IRegexSourceChangedResult
-    // * @extends {IRegexParseResult}
-    // */
-    //export interface IRegexParseCanceledResult extends IRegexParseResult {
-    //    /**
-    //     * Indicates that the source pattern and/or flags was changed before parsing was completed.
-    //     * @type {"Operation canceled"}
-    //     * @memberof IRegexSourceChangedResult
-    //     */
-    //    reason: 'Operation canceled';
-
-    //    /**
-    //     * Indicates that the source pattern and/or flags was changed before parsing was completed.
-    //     * @type {true}
-    //     * @memberof IRegexSourceChangedResult
-    //     */
-    //    operationCanceled: true;
-    //}
-
-    ///**
-    // * Types of regular expression parsing results.
-    // * @typedef RegexParseResult
-    // */
-    //export type RegexParseResult = IRegexParseSuccessResult | IRegexParseCanceledResult | IRegexParseFailResult;
-
-    ///**
-    // * Callback method for a RegexFlags change event.
-    // * @callback RegexFlagsChangedListener
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {string} oldValue - The previous regular expression flags.
-    // * @param {string} newValue - The current regular expression flags.
-    // */
-    //export type RegexFlagsChangedListener = ((event: ng.IAngularEvent, oldValue: RegexFlags, newValue: RegexFlags) => void) & Function;
-
-    ///**
-    // * Callback method for a RegexFlags change event.
-    // * @callback ThisRegexFlagsChangedListener
-    // * @template T
-    // * @this T
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {string} oldValue - The previous regular expression flags.
-    // * @param {string} newValue - The current regular expression flags.
-    // */
-    //export type ThisRegexFlagsChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: RegexFlags,
-    //    newValue: RegexFlags) => void) & Function;
-
-    ///**
-    // * Callback method for a regular expression pattern change event.
-    // * @callback RegexFlagsChangedListener
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {string} oldValue - The previous regular expression pattern.
-    // * @param {string} newValue - The current regular expression pattern.
-    // */
-    //export type RegexPatternChangedListener = ((event: ng.IAngularEvent, oldValue: string, newValue: string) => void) & Function;
-
-    ///**
-    // * Callback method for a regular expression pattern change event.
-    // * @callback ThisRegexPatternChangedListener
-    // * @template T
-    // * @this T
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {string} oldValue - The previous regular expression pattern.
-    // * @param {string} newValue - The current regular expression pattern.
-    // */
-    //export type ThisRegexPatternChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: string,
-    //    newValue: string) => void) & Function;
-
-    ///**
-    // * Callback method for when a regular expression pattern is about to be parsed.
-    // * @callback StartRegexPatternParseListener
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {string} pattern - The regular expression pattern to be parsed.
-    // * @param {RegexFlags} flags - The flags to be used when the RegExp object is constructed.
-    // */
-    //export type StartRegexPatternParseListener = ((event: ng.IAngularEvent, pattern: string, flags: RegexFlags) => void) & Function;
-
-    ///**
-    // * Callback method for when a regular expression pattern is about to be parsed.
-    // * @callback ThisStartRegexPatternParseListener
-    // * @template T
-    // * @this T
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {string} pattern - The regular expression pattern to be parsed.
-    // * @param {RegexFlags} flags - The flags to be used when the RegExp object is constructed.
-    // */
-    //export type ThisStartRegexPatternParseListener<T> = ((this: T, event: ng.IAngularEvent, pattern: string,
-    //    flags: RegexFlags) => void) & Function;
-
-    ///**
-    // * Callback method for a RegExp object change event.
-    // * @callback RegexObjectChangedListener
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {IRegexParseSuccessResult} result - Regex pattern parsing result.
-    // */
-    //export type RegexObjectChangedListener = ((event: ng.IAngularEvent, oldValue: RegExp, newValue: RegExp) => void) & Function;
-
-    ///**
-    // * Callback method for a RegExp object change event.
-    // * @callback ThisRegexObjectChangedListener
-    // * @template T
-    // * @this T
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {IRegexParseSuccessResult} result - Regex pattern parsing result.
-    // */
-    //export type ThisRegexObjectChangedListener<T> = ((this: T, event: ng.IAngularEvent, oldValue: RegExp,
-    //    newValue: RegExp) => void) & Function;
-
-    //export type RegexPatternParseSuccessListener = ((event: ng.IAngularEvent, result: IRegexParseSuccessResult) => void) & Function;
-    //export type ThisRegexPatternParseSuccessListener<T> = ((this: T, event: ng.IAngularEvent,
-    //    result: IRegexParseSuccessResult) => void) & Function;
-
-    ///**
-    // * Callback method for a regular expression pattern error event.
-    // * @callback ThisRegexPatternParseErrorListener
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {IRegexParseFailResult} result - Regex pattern parsing failure result.
-    // */
-    //export type RegexPatternParseErrorListener = ((event: ng.IAngularEvent, result: IRegexParseFailResult) => void) & Function;
-
-    ///**
-    // * Callback method for a regular expression pattern error event.
-    // * @callback ThisRegexPatternParseErrorListener
-    // * @template T
-    // * @this T
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {IRegexParseFailResult} result - Regex pattern parsing failure result.
-    // */
-    //export type ThisRegexPatternParseErrorListener<T> = ((this: T, event: ng.IAngularEvent,
-    //    result: IRegexParseFailResult) => void) & Function;
-
-    ///**
-    // * Callback method for a regular expression parsing completion event.
-    // * @callback EndRegexPatternParseListener
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {RegexParseResult} result - Regex pattern parsing result.
-    // */
-    //export type EndRegexPatternParseListener = ((event: ng.IAngularEvent, result: RegexParseResult, isAborted: boolean) => void) & Function;
-
-    ///**
-    // * Callback method for a regular expression parsing completion event.
-    // * @callback ThisEndRegexPatternParseListener
-    // * @template T
-    // * @this T
-    // * @param {ng.IAngularEvent} event - Information about the source of the event.
-    // * @param {RegexParseResult} result - Regex pattern parsing result.
-    // */
-    //export type ThisEndRegexPatternParseListener<T> = ((this: T, event: ng.IAngularEvent, result: RegexParseResult,
-    //    isAborted: boolean) => void) & Function;
-
-    ///**
-    // * Callback method for current regular expression parsing completion.
-    // * @callback ParserReadyListener
-    // * @param {RegexParseResult} result - Regex pattern parsing result.
-    // */
-    //export type ParserReadyListener = ((result: RegexParseResult) => void) & Function;
-
-    ///**
-    // * Callback method for current regular expression parsing completion.
-    // * @callback ThisParserReadyListener
-    // * @template T
-    // * @this T
-    // * @param {RegexParseResult} result - Regex pattern parsing result.
-    // */
-    //export type ThisParserReadyListener<T> = ((this: T, result: RegexParseResult) => void) & Function;
-
-    export enum RegexEvaluationMode {
-        match,
-        replace,
-        split
-    }
-
     export class JsLine {
         private static _re: RegExp = /^[^\r\n]*(\r\n?|\n)/;
         get text(): string { return this._text; }
@@ -456,14 +203,21 @@ module regexTester {
             return lines;
         }
     }
-    export class MatchGroup {
+
+    export class SplitTextInfo {
         private _text: JsLine[];
-        private _isMatch: boolean;
         get groupNumber(): number { return this._groupNumber; }
-        get text(): string { throw new Error('Property not implemented'); }
-        get isMatch(): boolean { throw new Error('Property not implemented'); }
+        get text(): JsLine[] { return this._text; }
         constructor(private _groupNumber: number, text?: string | null) {
             this._text = JsLine.toJsLines(text);
+        }
+    }
+
+    export class MatchGroup extends SplitTextInfo {
+        private _isMatch: boolean;
+        get isMatch(): boolean { return this._isMatch; }
+        constructor(groupNumber: number, text?: string | null) {
+            super(groupNumber, text);
             this._isMatch = (typeof text === 'string');
         }
     }
@@ -476,20 +230,20 @@ module regexTester {
     export class ValueVersion<V> {
         private _equalityCb: (x: V, y: V) => boolean;
         private _versionToken: symbol = Symbol();
+        private _isResolved;
+        private _reason?: any;
 
         /**
          * Gets or sets the current value.
          * @memberof ValueVersion;
          * @type {V}
          */
-        get value(): V { return this._value; }
-        set value(value: V) {
-            if (this._equalityCb(this._value, value) === true)
-                return;
-            this._value = value;
-            this._versionToken = Symbol();
-        }
-        
+        get value(): V | undefined { return this._value; }
+
+        get isResolved(): boolean { return this._isResolved; }
+
+        get reason(): any | undefined { return this._reason; }
+
         /**
          * Gets a symbol that is used to track when the associated value has changed.
          * @memberof ValueVersion;
@@ -497,93 +251,215 @@ module regexTester {
          */
         get versionToken(): symbol { return this._versionToken; }
 
-        constructor(private _value: V, equalityCb?: (x: V, y: V) => boolean) {
-            this._equalityCb = (typeof equalityCb === "function") ? equalityCb : function (x: V, y: V) {
+        get name(): string { return this._name; }
+
+        constructor(private _name: string, private _value?: V, equalityCb?: (x: V, y: V) => boolean) {
+            this._equalityCb = (typeof equalityCb === 'function') ? equalityCb : function (x: V, y: V) {
                 return x === y;
             };
+            if (typeof _value === 'undefined') {
+                this._isResolved = false;
+                this._reason = 'Value not defined';
+            } else
+                this._isResolved = true;
         }
 
-        /**
-         * Sets the current value
-         * @param value - The value to set.
-         * @returns {boolean} true if the value has changed; otherwise, false if the current value was the same.
-         */
-        protected setValue(value: V): boolean {
-            let token: symbol = this._versionToken;
-            this.value = value;
-            return token !== this._versionToken;
-        }
-    }
-    
-    export class ValueProducer<R> {
-        private _versionToken: symbol = Symbol();
-        /**
-         * Gets or sets the current value.
-         * @memberof ValueVersion;
-         * @type {R}
-         */
-        get value(): R { return this._value; }
-        set value(value: R) {
-            if (this._resultEqualityCb(this._value, value) === true)
+        resolve(value?: V) {
+            if (!this._isResolved) {
+                this._reason = undefined;
+                this._isResolved = true;
+            } else if (this._equalityCb(this._value, value) === true)
                 return;
             this._value = value;
             this._versionToken = Symbol();
         }
 
-        /**
-         * Gets a symbol that is used to track when the associated value has changed.
-         * @memberof ValueVersion;
-         * @type {symbol}
-         */
-        get versionToken(): symbol { return this._versionToken; }
-
-        private constructor(private readonly _resultEqualityCb: (x: R, y: R) => boolean, private readonly _producers: ValueProducer<any>[],
-            private readonly _resolver?: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, producerResults: { value: any; token: symbol; }[]) => void) {
-        }
-        getValue($q: ng.IQService): ng.IPromise<{ value: R; token: symbol; }> {
-            if (this._producers.length == 0)
-        }
-        static create<V1, V2, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, v1: V1, v2: V2) => void, equalityComparer: (x: R, y: R) => boolean, p1: ValueProducer<V1>, p2: ValueProducer<V2>): ValueProducer<R>
-        static create<V1, V2, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, v1: V1, v2: V2) => void, p1: ValueProducer<V1>, p2: ValueProducer<V2>): ValueProducer<R>
-        static create<V, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void, equalityComparer: (x: R, y: R) => boolean, producer: ValueProducer<V>): ValueProducer<R>;
-        static create<V, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void, producer: ValueProducer<V>): ValueProducer<R>;
-        static create<R>(equalityComparer?: (x: R, y: R) => boolean): ValueProducer<R>;
-        static create(arg0?: ((resolve: ng.IQResolveReject<any>, reject: ng.IQResolveReject<any>, ...values: any[]) => void) | ((x: any, y: any) => boolean), arg1?: ValueProducer<any> | ((x: any, y: any) => boolean), ...producers: ValueProducer<any>[]): ValueProducer<any> {
-            if (arguments.length == 0)
-                return new ValueProducer<any>(function (x: any, y: any): boolean { return x === y; }, []);
-            if (arguments.length == 1)
-                return new ValueProducer<any>(<(x: any, y: any) => boolean>arg0, []);
-            if (typeof arg1 === "function")
-                return new ValueProducer<any>(<(x: any, y: any) => boolean>arg1, producers, <(resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void>arg0);
-            return new ValueProducer<any>(function (x: any, y: any): boolean { return x === y; }, (typeof producers === "object" && producers !== null && producers.length > 0) ? [arg1].concat(producers) : [arg1], <(resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, value: V) => void>arg0);
-        }
-    }
-
-    export class EvaluationState<R> {
-        private _versionTokens: symbol[];
-        private _result: ValueVersion<R>;
-
-        get result(): R { return this._result.value; }
-
-        private constructor(private readonly _resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, ...components: ValueVersion<any>[]) => void, private readonly _resultEqualityCb: (x: R, y: R) => boolean, private readonly _components: ValueVersion<any>[]) { }
-
-        static create<V0, C0 extends ValueVersion<V0>, V1, C1 extends ValueVersion<V1>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c0: C0, c1: C1) => void, resultEqualityCb: (x: R, y: R) => boolean, c0: C0, c1: C1): EvaluationState<R>;
-        static create<V0, C0 extends ValueVersion<V0>, V1, C1 extends ValueVersion<V1>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c0: C0, c1: C1) => void, c0: C0, c1: C1): EvaluationState<R>;
-        static create<V, C extends ValueVersion<V>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c: C) => void, resultEqualityCb: (x: R, y: R) => boolean, c: C): EvaluationState<R>;
-        static create<V, C extends ValueVersion<V>, R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, c: C) => void, c: C): EvaluationState<R>;
-        static create<R>(resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, ...components: ValueVersion<any>[]) => void, arg1: ValueVersion<any> | ((x: R, y: R) => boolean), ...argN: any[]): EvaluationState<R> {
-            if (typeof arg1 === "function")
-                return new EvaluationState<R>(resolver, arg1, argN);
-            return new EvaluationState<R>(resolver, function (x: R, y: R): boolean { return x === y; }, (typeof argN === "object" && argN !== null && argN.length > 0) ? [arg1].concat(argN) : [arg1]);
+        reject(reason?: any): void {
+            if (this._isResolved)
+                this._isResolved = false;
+            else if (this._reason === reason)
+                return;
+            this._isResolved = false;
+            this._reason = reason;
+            this._versionToken = Symbol();
         }
 
-        checkChange($q: ng.IQService): ng.IPromise<{ value: R, isChanged?: boolean }>  {
-            return $q<{ value: R, isChanged?: boolean }>(function (resolve: ng.IQResolveReject<{ value: R, isChanged?: boolean }>, reject: ng.IQResolveReject<any>) {
-
+        getValueAsync($q: ng.IQService): ng.IPromise<{ value: V; token: symbol; }> {
+            const current: ValueVersion<V> = this;
+            return $q(function(resolve: ng.IQResolveReject<{ value: V; token: symbol; }>, reject: ng.IQResolveReject<any>): void {
+                if (current._isResolved)
+                    resolve({ value: current._value, token: current._versionToken });
+                else
+                    reject(current._reason);
             });
         }
     }
-    
+
+    export class ValueProducer<R> extends ValueVersion<R> {
+        private _tokens?: symbol[];
+        private _isComponentError = false;
+        get isComponentError(): boolean { return this._isComponentError; }
+        private constructor(name: string,
+            private readonly _resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>,
+                    ...componentValues: any[]) => void,
+                    private readonly _components: ValueVersion<any>[],
+                    equalityCb?: (x: R, y: R) => boolean, private readonly _thisArg?: any) {
+            super(name, undefined, equalityCb);
+        }
+        static create<V0, V1, V2, R>(name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1, v2: V2) => void,
+            equalityCb: (x: R, y: R) => boolean, c0: ValueVersion<V0>, c1: ValueVersion<V1>, c2: ValueVersion<V2>): ValueProducer<R>;
+        static create<V0, V1, V2, R>(name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1, v2: V2) => void,
+            c0: ValueVersion<V0>, c1: ValueVersion<V1>, c2: ValueVersion<V2>): ValueProducer<R>;
+        static create<V0, V1, R>(name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1) => void,
+            equalityCb: (x: R, y: R) => boolean, c0: ValueVersion<V0>, c1: ValueVersion<V1>): ValueProducer<R>;
+        static create<V0, V1, R>(name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1) => void, c0: ValueVersion<V0>, c1: ValueVersion<V1>): ValueProducer<R>;
+        static create<C, R>(name: string, resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, cv: C) => void,
+            equalityCb: (x: R, y: R) => boolean, component: ValueVersion<C>): ValueProducer<R>;
+        static create<C, R>(name: string, resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>, cv: C) => void,
+            component: ValueVersion<C>): ValueProducer<R>;
+        static create<R>(name: string, resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>,
+                    ...componentValues: any[]) => void,
+                arg1: ValueVersion<any> | ((x: R, y: R) => boolean), ...components: ValueVersion<any>[]): ValueProducer<R> {
+            if (typeof arg1 === 'function')
+                return new ValueProducer<R>(name, resolver, components, arg1);
+            if (typeof components !== 'object' || components === null || components.length == 0)
+                return new ValueProducer<R>(name, resolver, [arg1]);
+            return new ValueProducer<R>(name, resolver, [arg1].concat(components));
+        }
+        static createResolveWith<T, V0, V1, V2, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1, v2: V2) => void,
+            equalityCb: (x: R, y: R) => boolean, c0: ValueVersion<V0>, c1: ValueVersion<V1>, c2: ValueVersion<V2>): ValueProducer<R>;
+        static createResolveWith<T, V0, V1, V2, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1, v2: V2) => void,
+            c0: ValueVersion<V0>, c1: ValueVersion<V1>, c2: ValueVersion<V2>): ValueProducer<R>;
+        static createResolveWith<T, V0, V1, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1) => void,
+            equalityCb: (x: R, y: R) => boolean, c0: ValueVersion<V0>, c1: ValueVersion<V1>): ValueProducer<R>;
+        static createResolveWith<T, V0, V1, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, v0: V0, v1: V1) => void, c0: ValueVersion<V0>, c1: ValueVersion<V1>): ValueProducer<R>;
+        static createResolveWith<T, C, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, cv: C) => void,
+            equalityCb: (x: R, y: R) => boolean, component: ValueVersion<C>): ValueProducer<R>;
+        static createResolveWith<T, C, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>,
+                reject: ng.IQResolveReject<any>, cv: C) => void,
+            component: ValueVersion<C>): ValueProducer<R>;
+        static createResolveWith<T, R>(thisArg: T, name: string, resolver: (resolve: ng.IQResolveReject<R>, reject: ng.IQResolveReject<any>,
+                    ...componentValues: any[]) => void,
+                arg1: ValueVersion<any> | ((x: R, y: R) => boolean), ...components: ValueVersion<any>[]): ValueProducer<R> {
+            if (typeof arg1 === 'function')
+                return new ValueProducer<R>(name, resolver, components, arg1, thisArg);
+            if (typeof components !== 'object' || components === null || components.length == 0)
+                return new ValueProducer<R>(name, resolver, [arg1], undefined, thisArg);
+            return new ValueProducer<R>(name, resolver, [arg1].concat(components), undefined, thisArg);
+        }
+        getValueAsync($q: ng.IQService): ng.IPromise<{ value: R; token: symbol; }> {
+            const current: ValueProducer<R> = this;
+            if (this._components.length < 2)
+                return this._components[0].getValueAsync($q).then(
+                    function(cr: { value: any; token: symbol; }): ng.IPromise<{ value: R; token: symbol; }> {
+                        return $q<{ value: R; token: symbol; }>(
+                            function(resolve: ng.IQResolveReject<{ value: R; token: symbol; }>, reject: ng.IQResolveReject<any>): void {
+                                current._update(resolve, reject, [cr]);
+                            }
+                        );
+                    },
+                    function(reason?: any): any {
+                        return $q(function(resolve: ng.IQResolveReject<{ value: R; token: symbol; }>,
+                                reject: ng.IQResolveReject<any>): void {
+                            if (typeof reason === 'undefined')
+                                reject(current._onRejectedComponents());
+                            else
+                                reject(current._onRejectedComponents(reason));
+                        });
+                    }
+                );
+            return $q.all<{ value: any; token: symbol; }>(this._components.map(
+                function(c: ValueVersion<any>): ng.IPromise<{ value: any; token: symbol; }> {
+                    return c.getValueAsync($q);
+                }
+            )).then<{ value: R; token: symbol; }>(
+                function(cr: { value: any; token: symbol; }[]): ng.IPromise<{ value: R; token: symbol; }> {
+                    return $q<{ value: R; token: symbol; }>(
+                        function(resolve: ng.IQResolveReject<{ value: R; token: symbol; }>, reject: ng.IQResolveReject<any>): void {
+                            current._update(resolve, reject, cr);
+                        }
+                    );
+                },
+                function(reason?: any): any {
+                    return $q(function(resolve: ng.IQResolveReject<{ value: R; token: symbol; }>, reject: ng.IQResolveReject<any>): void {
+                        if (typeof reason === 'undefined')
+                            reject(current._onRejectedComponents());
+                        else
+                            reject(current._onRejectedComponents(reason));
+                    });
+                }
+            );
+        }
+        _update(resolve: ng.IQResolveReject<{ value: R; token: symbol; }>, reject: ng.IQResolveReject<any>,
+                cr: { value: any; token: symbol; }[]): void {
+            this._isComponentError = false;
+            const tokens: symbol[] = cr.map(function(v: { value: any; token: symbol; }): symbol { return v.token; });
+            let hasChange = typeof this._tokens === 'undefined';
+            if (!hasChange)
+                for (let i = 0; i < tokens.length; i++) {
+                    if (tokens[i] !== this._tokens[i]) {
+                        hasChange = true;
+                        break;
+                    }
+                }
+            if (hasChange) {
+                this._tokens = tokens;
+                const current: ValueProducer<R> = this;
+                this._resolver.apply(this._thisArg, [
+                    function(result?: R): void {
+                        current.resolve(result);
+                        resolve({ value: current.value, token: current.versionToken });
+                    },
+                    function(reason?: any): void {
+                        if (arguments.length == 0)
+                            current.reject();
+                        else
+                            current.reject(reason);
+                        if (typeof current.reason === 'undefined')
+                            reject();
+                        else
+                            reject(current.reason);
+                    }].concat(cr.map(function(v: { value: any; token: symbol; }): any { return v.value; }))
+                );
+            } else if (this.isResolved)
+                resolve({ value: this.value, token: this.versionToken });
+            else if (typeof this.reason === 'undefined')
+                reject();
+            else
+                reject(this.reason);
+        }
+        _onRejectedComponents(reason?: any): any {
+            this._isComponentError = true;
+            let rejectedComponents: ValueVersion<any>[] = this._components.filter(function(c: ValueVersion<any>): boolean {
+                return !c.isResolved;
+            });
+            if (rejectedComponents.length == 0)
+                rejectedComponents = this._components;
+            if (rejectedComponents.length == 1)
+                this.reject({
+                    message: rejectedComponents[0].name + ' has error',
+                    reason: reason
+                });
+            else
+                this.reject({
+                    message: 'The following components have errors: ' + rejectedComponents.map(function(c: ValueVersion<any>): string {
+                        return c.name;
+                    }).join(', '),
+                    reason: reason
+                });
+            return this.reason;
+        }
+    }
+
     /**
      * Service for parsing regular expression patterns.
      * @export
@@ -591,22 +467,25 @@ module regexTester {
      */
     export class RegexParserService {
         // private _parseId: symbol;
-        private _flags: ValueVersion<RegexFlags> = new ValueVersion<RegexFlags>(new RegexFlags(), function (x: RegexFlags, y: RegexFlags): boolean {
-        });
-        private _pattern: ValueVersion<string> = new ValueVersion<string>('(?:)');
-        private _inputText: ValueVersion<string> = new ValueVersion<string>('');
-        private _matchGroups: ValueVersion<RegExpMatchArray | null> = new ValueVersion<RegExpMatchArray | null>(null);
-        private _matchEvaluation = new EvaluationState();
-        private _replacementEvaluation = new EvaluationState();
-        private _replaceWith: ValueVersion<string> = new ValueVersion<string>('');
-        private _replacedText: ValueVersion<string> = new ValueVersion<string>('');
-        private _splitEvaluation = new EvaluationState();
-        private _splitLimit: ValueVersion<number> = new ValueVersion<number>(NaN);
-        private _splitText: ValueVersion<string[]> = new ValueVersion<string[]>([]);
-        private _regex: ValueVersion<RegExp>;
-        private _hasFault: ValueVersion<boolean> = new ValueVersion<boolean>(false);
-        private _faultReason: ValueVersion<any>;
-        private _mode: ValueVersion<RegexEvaluationMode> = new ValueVersion<RegexEvaluationMode>(RegexEvaluationMode.match);
+        private _flags: ValueVersion<RegexFlags> = new ValueVersion<RegexFlags>('Flags', new RegexFlags(),
+            function (x: RegexFlags, y: RegexFlags): boolean {
+                if (typeof x !== 'object')
+                    return typeof y !== 'object';
+                if (typeof y !== 'object')
+                    return false;
+                if (x === null)
+                    return y === null;
+                return y !== null && (x.flags === y.flags || (x.global === y.global && x.ignoreCase === y.ignoreCase &&
+                    x.multiline === y.multiline && x.unicode === y.unicode && x.sticky === y.sticky));
+            });
+        private _pattern: ValueVersion<string> = new ValueVersion<string>('Pattern Text', '(?:)');
+        private _regex: ValueProducer<RegExp>;
+        private _inputText: ValueVersion<string> = new ValueVersion<string>('Input Text', '');
+        private _matchGroups: ValueProducer<RegExpMatchArray>;
+        private _replaceWith: ValueVersion<string> = new ValueVersion<string>('Replacement Text', '');
+        private _replacedText: ValueProducer<string>;
+        private _splitLimit: ValueVersion<number> = new ValueVersion<number>('Split Limit', NaN);
+        private _splitText: ValueProducer<string[]>;
 
         readonly [Symbol.toStringTag]: string = app.ServiceNames.regexParser;
 
@@ -617,10 +496,82 @@ module regexTester {
          * @memberof RegexParserService
          */
         constructor(private readonly $rootScope: ng.IRootScopeService) {
-            // const initialResults: IRegexParseSuccessResult = {
-            //    pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
-            // };
-            this._regex = new RegExp(this._pattern, this._flags.flags);
+            this._regex = ValueProducer.create<RegexFlags, string, RegExp>('Regular Expression',
+                function(resolve: ng.IQResolveReject<RegExp>, reject: ng.IQResolveReject<any>, flags: RegexFlags, s: string): void {
+                    let r: RegExp;
+                    let reason: any;
+                    try { r = new RegExp(s, flags.flags); } catch (e) { reason = e; }
+                    if (typeof r === 'object' && r !== null)
+                        resolve(r);
+                    else
+                        reject((typeof reason === 'undefined') ? 'Invalid pattern' : reason);
+                }, function(x: RegExp, y: RegExp): boolean {
+                    if (typeof x !== 'object' || x === null)
+                        return typeof y !== 'object' || y === null;
+                    return typeof y === 'object' && y !== null && x.source === y.source && x.global === y.global &&
+                        x.ignoreCase === y.ignoreCase && x.multiline === y.multiline && x.unicode === y.unicode &&
+                        x.sticky === y.sticky;
+                }, this._flags, this._pattern);
+            this._matchGroups = ValueProducer.create<RegExp, string, RegExpMatchArray>('Match Groups',
+                function(resolve: ng.IQResolveReject<RegExpMatchArray>, reject: ng.IQResolveReject<any>, expr: RegExp, s: string): void {
+                        let r: RegExpMatchArray | null;
+                        let reason: any;
+                        try { r = s.match(expr); } catch (e) { reason = e; }
+                        if (typeof r === 'object' && r !== null)
+                            resolve(r);
+                        else
+                            reject((typeof reason === 'undefined') ? 'Match failed' : reason);
+                }, function(x: RegExpMatchArray, y: RegExpMatchArray): boolean {
+                    if (typeof x !== 'object' || x === null)
+                        return typeof y !== 'object' || y === null;
+                    if (typeof y !== 'object' || y === null || x.index != y.index || x.length != y.length)
+                        return false;
+                    for (let i = 0; i < x.length; i++) {
+                        if (x[i] !== y[i])
+                            return false;
+                    }
+                    return true;
+                }, this._regex, this._inputText);
+            this._replacedText = ValueProducer.create<RegExp, string, string, string>('Replaced Text',
+                function(resolve: ng.IQResolveReject<string>, reject: ng.IQResolveReject<any>, regex: RegExp, s: string, r: string): void {
+                    let t: string;
+                    let reason: any;
+                    try { t = s.replace(regex, r); } catch (e) { reason = e; }
+                    if (typeof t !== 'string')
+                        reject((typeof reason === 'undefined') ? 'Match failed' : reason);
+                    else if (t === s)
+                        reject('Nothing replaced');
+                    else
+                        resolve(t);
+                }, this._regex, this._inputText, this._replaceWith);
+            this._splitText = ValueProducer.create<RegExp, string, number, string[]>('Split Text',
+                function(resolve: ng.IQResolveReject<string[]>, reject: ng.IQResolveReject<any>,
+                        regex: RegExp, s: string, l: number): void {
+                    let r: string[];
+                    let reason: any;
+                    try {
+                        if (isNaN(l))
+                            r = s.split(regex);
+                        else
+                            r = s.split(regex, l);
+                    } catch (e) { reason = e; }
+                    if (typeof r !== 'object' || r === null)
+                        reject((typeof reason === 'undefined') ? 'Match failed' : reason);
+                    else if (r.length == 1)
+                        reject('Nothing matched');
+                    else
+                        resolve(r);
+                }, function(x: string[], y: string[]): boolean {
+                    if (typeof x !== 'object' || x === null)
+                        return typeof y !== 'object' || y === null;
+                    if (typeof y !== 'object' || y === null || x.length != y.length)
+                        return false;
+                    for (let i = 0; i < x.length; i++) {
+                        if (x[i] !== y[i])
+                            return false;
+                    }
+                    return true;
+                }, this._regex, this._inputText, this._splitLimit);
         }
 
         /**
@@ -630,30 +581,17 @@ module regexTester {
          * @memberof RegexParserService
          */
         flags(value?: RegexFlags | string): RegexFlags {
-            let flags: RegexFlags;
             switch (typeof value) {
                 case 'string':
-                    flags = new RegexFlags(<string>value);
+                    this._flags.resolve(new RegexFlags(<string>value));
                     break;
                 case 'object':
-                    if (value == null)
-                        return this._flags;
-                    flags = <RegexFlags>value;
+                if (value != null)
+                        this._flags.resolve(<RegexFlags>value);
                     break;
-                default:
-                    return this._flags;
             }
-            if (flags.flags === this._flags.flags)
-                return this._flags;
-            if (flags.global === this._flags.global && flags.ignoreCase === this._flags.ignoreCase &&
-                    flags.multiline === this._flags.multiline && flags.sticky === this._flags.sticky &&
-                    flags.unicode === this._flags.unicode) {
-                this._flags = flags;
-                return this._flags;
-            }
-            this._regexChangeToken = Symbol();
-            this.parsePattern();
-            return this._flags;
+
+            return this._flags.value;
         }
 
         /**
@@ -663,9 +601,9 @@ module regexTester {
          * @memberof RegexParserService
          */
         global(value?: boolean): boolean {
-            if (typeof value === 'boolean' && value !== this._flags.global)
-                this.flags(this._flags.setGlobal(value));
-            return this._flags.global;
+            if (typeof value === 'boolean' && value !== this._flags.value.global)
+                this.flags(this._flags.value.setGlobal(value));
+            return this._flags.value.global;
         }
 
         /**
@@ -675,9 +613,9 @@ module regexTester {
          * @memberof RegexParserService
          */
         ignoreCase(value?: boolean): boolean {
-            if (typeof value === 'boolean' && value !== this._flags.ignoreCase)
-                this.flags(this._flags.setIgnoreCase(value));
-            return this._flags.ignoreCase;
+            if (typeof value === 'boolean' && value !== this._flags.value.ignoreCase)
+                this.flags(this._flags.value.setIgnoreCase(value));
+            return this._flags.value.ignoreCase;
         }
 
         /**
@@ -687,9 +625,9 @@ module regexTester {
          * @memberof RegexParserService
          */
         multiline(value?: boolean): boolean {
-            if (typeof value === 'boolean' && value !== this._flags.multiline)
-                this.flags(this._flags.setMultiline(value));
-            return this._flags.multiline;
+            if (typeof value === 'boolean' && value !== this._flags.value.multiline)
+                this.flags(this._flags.value.setMultiline(value));
+            return this._flags.value.multiline;
         }
 
         /**
@@ -699,9 +637,9 @@ module regexTester {
          * @memberof RegexParserService
          */
         sticky(value?: boolean): boolean {
-            if (typeof value === 'boolean' && value !== this._flags.sticky)
-                this.flags(this._flags.setSticky(value));
-            return this._flags.sticky;
+            if (typeof value === 'boolean' && value !== this._flags.value.sticky)
+                this.flags(this._flags.value.setSticky(value));
+            return this._flags.value.sticky;
         }
 
         /**
@@ -711,31 +649,9 @@ module regexTester {
          * @memberof RegexParserService
          */
         unicode(value?: boolean): boolean {
-            if (typeof value === 'boolean' && value !== this._flags.unicode)
-                this.flags(this._flags.setUnicode(value));
-            return this._flags.unicode;
-        }
-
-        mode(value?: RegexEvaluationMode): RegexEvaluationMode {
-            if (typeof value === 'number' && (isNaN(value) || value === this._mode))
-                return this._mode;
-            this._mode = value;
-            switch (this._mode) {
-                case RegexEvaluationMode.replace:
-                    if (this._replacementEvaluated)
-                        return this._mode;
-                    break;
-                case RegexEvaluationMode.split:
-                    if (this._splitEvaluated)
-                        return this._mode;
-                    break;
-                default:
-                    if (this._matchEvaluated)
-                        return this._mode;
-                    break;
-            }
-            this.evaluatePattern();
-            return this._mode;
+            if (typeof value === 'boolean' && value !== this._flags.value.unicode)
+                this.flags(this._flags.value.setUnicode(value));
+            return this._flags.value.unicode;
         }
 
         /**
@@ -745,271 +661,34 @@ module regexTester {
          * @memberof RegexParserService
          */
         pattern(value?: string): string {
-            if (typeof value !== 'string' || value === this._pattern)
-                return this._pattern;
-            this._regexChangeToken = Symbol();
-            this._pattern = value;
-            this.parsePattern();
-            return this._pattern;
+            if (typeof value !== 'string')
+                this._pattern.resolve(value);
+            return this._pattern.value;
         }
 
         inputText(value?: string): string {
-            if (typeof value !== 'string' || value === this._inputText)
-                return this._inputText;
-            this._regexChangeToken = Symbol();
-            this._inputText = value;
-            this.evaluatePattern();
-            return this._inputText;
+            if (typeof value !== 'string')
+                this._inputText.resolve(value);
+            return this._inputText.value;
         }
 
-        regexChangeToken(): symbol { return this._regexChangeToken; }
-
         replaceWith(value?: string): string {
-            if (typeof value !== 'string' || value === this._replaceWith)
-                return this._replaceWith;
-            this._replacementEvaluation.isEvaluated = false;
-            this._replacedText = this._inputText.replace(this._inputText, this._replaceWith);
-            return this._replaceWith;
+            if (typeof value !== 'string')
+                this._replaceWith.resolve(value);
+            return this._replaceWith.value;
         }
 
         splitLimit(value?: number): number {
-            if (typeof value !== 'number' || value === this._splitLimit)
-                return this._splitLimit;
-            this._splitEvaluation.isEvaluated = false;
-            if (isNaN(this._splitLimit))
-                this._splitText = this._inputText.split(this._regex);
-            else
-                this._splitText = this._inputText.split(this._regex, this._splitLimit);
-            return this._splitLimit;
+            if (typeof value !== 'number')
+                this._splitLimit.resolve(value);
+            return this._splitLimit.value;
         }
 
-        matchEvaluationToken(): symbol { return this._matchEvaluation.token; }
-        replacementEvaluationToken(): symbol { return this._replacementEvaluation.token; }
-        splitEvaluationToken(): symbol { return this._splitEvaluation.token; }
-        matchEvaluated(): boolean { return this._matchEvaluation.isEvaluated; }
-        replacementEvaluated(): boolean { return this._replacementEvaluation.isEvaluated; }
-        splitEvaluated(): boolean { return this._splitEvaluation.isEvaluated; }
+        matchGroups(): ValueProducer<RegExpMatchArray> { return this._matchGroups; }
 
-        matchGroups(): RegExpMatchArray | null { return this._matchGroups; }
+        replacedText(): ValueProducer<string> { return this._replacedText; }
 
-        replacedText(): string { return this._replacedText; }
-
-        splitText(): ReadonlyArray<string> { return this._splitText; }
-
-        ///**
-        // * Indicates whether the current regular expression pattern is still being parsed.
-        // * @returns {boolean} true if the current regular expression pattern is still being parsed; otherwise, false.
-        // * @memberof RegexParserService
-        // */
-        //isParsing(): boolean { return this._isParsing; }
-
-        /**
-         * Indicates whether the last regular expression parsing failed.
-         * @returns {boolean} true if the last regular expression parsing failed; otherwise, false.
-         * @memberof RegexParserService
-         */
-        hasFault(): boolean { return this._hasFault; }
-
-        /**
-         * The reason for the last failed regular expression parsing.
-         * @returns {*}
-         * @memberof RegexParserService
-         */
-        faultReason(): any { return this._faultReason; }
-
-        parsePattern(): void {
-            try {
-                this._regex = new RegExp(this._pattern, this._flags.flags);
-                this._hasFault = false;
-                this._faultReason = '';
-            } catch (e) {
-                this._hasFault = true;
-                this._faultReason = e;
-            }
-        }
-
-        evaluatePattern(): void {
-            this._matchEvaluation.isEvaluated = false;
-            this._replacementEvaluation.isEvaluated = false;
-            this._splitEvaluation.isEvaluated = false;
-            if (this._hasFault)
-                return;
-            switch (this._mode) {
-                case RegexEvaluationMode.replace:
-                    this._replacedText = this._inputText.replace(this._inputText, this._replaceWith);
-                    this._replacementEvaluation.isEvaluated = true;
-                    break;
-                case RegexEvaluationMode.split:
-                    if (isNaN(this._splitLimit))
-                        this._splitText = this._inputText.split(this._regex);
-                    else
-                        this._splitText = this._inputText.split(this._regex, this._splitLimit);
-                    this._splitEvaluation.isEvaluated = true;
-                    break;
-                default:
-                    this._matchGroups = this._inputText.match(this._regex);
-                    this._matchEvaluation.isEvaluated = true;
-                    break;
-            }
-        }
-
-        //private startPatternParse(regex: RegExp): void;
-        //private startPatternParse(pattern: string, flags: RegexFlags): void;
-        //private startPatternParse(arg0: string | RegExp, flags?: RegexFlags): RegExp {
-        //    const parseId: symbol = Symbol();
-        //    const previous: IRegexParseSuccessResult & { previous?: undefined } = {
-        //        flags: this._flags,
-        //        pattern: this._pattern,
-        //        regex: this._regex
-        //    };
-        //    let pattern: string;
-        //    if (typeof arg0 === 'string') {
-        //        this._pattern = pattern = arg0;
-        //        this._flags = flags;
-        //        if (arg0 === previous.pattern) {
-        //            if (flags.flags === previous.flags.flags)
-        //                return;
-        //            if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
-        //                    flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
-        //                    flags.sticky == previous.flags.sticky) {
-        //                try {
-        //                    this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, this._parseId);
-        //                } catch { }
-        //                return;
-        //            }
-        //            this._parseId = parseId;
-        //            this._isParsing = true;
-        //            try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
-        //        } else {
-        //            this._parseId = parseId;
-        //            this._isParsing = true;
-        //            if (flags.flags !== previous.flags.flags) {
-        //                try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
-        //                if (this._parseId === parseId)
-        //                    try {
-        //                        this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId);
-        //                    } catch { }
-        //            } else
-        //                try { this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId); } catch { }
-        //        }
-        //    } else {
-        //        this._pattern = pattern = (this._regex = arg0).source;
-        //        this._flags = flags = new RegexFlags(arg0);
-        //        if (this._hasFault) {
-        //            this._parseId = parseId;
-        //            this._isParsing = true;
-        //            if ((this._flags = flags).flags !== previous.flags.flags)
-        //                try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
-        //            if (this._parseId === parseId && pattern !== previous.pattern)
-        //                try {
-        //                    this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
-        //                } catch { }
-        //        } else if (pattern === previous.pattern) {
-        //            if (flags.flags === previous.flags.flags || (flags.global == previous.flags.global &&
-        //                    flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline &&
-        //                    flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky))
-        //                return;
-        //            this._parseId = parseId;
-        //            this._isParsing = true;
-        //            try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
-        //        } else {
-        //            this._parseId = parseId;
-        //            this._isParsing = true;
-        //            this._pattern = pattern;
-        //            if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
-        //                    flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
-        //                    flags.sticky == previous.flags.sticky)
-        //                this._flags = flags = previous.flags;
-        //            else {
-        //                try { this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId); } catch { }
-        //                if (this._parseId === parseId)
-        //                    try {
-        //                        this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
-        //                    } catch { }
-        //            }
-        //            if (this._parseId === parseId)
-        //                try {
-        //                    this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
-        //                } catch { }
-        //        }
-        //    }
-
-        //    const svc: RegexParserService = this;
-        //    this.supplantablePromiseChainService.start<IRegexParseSuccessResult>(this._taskId,
-        //        function(resolve: ng.IQResolveReject<IRegexParseSuccessResult>,
-        //                reject: ng.IQResolveReject<IRegexParseCanceledResult | IRegexParseFailResult>): void {
-        //            try { svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse, pattern, flags, parseId); } catch { }
-        //            if (parseId !== svc._parseId)
-        //                reject(<IRegexParseCanceledResult>{
-        //                    pattern: pattern,
-        //                    flags: flags,
-        //                    operationCanceled: true,
-        //                    previous: previous,
-        //                    reason: 'Operation canceled'
-        //                });
-        //            else if (typeof arg0 === 'string') {
-        //                try {
-        //                    resolve({
-        //                        pattern: pattern,
-        //                        flags: flags,
-        //                        regex: new RegExp(pattern),
-        //                        previous: previous
-        //                    });
-        //                } catch (e) {
-        //                    reject(<IRegexParseFailResult>{
-        //                        pattern: pattern,
-        //                        flags: flags,
-        //                        previous: previous,
-        //                        reason: e
-        //                    });
-        //                }
-        //            } else
-        //                resolve({
-        //                    pattern: pattern,
-        //                    flags: flags,
-        //                    regex: arg0,
-        //                    previous: previous
-        //                });
-        //    }).then(function (result: IRegexParseSuccessResult) {
-        //        if (parseId === svc._parseId) {
-        //            svc._hasFault = svc._isParsing = false;
-        //            svc._faultReason = undefined;
-        //            svc._regex = result.regex;
-        //            if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source ||
-        //                    result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase ||
-        //                    result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
-        //                    result.regex.sticky !== previous.regex.sticky)
-        //                try {
-        //                    svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged, previous.regex, result.regex, parseId);
-        //                } catch { }
-        //            try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
-        //            try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId); } catch { }
-        //        } else {
-        //            try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId); } catch { }
-        //            try {
-        //                svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, <IRegexParseCanceledResult>{
-        //                    pattern: pattern,
-        //                    flags: flags,
-        //                    operationCanceled: true,
-        //                    previous: previous,
-        //                    reason: 'Operation canceled'
-        //                }, parseId);
-        //            } catch { }
-        //        }
-        //    }, function (result: IRegexParseCanceledResult | IRegexParseFailResult) {
-        //        if (parseId === svc._parseId) {
-        //            svc._isParsing = false;
-        //            if (!svc.isParseCancel(result)) {
-        //                svc._hasFault = true;
-        //                svc._faultReason = result.reason;
-        //                try { svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError, result, parseId); } catch { }
-        //            }
-        //        }
-        //        try { svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId); } catch { }
-        //    });
-
-        //    return this._regex;
-        //}
+        splitText(): ValueProducer<string[]> { return this._splitText; }
 
         /**
          * Gets or sets the Regular Expression object.
@@ -1017,247 +696,8 @@ module regexTester {
          * @returns {RegExp} The current Regular Expression object.
          * @memberof RegexParserService
          */
-        regex(value?: RegExp): RegExp {
-            if (typeof value === 'object' && value !== null && value instanceof RegExp) {
-                this._flags = new RegexFlags(value);
-                this._pattern = value.source;
-                this._hasFault = false;
-                this._faultReason = '';
-            }
-            return this._regex;
-        }
-
-        ///**
-        // * Indicates whether the results indicate a successful regular expression parsing.
-        // * @param {RegexParseResult} result - The regular expression pattern parse result object.
-        // * @returns {result is IRegexParseSuccessResult} true if the RegExp object was successfully constructed; otherwise, false.
-        // * @memberof RegexParserService
-        // */
-        //isParseSuccess(result: RegexParseResult): result is IRegexParseSuccessResult {
-        //    return typeof (<IRegexParseSuccessResult>result).regex === 'object';
-        //}
-
-        //isParseCancel(result: RegexParseResult): result is IRegexParseCanceledResult {
-        //    return (<IRegexParseCanceledResult>result).operationCanceled === true;
-        //}
-
-        ///**
-        // * Listens for the flags change event.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {RegexFlagsChangedListener} callbackFn - The callback method to invoke when the flags change event is raised.
-        // * @memberof RegexParserService
-        // */
-        //onRegexFlagsChanged($scope: ng.IScope, callbackFn: RegexFlagsChangedListener): void;
-
-        ///**
-        // * Listens for the flags change event.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisRegexFlagsChangedListener<T>} callbackFn - The callback method to invoke when the flags value has changed.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onRegexFlagsChanged<T>($scope: ng.IScope, callbackFn: ThisRegexFlagsChangedListener<T>, thisObj: T): void;
-        //onRegexFlagsChanged($scope: ng.IScope, callbackFn: RegexFlagsChangedListener | ThisRegexFlagsChangedListener<any>,
-        //        thisObj?: any): void {
-        //    if (arguments.length < 3) {
-        //        $scope.$on(app.EventNames.regexFlagsChanged, callbackFn);
-        //    } else {
-        //        $scope.$on(app.EventNames.regexFlagsChanged, (event: ng.IAngularEvent, oldValue: RegexFlags,
-        //                newValue: RegexFlags): void => {
-        //            callbackFn.call(thisObj, event, oldValue, newValue);
-        //        });
-        //    }
-        //}
-
-        ///**
-        // * Listens for the regular expression pattern change event.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {RegexPatternChangedListener} callbackFn - The callback method to invoke when the regular expression pattern has changed.
-        // * @memberof RegexParserService
-        // */
-        //onRegexPatternChanged($scope: ng.IScope, callbackFn: RegexPatternChangedListener): void;
-
-        ///**
-        // * Listens for the regular expression pattern change event.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisRegexPatternChangedListener<T>} callbackFn - The callback method to invoke when the regular expression pattern has
-        // *      changed.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onRegexPatternChanged<T>($scope: ng.IScope, callbackFn: ThisRegexPatternChangedListener<T>, thisObj: T): void;
-        //onRegexPatternChanged($scope: ng.IScope, callbackFn: RegexPatternChangedListener | ThisRegexPatternChangedListener<any>,
-        //        thisObj?: any): void {
-        //    if (arguments.length < 3)
-        //        $scope.$on(app.EventNames.regexPatternChanged, callbackFn);
-        //    else
-        //        $scope.$on(app.EventNames.regexPatternChanged, (event: ng.IAngularEvent, oldValue: string, newValue: string): void => {
-        //            callbackFn.call(thisObj, event, oldValue, newValue);
-        //        });
-        //}
-
-        ///**
-        // * Listens for the event that is raised before a an attempt to construct new RegExp for the regex property.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {StartRegexPatternParseListener} callbackFn - The callback method to invoke before an attempt to construct new RegExp
-        // *      for the regex property.
-        // * @memberof RegexParserService
-        // */
-        //onStartRegexPatternParse($scope: ng.IScope, callbackFn: StartRegexPatternParseListener): void;
-
-        ///**
-        // * Listens for the event that is raised before a an attempt to construct new RegExp for the regex property.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisStartRegexPatternParseListener<T>} callbackFn - The callback method to invoke before an attempt to construct new
-        // *      RegExp for the regex property.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onStartRegexPatternParse<T>($scope: ng.IScope, callbackFn: ThisStartRegexPatternParseListener<T>, thisObj: T): void;
-        //onStartRegexPatternParse($scope: ng.IScope, callbackFn: StartRegexPatternParseListener | ThisStartRegexPatternParseListener<any>,
-        //        thisObj?: any): void {
-        //    if (arguments.length < 3)
-        //        $scope.$on(app.EventNames.startRegexPatternParse, callbackFn);
-        //    else
-        //        $scope.$on(app.EventNames.startRegexPatternParse, (event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void => {
-        //            callbackFn.call(thisObj, event, pattern, flags);
-        //        });
-        //}
-
-        ///**
-        // * Listens for the parsed regex object change event.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {RegexObjectChangedListener} callbackFn - The callback method to invoke when the parsed regex object has changed.
-        // * @memberof RegexParserService
-        // */
-        //onRegexObjectChanged($scope: ng.IScope, callbackFn: RegexObjectChangedListener): void;
-
-        ///**
-        // * Listens for the parsed regex object change event.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisRegexObjectChangedListener<T>} callbackFn - The callback method to invoke when the parsed regex object has changed.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onRegexObjectChanged<T>($scope: ng.IScope, callbackFn: ThisRegexObjectChangedListener<T>, thisObj: T): void;
-        //onRegexObjectChanged($scope: ng.IScope, callbackFn: RegexObjectChangedListener | ThisRegexObjectChangedListener<any>,
-        //        thisObj?: any): void {
-        //    if (arguments.length < 3)
-        //        $scope.$on(app.EventNames.regexObjectChanged, callbackFn);
-        //    else
-        //        $scope.$on(app.EventNames.regexObjectChanged, (event: ng.IAngularEvent, oldValue: RegExp, newValue: RegExp): void => {
-        //            callbackFn.call(thisObj, event, oldValue, newValue);
-        //        });
-        //}
-
-        ///**
-        // * Listens for the regular expression pattern parse error event.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {RegexPatternParseErrorListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
-        // *      failed.
-        // * @memberof RegexParserService
-        // */
-        //onRegexPatternParseError($scope: ng.IScope, callbackFn: RegexPatternParseErrorListener): void;
-
-        ///**
-        // * Listens for the regular expression pattern parse error event.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisRegexPatternParseErrorListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
-        // *      parsing failed.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onRegexPatternParseError<T>($scope: ng.IScope, callbackFn: ThisRegexPatternParseErrorListener<T>, thisObj: T): void;
-        //onRegexPatternParseError($scope: ng.IScope, callbackFn: RegexPatternParseErrorListener | ThisRegexPatternParseErrorListener<any>,
-        //        thisObj?: any): void {
-        //    if (arguments.length < 3)
-        //        $scope.$on(app.EventNames.regexPatternParseError, callbackFn);
-        //    else
-        //        $scope.$on(app.EventNames.regexPatternParseError, (event: ng.IAngularEvent, result: IRegexParseFailResult): void => {
-        //            callbackFn.call(thisObj, event, result);
-        //        });
-        //}
-
-        ///**
-        // * Listens for the regular expression pattern parse error event.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {RegexPatternParseErrorListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
-        // *      failed.
-        // * @memberof RegexParserService
-        // */
-        //onRegexPatternParseSuccess($scope: ng.IScope, callbackFn: RegexPatternParseSuccessListener): void;
-
-        ///**
-        // * Listens for the regular expression pattern parse error event.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisRegexPatternParseErrorListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
-        // *      parsing failed.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onRegexPatternParseSuccess<T>($scope: ng.IScope, callbackFn: ThisRegexPatternParseSuccessListener<T>, thisObj: T): void;
-        //onRegexPatternParseSuccess($scope: ng.IScope,
-        //        callbackFn: RegexPatternParseSuccessListener | ThisRegexPatternParseSuccessListener<any>, thisObj?: any): void {
-        //    if (arguments.length < 3)
-        //        $scope.$on(app.EventNames.regexPatternParseSuccess, callbackFn);
-        //    else
-        //        $scope.$on(app.EventNames.regexPatternParseSuccess, (event: ng.IAngularEvent, result: IRegexParseSuccessResult): void => {
-        //                callbackFn.call(thisObj, event, result);
-        //        });
-        //}
-
-        ///**
-        // * Listens for the regular expression pattern parsing completion event.
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {EndRegexPatternParseListener} callbackFn - The callback method to invoke when a regular expression pattern parsing
-        // *      attempt has completed.
-        // * @memberof RegexParserService
-        // */
-        //onEndRegexPatternParse($scope: ng.IScope, callbackFn: EndRegexPatternParseListener): void;
-
-        ///**
-        // * Listens for the regular expression pattern parsing completion event.
-        // * @template T
-        // * @param {ng.IScope} $scope - The scope to listen on.
-        // * @param {ThisEndRegexPatternParseListener<T>} callbackFn - The callback method to invoke when a regular expression pattern
-        // *      parsing attempt has completed.
-        // * @param {T} thisObj - The object to use as the 'this' object when the callback function is invoked.
-        // * @memberof RegexParserService
-        // */
-        //onEndRegexPatternParse<T>($scope: ng.IScope, callbackFn: ThisEndRegexPatternParseListener<T>, thisObj: T): void;
-        //onEndRegexPatternParse($scope: ng.IScope, callbackFn: EndRegexPatternParseListener | ThisEndRegexPatternParseListener<any>,
-        //        thisObj?: any): void {
-        //    if (arguments.length < 3)
-        //        $scope.$on(app.EventNames.endRegexPatternParse, callbackFn);
-        //    else
-        //        $scope.$on(app.EventNames.endRegexPatternParse, (event: ng.IAngularEvent, result: RegexParseResult,
-        //                isAborted: boolean): void => {
-        //            callbackFn.call(thisObj, event, result, isAborted);
-        //        });
-        //}
+        regex(): ValueProducer<RegExp> { return this._regex; }
     }
-
-    //interface IParseOperationSuccess {
-    //    regex: RegExp;
-    //    previous?: RegexParseResult;
-    //}
-
-    //interface IParseOperationFail {
-    //    reason?: any;
-    //    previous?: RegexParseResult;
-    //}
-
-    //type ParseOperation = IParseOperationSuccess | IParseOperationFail;
-
-    //function isParseOperationSuccess(value: ParseOperation): value is IParseOperationSuccess {
-    //    return typeof (<IParseOperationSuccess>value).regex !== 'undefined';
-    //}
 
     /**
      * Defines the scope common to all regular expression controllers.
@@ -1271,67 +711,55 @@ module regexTester {
         showParseError: boolean;
         inputLines: JsLine[];
         success: boolean;
+        evaluationErrorMessage: string;
+        showEvaluationError: boolean;
     }
 
     export abstract class RegexController<TScope extends IRegexControllerScope> implements ng.IController {
         abstract readonly [Symbol.toStringTag]: string;
-        protected abstract onRegexChange(): void;
+        private _regexToken: symbol = Symbol();
 
         get global(): boolean { return this.regexParser.global(); }
         set global(value: boolean) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.global(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
+            this.onFlagsChange();
         }
 
         get ignoreCase(): boolean { return this.regexParser.ignoreCase(); }
         set ignoreCase(value: boolean) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.ignoreCase(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
+            this.onFlagsChange();
         }
 
         get multiline(): boolean { return this.regexParser.multiline(); }
         set multiline(value: boolean) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.multiline(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
+            this.onFlagsChange();
         }
 
         get unicode(): boolean { return this.regexParser.unicode(); }
         set unicode(value: boolean) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.unicode(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
+            this.onFlagsChange();
         }
 
         get sticky(): boolean { return this.regexParser.sticky(); }
         set sticky(value: boolean) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.sticky(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
+            this.onFlagsChange();
         }
 
         get pattern(): string { return this.regexParser.pattern(); }
         set pattern(value: string) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.pattern(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
+            this.raiseRegexChange();
         }
 
         get inputText(): string { return this.regexParser.inputText(); }
         set inputText(value: string) {
-            const token = this.regexParser.regexChangeToken();
             this.regexParser.inputText(value);
-            if (token !== this.regexParser.regexChangeToken())
-                this.onRegexChange();
             this.$scope.inputLines = JsLine.toJsLines(this.regexParser.inputText());
+            this.onRegexChange();
         }
 
         /**
@@ -1340,67 +768,62 @@ module regexTester {
          * @param {app.PageLocationService} pageLocationService
          * @memberof RegexMatchController
          */
-        constructor(protected readonly $scope: TScope, protected readonly regexParser: RegexParserService,
-                pageLocationService: app.PageLocationService, subTitle: string) {
+        constructor(protected readonly $scope: TScope, protected readonly $q: ng.IQService,
+                protected readonly regexParser: RegexParserService,
+                protected readonly pageLocationService: app.PageLocationService, subTitle: string) {
             pageLocationService.pageTitle('Regular Expression Evaluator', subTitle);
-            //regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
-            //regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
-            //regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
-            //$scope.isParsing = regexParser.isParsing();
-            $scope.flags = regexParser.flags().flags;
-            if (regexParser.hasFault())
-                this.setError(regexParser.faultReason());
-            else {
-                $scope.showParseError = false;
-                $scope.parseErrorMessage = '';
-            }
+            $scope.showParseError = false;
+            $scope.showEvaluationError = false;
+            $scope.parseErrorMessage = '';
+            $scope.evaluationErrorMessage = '';
             $scope.inputLines = JsLine.toJsLines(regexParser.inputText());
+            this.onFlagsChange();
         }
 
-        private setError(reason: any): void {
-            switch (typeof reason) {
-                case 'undefined':
-                    break;
-                case 'object':
-                    if (reason !== null) {
-                        this.setError(JSON.stringify(reason));
-                        return;
+        private raiseRegexChange(): void {
+            const ctrl: RegexController<TScope> = this;
+            this.regexParser.regex().getValueAsync(this.$q).then(
+                function(result: { value: RegExp, token: symbol }): void {
+                    if (ctrl._regexToken !== result.token) {
+                        ctrl._regexToken = result.token;
+                        ctrl.$scope.parseErrorMessage = '';
+                        ctrl.$scope.showParseError = false;
+                        ctrl.onRegexChange();
                     }
-                    break;
-                case 'string':
-                    if ((this.$scope.parseErrorMessage = reason.trim()).length > 0) {
-                        this.$scope.showParseError = true;
-                        return;
+                },
+                function(reason: any): void {
+                    if (ctrl._regexToken !== ctrl.regexParser.regex().versionToken) {
+                        ctrl._regexToken = ctrl.regexParser.regex().versionToken;
+                        ctrl.$scope.parseErrorMessage = (typeof reason === 'undefined') ? '' :
+                            ((typeof reason === 'string') ? reason : JSON.stringify(reason));
+                        if (ctrl.$scope.parseErrorMessage.trim().length == 0)
+                            ctrl.$scope.parseErrorMessage = 'Pattern parse error';
+                        ctrl.$scope.showParseError = true;
+                        ctrl.onRegexChange();
                     }
-                    break;
-                default:
-                    this.setError(JSON.stringify(reason));
-                    return;
-            }
-            this.setError('Unknown parse failure.');
+                }
+            );
         }
 
-        //protected onRegexFlagsChanged(event: ng.IAngularEvent, oldValue: RegexFlags, newValue: RegexFlags): void {
-        //    this.$scope.flags = this.regexParser.flags().flags;
-        //}
+        protected abstract onRegexChange(): void;
 
-        // protected onRegexPatternChanged(event: ng.IAngularEvent, oldValue: string, newValue: string): void { }
+        private onFlagsChange(): void {
+            this.$scope.flags = this.regexParser.flags().flags;
+            this.raiseRegexChange();
+        }
 
-        //protected onStartRegexPatternParse(event: ng.IAngularEvent, pattern: string, flags: RegexFlags): void {
-        //    this.$scope.showParseError = false;
-        //    this.$scope.isParsing = this.regexParser.isParsing();
-        //}
-
-        //protected onEndRegexPatternParse(event: ng.IAngularEvent, result: RegexParseResult): void {
-        //    this.$scope.isParsing = this.regexParser.isParsing();
-        //    if (this.regexParser.hasFault()) {
-        //        this.$scope.showParseError = true;
-        //        this.setError(this.regexParser.faultReason());
-        //    } else {
-        //        this.$scope.showParseError = false;
-        //        this.$scope.parseErrorMessage = '';
-        //    }
-        //}
+        protected setEvalSuccess() {
+            this. $scope.showEvaluationError = false;
+            this.$scope.evaluationErrorMessage = '';
+            this.$scope.success = true;
+        }
+        protected setEvalFail(reason: any) {
+            this. $scope.showEvaluationError = true;
+            this.$scope.evaluationErrorMessage = (typeof reason === 'undefined') ? '' :
+                ((typeof reason === 'string') ? reason :
+                    ((typeof reason === 'object' && reason instanceof Error) ? '' + reason : JSON.stringify(reason)));
+            this.$scope.success = false;
+        }
 
         $doCheck(): void { }
     }
@@ -1423,40 +846,45 @@ module regexTester {
      */
     export class RegexMatchController extends RegexController<IRegexMatchControllerScope> {
         readonly [Symbol.toStringTag]: string = app.ControllerNames.regexMatch;
+        private _groupsToken: symbol;
 
         /**
          * Creates an instance of RegexMatchController.
          * @param {IRegexMatchControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageLocationService} pageLocationService
+         * @param {ng.IQService} $q - Asynchronous processing service.
+         * @param {RegexParserService} regexParser - Regular expression parsing service.
+         * @param {app.PageLocationService} pageLocationService - Page location service.
          * @memberof RegexMatchController
          */
-        constructor($scope: IRegexMatchControllerScope, regexParser: RegexParserService, pageLocationService: app.PageLocationService) {
-            super($scope, regexParser, pageLocationService, 'Match');
+        constructor($scope: IRegexMatchControllerScope, $q: ng.IQService, regexParser: RegexParserService,
+                pageLocationService: app.PageLocationService) {
+            super($scope, $q, regexParser, pageLocationService, 'Match');
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
-            const m = regexParser.matchGroups();
-            $scope.groups = [];
-            if (typeof m !== "object" || m === null) {
-                $scope.matchIndex = -1;
-                $scope.success = false;
-            } else {
-                $scope.success = true;
-                $scope.matchIndex = m.index;
-                for (let n = 0; n < m.length; n++)
-                    $scope.groups.push(new MatchGroup(n, m[n]));
-            }
         }
         protected onRegexChange(): void {
-            const m = this.regexParser.matchGroups();
-            this.$scope.groups = [];
-            if (typeof m !== "object" || m === null) {
-                this.$scope.matchIndex = -1;
-                this.$scope.success = false;
-            } else {
-                this.$scope.success = true;
-                this.$scope.matchIndex = m.index;
-                for (let n = 0; n < m.length; n++)
-                    this.$scope.groups.push(new MatchGroup(n, m[n]));
-            }
+            const ctrl: RegexMatchController = this;
+            this.regexParser.matchGroups().getValueAsync(this.$q).then(
+                function(result: { value: RegExpMatchArray; token: symbol; }): void {
+                    if (ctrl._groupsToken !== result.token) {
+                        ctrl._groupsToken = result.token;
+                        ctrl.$scope.groups = [];
+                        ctrl.$scope.matchIndex = result.value.index;
+                        for (let n = 0; n < result.value.length; n++)
+                            ctrl.$scope.groups.push(new MatchGroup(n, result.value[n]));
+                        ctrl.setEvalSuccess();
+                    }
+                },
+                function(reason: any): void {
+                    if (ctrl._groupsToken !== ctrl.regexParser.matchGroups().versionToken) {
+                        ctrl._groupsToken = ctrl.regexParser.matchGroups().versionToken;
+                        if (ctrl.regexParser.matchGroups().isComponentError)
+                            return;
+                        ctrl.$scope.groups = [];
+                        ctrl.$scope.matchIndex = -1;
+                        ctrl.setEvalFail(reason);
+                    }
+                }
+            );
         }
     }
 
@@ -1467,7 +895,8 @@ module regexTester {
      * @extends {IRegexControllerScope}
      */
     export interface IRegexReplaceControllerScope extends IRegexControllerScope {
-
+        replaceWithLines: JsLine[];
+        replacedLines: JsLine[];
     }
 
     /**
@@ -1477,17 +906,52 @@ module regexTester {
      * @implements {ng.IController}
      */
     export class RegexReplaceController extends RegexController<IRegexReplaceControllerScope> {
+        private _replacedLinesToken: symbol = Symbol();
+
         readonly [Symbol.toStringTag]: string = app.ControllerNames.regexMatch;
+
+        get replaceWith(): string { return this.regexParser.replaceWith(); }
+        set replaceWith(value: string) {
+            this.regexParser.replaceWith(value);
+            this.$scope.replaceWithLines = JsLine.toJsLines(this.regexParser.replaceWith());
+            this.onRegexChange();
+        }
 
         /**`
          * Creates an instance of RegexReplaceController.
          * @param {IRegexReplaceControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageLocationService} pageLocationService
+         * @param {ng.IQService} $q - Asynchronous processing service.
+         * @param {RegexParserService} regexParser - Regular expression parsing service.
+         * @param {app.PageLocationService} pageLocationService - Page location service.
          * @memberof RegexReplaceController
          */
-        constructor($scope: IRegexReplaceControllerScope, regexParser: RegexParserService,  pageLocationService: app.PageLocationService) {
-            super($scope, regexParser, pageLocationService, 'Replace');
+        constructor($scope: IRegexReplaceControllerScope, $q: ng.IQService, regexParser: RegexParserService,
+                pageLocationService: app.PageLocationService) {
+            super($scope, $q, regexParser, pageLocationService, 'Replace');
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
+        }
+
+        protected onRegexChange(): void {
+            const ctrl: RegexReplaceController = this;
+            this.regexParser.replacedText().getValueAsync(this.$q).then(
+                function(result: { value: string; token: symbol; }): void {
+                    if (ctrl._replacedLinesToken !== result.token) {
+                        ctrl._replacedLinesToken = result.token;
+                        ctrl.$scope.replacedLines = JsLine.toJsLines(result.value);
+                        ctrl.setEvalSuccess();
+                    }
+                },
+                function(reason: any): void {
+                    if (ctrl._replacedLinesToken !== ctrl.regexParser.replacedText().versionToken) {
+                        ctrl._replacedLinesToken = ctrl.regexParser.replacedText().versionToken;
+                        if (ctrl.regexParser.replacedText().isComponentError)
+                            return;
+                        ctrl.$scope.replacedLines = [];
+                        ctrl.$scope.replaceWithLines = [];
+                        ctrl.setEvalFail(reason);
+                    }
+                }
+            );
         }
     }
 
@@ -1498,7 +962,7 @@ module regexTester {
      * @extends {IRegexControllerScope}
      */
     export interface IRegexSplitControllerScope extends IRegexControllerScope {
-
+        splitText: SplitTextInfo[];
     }
 
     /**
@@ -1508,17 +972,52 @@ module regexTester {
      * @implements {ng.IController}
      */
     export class RegexSplitController extends RegexController<IRegexSplitControllerScope> {
+        private _splitTextToken: symbol = Symbol();
         readonly [Symbol.toStringTag]: string = app.ControllerNames.regexMatch;
+
+        get splitLimit(): number { return this.regexParser.splitLimit(); }
+        set splitLimit(value: number) {
+            this.regexParser.splitLimit(value);
+            this.onRegexChange();
+        }
 
         /**
          * Creates an instance of RegexSplitController.
          * @param {IRegexSplitControllerScope} $scope - The scope object for the current controller.
-         * @param {app.PageLocationService} pageLocationService
+         * @param {ng.IQService} $q - Asynchronous processing service.
+         * @param {RegexParserService} regexParser - Regular expression parsing service.
+         * @param {app.PageLocationService} pageLocationService - Page location service.
          * @memberof RegexSplitController
          */
-        constructor($scope: IRegexSplitControllerScope, regexParser: RegexParserService, pageLocationService: app.PageLocationService) {
-            super($scope, regexParser, pageLocationService, 'Split');
+        constructor($scope: IRegexSplitControllerScope, $q: ng.IQService, regexParser: RegexParserService,
+                pageLocationService: app.PageLocationService) {
+            super($scope, $q, regexParser, pageLocationService, 'Split');
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
+            this.onRegexChange();
+        }
+
+        protected onRegexChange(): void {
+            const ctrl: RegexSplitController = this;
+            this.regexParser.splitText().getValueAsync(this.$q).then(
+                function(result: { value: string[]; token: symbol; }): void {
+                    if (ctrl._splitTextToken !== result.token) {
+                        ctrl._splitTextToken = result.token;
+                        ctrl.$scope.splitText = result.value.map(function(s: string, index: number): SplitTextInfo {
+                            return new SplitTextInfo(index + 1, s);
+                        });
+                        ctrl.setEvalSuccess();
+                    }
+                },
+                function(reason: any): void {
+                    if (ctrl._splitTextToken !== ctrl.regexParser.splitText().versionToken) {
+                        ctrl._splitTextToken = ctrl.regexParser.splitText().versionToken;
+                        if (ctrl.regexParser.splitText().isComponentError)
+                            return;
+                        ctrl.$scope.splitText = [];
+                        ctrl.setEvalFail(reason);
+                    }
+                }
+            );
         }
     }
 

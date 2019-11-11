@@ -18,7 +18,7 @@ var app;
         mainNavigationProvider: 'mainNavigationProvider', regexParser: 'regexParser'
     };
     app.EventNames = {
-        setPageTitle: 'MyGitHubPages.setPageTitle', topNavChanged: 'MyGitHubPages.topNavChanged',
+        setPageTitle: 'MyGitHubPages.setPageTitle', topNavChanged: 'MyGitHubPages.topNavChanged'
     };
     app.HashPrefix = '!';
     app.NavPrefix = '#!';
@@ -139,7 +139,6 @@ var app;
             $locationProvider.hashPrefix(app.HashPrefix);
             PageLocationService.ConfigureRoutes($routeProvider);
         }])
-        .service(app.ServiceNames.supplantablePromiseChain, ['$q', '$interval', SupplantablePromiseChainService])
         .service(app.ServiceNames.pageLocation, PageLocationService)
         .controller(app.ControllerNames.mainContent, ['$scope', app.ServiceNames.pageLocation, MainContentController]);
 })(app || (app = {}));

@@ -82,434 +82,570 @@ var regexTester;
         get flags() { return this._flags; }
     }
     regexTester.RegexFlags = RegexFlags;
-    class RegexParserService {
-        constructor($rootScope, supplantablePromiseChainService) {
-            this.$rootScope = $rootScope;
-            this.supplantablePromiseChainService = supplantablePromiseChainService;
-            this._flags = new RegexFlags();
-            this._pattern = '(?:)';
-            this._isParsing = false;
-            this._hasFault = false;
-            this._taskId = Symbol();
-            this[Symbol.toStringTag] = app.ServiceNames.regexParser;
-            const initialResults = {
-                pattern: this._pattern, flags: this._flags, regex: new RegExp(this._pattern, this._flags.flags)
+    class JsLine {
+        constructor(_text, _lineNumber) {
+            this._text = _text;
+            this._lineNumber = _lineNumber;
+        }
+        get text() { return this._text; }
+        get lineNumber() { return this._lineNumber; }
+        static toJsLines(source) {
+            if (typeof source !== 'string')
+                return [new JsLine('null', 0)];
+            if (source.length == 0)
+                return [new JsLine('""', 1)];
+            const lines = [];
+            let lineNumber = 1;
+            for (let m = source.match(JsLine._re); typeof m === 'object' && m !== null; m = source.match(JsLine._re)) {
+                lines.push(new JsLine(JSON.stringify(m[0]), lineNumber++));
+                source = source.substr(m[0].length);
+            }
+            if (source.length > 0)
+                lines.push(new JsLine(JSON.stringify(source), lineNumber));
+            return lines;
+        }
+    }
+    JsLine._re = /^[^\r\n]*(\r\n?|\n)/;
+    regexTester.JsLine = JsLine;
+    class SplitTextInfo {
+        constructor(_groupNumber, text) {
+            this._groupNumber = _groupNumber;
+            this._text = JsLine.toJsLines(text);
+        }
+        get groupNumber() { return this._groupNumber; }
+        get text() { return this._text; }
+    }
+    regexTester.SplitTextInfo = SplitTextInfo;
+    class MatchGroup extends SplitTextInfo {
+        constructor(groupNumber, text) {
+            super(groupNumber, text);
+            this._isMatch = (typeof text === 'string');
+        }
+        get isMatch() { return this._isMatch; }
+    }
+    regexTester.MatchGroup = MatchGroup;
+    class ValueVersion {
+        constructor(_name, _value, equalityCb) {
+            this._name = _name;
+            this._value = _value;
+            this._versionToken = Symbol();
+            this._equalityCb = (typeof equalityCb === 'function') ? equalityCb : function (x, y) {
+                return x === y;
             };
-            this._regex = initialResults.regex;
+            if (typeof _value === 'undefined') {
+                this._isResolved = false;
+                this._reason = 'Value not defined';
+            }
+            else
+                this._isResolved = true;
+        }
+        get value() { return this._value; }
+        get isResolved() { return this._isResolved; }
+        get reason() { return this._reason; }
+        get versionToken() { return this._versionToken; }
+        get name() { return this._name; }
+        resolve(value) {
+            if (!this._isResolved) {
+                this._reason = undefined;
+                this._isResolved = true;
+            }
+            else if (this._equalityCb(this._value, value) === true)
+                return;
+            this._value = value;
+            this._versionToken = Symbol();
+        }
+        reject(reason) {
+            if (this._isResolved)
+                this._isResolved = false;
+            else if (this._reason === reason)
+                return;
+            this._isResolved = false;
+            this._reason = reason;
+            this._versionToken = Symbol();
+        }
+        getValueAsync($q) {
+            const current = this;
+            return $q(function (resolve, reject) {
+                if (current._isResolved)
+                    resolve({ value: current._value, token: current._versionToken });
+                else
+                    reject(current._reason);
+            });
+        }
+    }
+    regexTester.ValueVersion = ValueVersion;
+    class ValueProducer extends ValueVersion {
+        constructor(name, _resolver, _components, equalityCb, _thisArg) {
+            super(name, undefined, equalityCb);
+            this._resolver = _resolver;
+            this._components = _components;
+            this._thisArg = _thisArg;
+            this._isComponentError = false;
+        }
+        get isComponentError() { return this._isComponentError; }
+        static create(name, resolver, arg1, ...components) {
+            if (typeof arg1 === 'function')
+                return new ValueProducer(name, resolver, components, arg1);
+            if (typeof components !== 'object' || components === null || components.length == 0)
+                return new ValueProducer(name, resolver, [arg1]);
+            return new ValueProducer(name, resolver, [arg1].concat(components));
+        }
+        static createResolveWith(thisArg, name, resolver, arg1, ...components) {
+            if (typeof arg1 === 'function')
+                return new ValueProducer(name, resolver, components, arg1, thisArg);
+            if (typeof components !== 'object' || components === null || components.length == 0)
+                return new ValueProducer(name, resolver, [arg1], undefined, thisArg);
+            return new ValueProducer(name, resolver, [arg1].concat(components), undefined, thisArg);
+        }
+        getValueAsync($q) {
+            const current = this;
+            if (this._components.length < 2)
+                return this._components[0].getValueAsync($q).then(function (cr) {
+                    return $q(function (resolve, reject) {
+                        current._update(resolve, reject, [cr]);
+                    });
+                }, function (reason) {
+                    return $q(function (resolve, reject) {
+                        if (typeof reason === 'undefined')
+                            reject(current._onRejectedComponents());
+                        else
+                            reject(current._onRejectedComponents(reason));
+                    });
+                });
+            return $q.all(this._components.map(function (c) {
+                return c.getValueAsync($q);
+            })).then(function (cr) {
+                return $q(function (resolve, reject) {
+                    current._update(resolve, reject, cr);
+                });
+            }, function (reason) {
+                return $q(function (resolve, reject) {
+                    if (typeof reason === 'undefined')
+                        reject(current._onRejectedComponents());
+                    else
+                        reject(current._onRejectedComponents(reason));
+                });
+            });
+        }
+        _update(resolve, reject, cr) {
+            this._isComponentError = false;
+            const tokens = cr.map(function (v) { return v.token; });
+            let hasChange = typeof this._tokens === 'undefined';
+            if (!hasChange)
+                for (let i = 0; i < tokens.length; i++) {
+                    if (tokens[i] !== this._tokens[i]) {
+                        hasChange = true;
+                        break;
+                    }
+                }
+            if (hasChange) {
+                this._tokens = tokens;
+                const current = this;
+                this._resolver.apply(this._thisArg, [
+                    function (result) {
+                        current.resolve(result);
+                        resolve({ value: current.value, token: current.versionToken });
+                    },
+                    function (reason) {
+                        if (arguments.length == 0)
+                            current.reject();
+                        else
+                            current.reject(reason);
+                        if (typeof current.reason === 'undefined')
+                            reject();
+                        else
+                            reject(current.reason);
+                    }
+                ].concat(cr.map(function (v) { return v.value; })));
+            }
+            else if (this.isResolved)
+                resolve({ value: this.value, token: this.versionToken });
+            else if (typeof this.reason === 'undefined')
+                reject();
+            else
+                reject(this.reason);
+        }
+        _onRejectedComponents(reason) {
+            this._isComponentError = true;
+            let rejectedComponents = this._components.filter(function (c) {
+                return !c.isResolved;
+            });
+            if (rejectedComponents.length == 0)
+                rejectedComponents = this._components;
+            if (rejectedComponents.length == 1)
+                this.reject({
+                    message: rejectedComponents[0].name + ' has error',
+                    reason: reason
+                });
+            else
+                this.reject({
+                    message: 'The following components have errors: ' + rejectedComponents.map(function (c) {
+                        return c.name;
+                    }).join(', '),
+                    reason: reason
+                });
+            return this.reason;
+        }
+    }
+    regexTester.ValueProducer = ValueProducer;
+    class RegexParserService {
+        constructor($rootScope) {
+            this.$rootScope = $rootScope;
+            this._flags = new ValueVersion('Flags', new RegexFlags(), function (x, y) {
+                if (typeof x !== 'object')
+                    return typeof y !== 'object';
+                if (typeof y !== 'object')
+                    return false;
+                if (x === null)
+                    return y === null;
+                return y !== null && (x.flags === y.flags || (x.global === y.global && x.ignoreCase === y.ignoreCase &&
+                    x.multiline === y.multiline && x.unicode === y.unicode && x.sticky === y.sticky));
+            });
+            this._pattern = new ValueVersion('Pattern Text', '(?:)');
+            this._inputText = new ValueVersion('Input Text', '');
+            this._replaceWith = new ValueVersion('Replacement Text', '');
+            this._splitLimit = new ValueVersion('Split Limit', NaN);
+            this[Symbol.toStringTag] = app.ServiceNames.regexParser;
+            this._regex = ValueProducer.create('Regular Expression', function (resolve, reject, flags, s) {
+                let r;
+                let reason;
+                try {
+                    r = new RegExp(s, flags.flags);
+                }
+                catch (e) {
+                    reason = e;
+                }
+                if (typeof r === 'object' && r !== null)
+                    resolve(r);
+                else
+                    reject((typeof reason === 'undefined') ? 'Invalid pattern' : reason);
+            }, function (x, y) {
+                if (typeof x !== 'object' || x === null)
+                    return typeof y !== 'object' || y === null;
+                return typeof y === 'object' && y !== null && x.source === y.source && x.global === y.global &&
+                    x.ignoreCase === y.ignoreCase && x.multiline === y.multiline && x.unicode === y.unicode &&
+                    x.sticky === y.sticky;
+            }, this._flags, this._pattern);
+            this._matchGroups = ValueProducer.create('Match Groups', function (resolve, reject, expr, s) {
+                let r;
+                let reason;
+                try {
+                    r = s.match(expr);
+                }
+                catch (e) {
+                    reason = e;
+                }
+                if (typeof r === 'object' && r !== null)
+                    resolve(r);
+                else
+                    reject((typeof reason === 'undefined') ? 'Match failed' : reason);
+            }, function (x, y) {
+                if (typeof x !== 'object' || x === null)
+                    return typeof y !== 'object' || y === null;
+                if (typeof y !== 'object' || y === null || x.index != y.index || x.length != y.length)
+                    return false;
+                for (let i = 0; i < x.length; i++) {
+                    if (x[i] !== y[i])
+                        return false;
+                }
+                return true;
+            }, this._regex, this._inputText);
+            this._replacedText = ValueProducer.create('Replaced Text', function (resolve, reject, regex, s, r) {
+                let t;
+                let reason;
+                try {
+                    t = s.replace(regex, r);
+                }
+                catch (e) {
+                    reason = e;
+                }
+                if (typeof t !== 'string')
+                    reject((typeof reason === 'undefined') ? 'Match failed' : reason);
+                else if (t === s)
+                    reject('Nothing replaced');
+                else
+                    resolve(t);
+            }, this._regex, this._inputText, this._replaceWith);
+            this._splitText = ValueProducer.create('Split Text', function (resolve, reject, regex, s, l) {
+                let r;
+                let reason;
+                try {
+                    if (isNaN(l))
+                        r = s.split(regex);
+                    else
+                        r = s.split(regex, l);
+                }
+                catch (e) {
+                    reason = e;
+                }
+                if (typeof r !== 'object' || r === null)
+                    reject((typeof reason === 'undefined') ? 'Match failed' : reason);
+                else if (r.length == 1)
+                    reject('Nothing matched');
+                else
+                    resolve(r);
+            }, function (x, y) {
+                if (typeof x !== 'object' || x === null)
+                    return typeof y !== 'object' || y === null;
+                if (typeof y !== 'object' || y === null || x.length != y.length)
+                    return false;
+                for (let i = 0; i < x.length; i++) {
+                    if (x[i] !== y[i])
+                        return false;
+                }
+                return true;
+            }, this._regex, this._inputText, this._splitLimit);
         }
         flags(value) {
             switch (typeof value) {
                 case 'string':
-                    this.startPatternParse(this._pattern, new RegexFlags(value));
+                    this._flags.resolve(new RegexFlags(value));
                     break;
                 case 'object':
-                    this.startPatternParse(this._pattern, value);
+                    if (value != null)
+                        this._flags.resolve(value);
                     break;
             }
-            return this._flags;
+            return this._flags.value;
         }
         global(value) {
-            if (typeof value === 'boolean' && value !== this._flags.global)
-                this.flags(this._flags.setGlobal(value));
-            return this._flags.global;
+            if (typeof value === 'boolean' && value !== this._flags.value.global)
+                this.flags(this._flags.value.setGlobal(value));
+            return this._flags.value.global;
         }
         ignoreCase(value) {
-            if (typeof value === 'boolean' && value !== this._flags.ignoreCase)
-                this.flags(this._flags.setIgnoreCase(value));
-            return this._flags.ignoreCase;
+            if (typeof value === 'boolean' && value !== this._flags.value.ignoreCase)
+                this.flags(this._flags.value.setIgnoreCase(value));
+            return this._flags.value.ignoreCase;
         }
         multiline(value) {
-            if (typeof value === 'boolean' && value !== this._flags.multiline)
-                this.flags(this._flags.setMultiline(value));
-            return this._flags.multiline;
+            if (typeof value === 'boolean' && value !== this._flags.value.multiline)
+                this.flags(this._flags.value.setMultiline(value));
+            return this._flags.value.multiline;
         }
         sticky(value) {
-            if (typeof value === 'boolean' && value !== this._flags.sticky)
-                this.flags(this._flags.setSticky(value));
-            return this._flags.sticky;
+            if (typeof value === 'boolean' && value !== this._flags.value.sticky)
+                this.flags(this._flags.value.setSticky(value));
+            return this._flags.value.sticky;
         }
         unicode(value) {
-            if (typeof value === 'boolean' && value !== this._flags.unicode)
-                this.flags(this._flags.setUnicode(value));
-            return this._flags.unicode;
+            if (typeof value === 'boolean' && value !== this._flags.value.unicode)
+                this.flags(this._flags.value.setUnicode(value));
+            return this._flags.value.unicode;
         }
         pattern(value) {
-            if (typeof value === 'string')
-                this.startPatternParse(value, this._flags);
-            return this._pattern;
+            if (typeof value !== 'string')
+                this._pattern.resolve(value);
+            return this._pattern.value;
         }
-        isParsing() { return this._isParsing; }
-        hasFault() { return this._hasFault; }
-        faultReason() { return this._faultReason; }
-        startPatternParse(arg0, flags) {
-            const parseId = Symbol();
-            const previous = {
-                flags: this._flags,
-                pattern: this._pattern,
-                regex: this._regex
-            };
-            let pattern;
-            if (typeof arg0 === 'string') {
-                this._pattern = pattern = arg0;
-                this._flags = flags;
-                if (arg0 === previous.pattern) {
-                    if (flags.flags === previous.flags.flags)
-                        return;
-                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
-                        flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
-                        flags.sticky == previous.flags.sticky) {
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, this._parseId);
-                        }
-                        catch (_a) { }
-                        return;
-                    }
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    try {
-                        this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
-                    }
-                    catch (_b) { }
-                }
-                else {
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    if (flags.flags !== previous.flags.flags) {
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
-                        }
-                        catch (_c) { }
-                        if (this._parseId === parseId)
-                            try {
-                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId);
-                            }
-                            catch (_d) { }
-                    }
-                    else
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, arg0, parseId);
-                        }
-                        catch (_e) { }
-                }
-            }
-            else {
-                this._pattern = pattern = (this._regex = arg0).source;
-                this._flags = flags = new RegexFlags(arg0);
-                if (this._hasFault) {
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    if ((this._flags = flags).flags !== previous.flags.flags)
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
-                        }
-                        catch (_f) { }
-                    if (this._parseId === parseId && pattern !== previous.pattern)
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
-                        }
-                        catch (_g) { }
-                }
-                else if (pattern === previous.pattern) {
-                    if (flags.flags === previous.flags.flags || (flags.global == previous.flags.global &&
-                        flags.ignoreCase == previous.flags.ignoreCase && flags.multiline == previous.flags.multiline &&
-                        flags.unicode == previous.flags.unicode && flags.sticky == previous.flags.sticky))
-                        return;
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    try {
-                        this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
-                    }
-                    catch (_h) { }
-                }
-                else {
-                    this._parseId = parseId;
-                    this._isParsing = true;
-                    this._pattern = pattern;
-                    if (flags.global == previous.flags.global && flags.ignoreCase == previous.flags.ignoreCase &&
-                        flags.multiline == previous.flags.multiline && flags.unicode == previous.flags.unicode &&
-                        flags.sticky == previous.flags.sticky)
-                        this._flags = flags = previous.flags;
-                    else {
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexFlagsChanged, previous.flags, flags, parseId);
-                        }
-                        catch (_j) { }
-                        if (this._parseId === parseId)
-                            try {
-                                this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
-                            }
-                            catch (_k) { }
-                    }
-                    if (this._parseId === parseId)
-                        try {
-                            this.$rootScope.$broadcast(app.EventNames.regexPatternChanged, previous.pattern, pattern, parseId);
-                        }
-                        catch (_l) { }
-                }
-            }
-            const svc = this;
-            this.supplantablePromiseChainService.start(this._taskId, function (resolve, reject) {
-                try {
-                    svc.$rootScope.$broadcast(app.EventNames.startRegexPatternParse, pattern, flags, parseId);
-                }
-                catch (_a) { }
-                if (parseId !== svc._parseId)
-                    reject({
-                        pattern: pattern,
-                        flags: flags,
-                        operationCanceled: true,
-                        previous: previous,
-                        reason: 'Operation canceled'
-                    });
-                else if (typeof arg0 === 'string') {
-                    try {
-                        resolve({
-                            pattern: pattern,
-                            flags: flags,
-                            regex: new RegExp(pattern),
-                            previous: previous
-                        });
-                    }
-                    catch (e) {
-                        reject({
-                            pattern: pattern,
-                            flags: flags,
-                            previous: previous,
-                            reason: e
-                        });
-                    }
-                }
-                else
-                    resolve({
-                        pattern: pattern,
-                        flags: flags,
-                        regex: arg0,
-                        previous: previous
-                    });
-            }).then(function (result) {
-                if (parseId === svc._parseId) {
-                    svc._hasFault = svc._isParsing = false;
-                    svc._faultReason = undefined;
-                    svc._regex = result.regex;
-                    if (typeof arg0 === 'string' || result.regex.source !== previous.regex.source ||
-                        result.regex.global !== previous.regex.global || result.regex.ignoreCase !== previous.regex.ignoreCase ||
-                        result.regex.multiline !== previous.regex.multiline || result.regex.unicode !== previous.regex.unicode ||
-                        result.regex.sticky !== previous.regex.sticky)
-                        try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexObjectChanged, previous.regex, result.regex, parseId);
-                        }
-                        catch (_a) { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId);
-                    }
-                    catch (_b) { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId);
-                    }
-                    catch (_c) { }
-                }
-                else {
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.regexPatternParseSuccess, result, parseId);
-                    }
-                    catch (_d) { }
-                    try {
-                        svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, {
-                            pattern: pattern,
-                            flags: flags,
-                            operationCanceled: true,
-                            previous: previous,
-                            reason: 'Operation canceled'
-                        }, parseId);
-                    }
-                    catch (_e) { }
-                }
-            }, function (result) {
-                if (parseId === svc._parseId) {
-                    svc._isParsing = false;
-                    if (!svc.isParseCancel(result)) {
-                        svc._hasFault = true;
-                        svc._faultReason = result.reason;
-                        try {
-                            svc.$rootScope.$broadcast(app.EventNames.regexPatternParseError, result, parseId);
-                        }
-                        catch (_a) { }
-                    }
-                }
-                try {
-                    svc.$rootScope.$broadcast(app.EventNames.endRegexPatternParse, result, parseId);
-                }
-                catch (_b) { }
-            });
-            return this._regex;
+        inputText(value) {
+            if (typeof value !== 'string')
+                this._inputText.resolve(value);
+            return this._inputText.value;
         }
-        regex(value) {
-            if (typeof value === 'object' && value !== null && value instanceof RegExp)
-                this.startPatternParse(value);
-            return this._regex;
+        replaceWith(value) {
+            if (typeof value !== 'string')
+                this._replaceWith.resolve(value);
+            return this._replaceWith.value;
         }
-        isParseSuccess(result) {
-            return typeof result.regex === 'object';
+        splitLimit(value) {
+            if (typeof value !== 'number')
+                this._splitLimit.resolve(value);
+            return this._splitLimit.value;
         }
-        isParseCancel(result) {
-            return result.operationCanceled === true;
-        }
-        onRegexFlagsChanged($scope, callbackFn, thisObj) {
-            if (arguments.length < 3) {
-                $scope.$on(app.EventNames.regexFlagsChanged, callbackFn);
-            }
-            else {
-                $scope.$on(app.EventNames.regexFlagsChanged, (event, oldValue, newValue) => {
-                    callbackFn.call(thisObj, event, oldValue, newValue);
-                });
-            }
-        }
-        onRegexPatternChanged($scope, callbackFn, thisObj) {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternChanged, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexPatternChanged, (event, oldValue, newValue) => {
-                    callbackFn.call(thisObj, event, oldValue, newValue);
-                });
-        }
-        onStartRegexPatternParse($scope, callbackFn, thisObj) {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.startRegexPatternParse, callbackFn);
-            else
-                $scope.$on(app.EventNames.startRegexPatternParse, (event, pattern, flags) => {
-                    callbackFn.call(thisObj, event, pattern, flags);
-                });
-        }
-        onRegexObjectChanged($scope, callbackFn, thisObj) {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexObjectChanged, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexObjectChanged, (event, oldValue, newValue) => {
-                    callbackFn.call(thisObj, event, oldValue, newValue);
-                });
-        }
-        onRegexPatternParseError($scope, callbackFn, thisObj) {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternParseError, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexPatternParseError, (event, result) => {
-                    callbackFn.call(thisObj, event, result);
-                });
-        }
-        onRegexPatternParseSuccess($scope, callbackFn, thisObj) {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.regexPatternParseSuccess, callbackFn);
-            else
-                $scope.$on(app.EventNames.regexPatternParseSuccess, (event, result) => {
-                    callbackFn.call(thisObj, event, result);
-                });
-        }
-        onEndRegexPatternParse($scope, callbackFn, thisObj) {
-            if (arguments.length < 3)
-                $scope.$on(app.EventNames.endRegexPatternParse, callbackFn);
-            else
-                $scope.$on(app.EventNames.endRegexPatternParse, (event, result, isAborted) => {
-                    callbackFn.call(thisObj, event, result, isAborted);
-                });
-        }
+        matchGroups() { return this._matchGroups; }
+        replacedText() { return this._replacedText; }
+        splitText() { return this._splitText; }
+        regex() { return this._regex; }
     }
     regexTester.RegexParserService = RegexParserService;
-    function isParseOperationSuccess(value) {
-        return typeof value.regex !== 'undefined';
-    }
     class RegexController {
-        constructor($scope, regexParser, pageLocationService, subTitle) {
+        constructor($scope, $q, regexParser, pageLocationService, subTitle) {
             this.$scope = $scope;
+            this.$q = $q;
             this.regexParser = regexParser;
+            this.pageLocationService = pageLocationService;
+            this._regexToken = Symbol();
             pageLocationService.pageTitle('Regular Expression Evaluator', subTitle);
-            regexParser.onRegexFlagsChanged($scope, this.onRegexFlagsChanged, this);
-            regexParser.onStartRegexPatternParse($scope, this.onStartRegexPatternParse, this);
-            regexParser.onEndRegexPatternParse($scope, this.onEndRegexPatternParse, this);
-            $scope.isParsing = regexParser.isParsing();
-            $scope.flags = regexParser.flags().flags;
-            if (regexParser.hasFault())
-                this.setError(regexParser.faultReason());
-            else {
-                $scope.showParseError = false;
-                $scope.parseErrorMessage = '';
-            }
+            $scope.showParseError = false;
+            $scope.showEvaluationError = false;
+            $scope.parseErrorMessage = '';
+            $scope.evaluationErrorMessage = '';
+            $scope.inputLines = JsLine.toJsLines(regexParser.inputText());
+            this.onFlagsChange();
         }
         get global() { return this.regexParser.global(); }
-        set global(value) { this.regexParser.global(value); }
+        set global(value) {
+            this.regexParser.global(value);
+            this.onFlagsChange();
+        }
         get ignoreCase() { return this.regexParser.ignoreCase(); }
-        set ignoreCase(value) { this.regexParser.ignoreCase(value); }
+        set ignoreCase(value) {
+            this.regexParser.ignoreCase(value);
+            this.onFlagsChange();
+        }
         get multiline() { return this.regexParser.multiline(); }
-        set multiline(value) { this.regexParser.multiline(value); }
+        set multiline(value) {
+            this.regexParser.multiline(value);
+            this.onFlagsChange();
+        }
         get unicode() { return this.regexParser.unicode(); }
-        set unicode(value) { this.regexParser.unicode(value); }
+        set unicode(value) {
+            this.regexParser.unicode(value);
+            this.onFlagsChange();
+        }
         get sticky() { return this.regexParser.sticky(); }
-        set sticky(value) { this.regexParser.sticky(value); }
+        set sticky(value) {
+            this.regexParser.sticky(value);
+            this.onFlagsChange();
+        }
         get pattern() { return this.regexParser.pattern(); }
-        set pattern(value) { this.regexParser.pattern(value); }
-        setError(reason) {
-            switch (typeof reason) {
-                case 'undefined':
-                    break;
-                case 'object':
-                    if (reason !== null) {
-                        this.setError(JSON.stringify(reason));
-                        return;
-                    }
-                    break;
-                case 'string':
-                    if ((this.$scope.parseErrorMessage = reason.trim()).length > 0) {
-                        this.$scope.showParseError = true;
-                        return;
-                    }
-                    break;
-                default:
-                    this.setError(JSON.stringify(reason));
-                    return;
-            }
-            this.setError('Unknown parse failure.');
+        set pattern(value) {
+            this.regexParser.pattern(value);
+            this.raiseRegexChange();
         }
-        onRegexFlagsChanged(event, oldValue, newValue) {
+        get inputText() { return this.regexParser.inputText(); }
+        set inputText(value) {
+            this.regexParser.inputText(value);
+            this.$scope.inputLines = JsLine.toJsLines(this.regexParser.inputText());
+            this.onRegexChange();
+        }
+        raiseRegexChange() {
+            const ctrl = this;
+            this.regexParser.regex().getValueAsync(this.$q).then(function (result) {
+                if (ctrl._regexToken !== result.token) {
+                    ctrl._regexToken = result.token;
+                    ctrl.$scope.parseErrorMessage = '';
+                    ctrl.$scope.showParseError = false;
+                    ctrl.onRegexChange();
+                }
+            }, function (reason) {
+                if (ctrl._regexToken !== ctrl.regexParser.regex().versionToken) {
+                    ctrl._regexToken = ctrl.regexParser.regex().versionToken;
+                    ctrl.$scope.parseErrorMessage = (typeof reason === 'undefined') ? '' :
+                        ((typeof reason === 'string') ? reason : JSON.stringify(reason));
+                    if (ctrl.$scope.parseErrorMessage.trim().length == 0)
+                        ctrl.$scope.parseErrorMessage = 'Pattern parse error';
+                    ctrl.$scope.showParseError = true;
+                    ctrl.onRegexChange();
+                }
+            });
+        }
+        onFlagsChange() {
             this.$scope.flags = this.regexParser.flags().flags;
+            this.raiseRegexChange();
         }
-        onStartRegexPatternParse(event, pattern, flags) {
-            this.$scope.showParseError = false;
-            this.$scope.isParsing = this.regexParser.isParsing();
+        setEvalSuccess() {
+            this.$scope.showEvaluationError = false;
+            this.$scope.evaluationErrorMessage = '';
+            this.$scope.success = true;
         }
-        onEndRegexPatternParse(event, result) {
-            this.$scope.isParsing = this.regexParser.isParsing();
-            if (this.regexParser.hasFault()) {
-                this.$scope.showParseError = true;
-                this.setError(this.regexParser.faultReason());
-            }
-            else {
-                this.$scope.showParseError = false;
-                this.$scope.parseErrorMessage = '';
-            }
+        setEvalFail(reason) {
+            this.$scope.showEvaluationError = true;
+            this.$scope.evaluationErrorMessage = (typeof reason === 'undefined') ? '' :
+                ((typeof reason === 'string') ? reason :
+                    ((typeof reason === 'object' && reason instanceof Error) ? '' + reason : JSON.stringify(reason)));
+            this.$scope.success = false;
         }
         $doCheck() { }
     }
     regexTester.RegexController = RegexController;
     class RegexMatchController extends RegexController {
-        constructor($scope, regexParser, pageLocationService) {
-            super($scope, regexParser, pageLocationService, 'Match');
+        constructor($scope, $q, regexParser, pageLocationService) {
+            super($scope, $q, regexParser, pageLocationService, 'Match');
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexMatch);
+        }
+        onRegexChange() {
+            const ctrl = this;
+            this.regexParser.matchGroups().getValueAsync(this.$q).then(function (result) {
+                if (ctrl._groupsToken !== result.token) {
+                    ctrl._groupsToken = result.token;
+                    ctrl.$scope.groups = [];
+                    ctrl.$scope.matchIndex = result.value.index;
+                    for (let n = 0; n < result.value.length; n++)
+                        ctrl.$scope.groups.push(new MatchGroup(n, result.value[n]));
+                    ctrl.setEvalSuccess();
+                }
+            }, function (reason) {
+                if (ctrl._groupsToken !== ctrl.regexParser.matchGroups().versionToken) {
+                    ctrl._groupsToken = ctrl.regexParser.matchGroups().versionToken;
+                    if (ctrl.regexParser.matchGroups().isComponentError)
+                        return;
+                    ctrl.$scope.groups = [];
+                    ctrl.$scope.matchIndex = -1;
+                    ctrl.setEvalFail(reason);
+                }
+            });
         }
     }
     regexTester.RegexMatchController = RegexMatchController;
     class RegexReplaceController extends RegexController {
-        constructor($scope, regexParser, pageLocationService) {
-            super($scope, regexParser, pageLocationService, 'Replace');
+        constructor($scope, $q, regexParser, pageLocationService) {
+            super($scope, $q, regexParser, pageLocationService, 'Replace');
+            this._replacedLinesToken = Symbol();
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexReplace);
+        }
+        get replaceWith() { return this.regexParser.replaceWith(); }
+        set replaceWith(value) {
+            this.regexParser.replaceWith(value);
+            this.$scope.replaceWithLines = JsLine.toJsLines(this.regexParser.replaceWith());
+            this.onRegexChange();
+        }
+        onRegexChange() {
+            const ctrl = this;
+            this.regexParser.replacedText().getValueAsync(this.$q).then(function (result) {
+                if (ctrl._replacedLinesToken !== result.token) {
+                    ctrl._replacedLinesToken = result.token;
+                    ctrl.$scope.replacedLines = JsLine.toJsLines(result.value);
+                    ctrl.setEvalSuccess();
+                }
+            }, function (reason) {
+                if (ctrl._replacedLinesToken !== ctrl.regexParser.replacedText().versionToken) {
+                    ctrl._replacedLinesToken = ctrl.regexParser.replacedText().versionToken;
+                    if (ctrl.regexParser.replacedText().isComponentError)
+                        return;
+                    ctrl.$scope.replacedLines = [];
+                    ctrl.$scope.replaceWithLines = [];
+                    ctrl.setEvalFail(reason);
+                }
+            });
         }
     }
     regexTester.RegexReplaceController = RegexReplaceController;
     class RegexSplitController extends RegexController {
-        constructor($scope, regexParser, pageLocationService) {
-            super($scope, regexParser, pageLocationService, 'Split');
+        constructor($scope, $q, regexParser, pageLocationService) {
+            super($scope, $q, regexParser, pageLocationService, 'Split');
+            this._splitTextToken = Symbol();
             this[Symbol.toStringTag] = app.ControllerNames.regexMatch;
             pageLocationService.regexHref(app.NavPrefix + app.ModulePaths.regexSplit);
+            this.onRegexChange();
+        }
+        get splitLimit() { return this.regexParser.splitLimit(); }
+        set splitLimit(value) {
+            this.regexParser.splitLimit(value);
+            this.onRegexChange();
+        }
+        onRegexChange() {
+            const ctrl = this;
+            this.regexParser.splitText().getValueAsync(this.$q).then(function (result) {
+                if (ctrl._splitTextToken !== result.token) {
+                    ctrl._splitTextToken = result.token;
+                    ctrl.$scope.splitText = result.value.map(function (s, index) {
+                        return new SplitTextInfo(index + 1, s);
+                    });
+                    ctrl.setEvalSuccess();
+                }
+            }, function (reason) {
+                if (ctrl._splitTextToken !== ctrl.regexParser.splitText().versionToken) {
+                    ctrl._splitTextToken = ctrl.regexParser.splitText().versionToken;
+                    if (ctrl.regexParser.splitText().isComponentError)
+                        return;
+                    ctrl.$scope.splitText = [];
+                    ctrl.setEvalFail(reason);
+                }
+            });
         }
     }
     regexTester.RegexSplitController = RegexSplitController;
